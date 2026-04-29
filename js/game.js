@@ -46,7 +46,7 @@ const STATES = {
 let gameState = STATES.MENU;
 
 let platforms = [];
-let character = { x: 0, y: 0, size: 55, rotation: 0 };
+let character = { x: 0, y: 0, size: 55, rotation: 0, squash: 1.0 };
 let bridge = { x: 0, y: 0, length: 0, angle: 0, thickness: 8, fallTime: 0 };
 let perfectStreak = 0;
 let sessionBestCombo = 0;
@@ -623,8 +623,9 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     armAngle2 = -legAngle2 * 0.8;
   }
 
-  // Translate up so feet touch 0
+  // Translate up so feet touch 0, apply squash
   targetCtx.translate(0, -s + bounceY);
+  targetCtx.scale(1.0 + (1.0 - character.squash)*0.5, character.squash);
   const id = skinData.id;
   const colors = skinData.colors;
 
@@ -976,6 +977,7 @@ function checkLanding() {
       playSound('levelup');
     }
     updateLevelUI();
+    character.squash = 0.6; // squash effect on land
   } else { 
     success = false; 
     perfectStreak = 0; // Reset streak on failure
@@ -1126,6 +1128,9 @@ function update(dt) {
   
   // Only process physics/movement if not in menus
   if ([STATES.MENU, STATES.SHOP, STATES.DAILY, STATES.LEADERBOARD, STATES.ACHIEVEMENTS, STATES.GAME_OVER, STATES.GAME_WON].includes(gameState)) return;
+
+  // Restore squash
+  character.squash += (1.0 - character.squash) * 15 * (dt/1000);
 
   if (gameState === STATES.BRIDGE_GROWING) {
     // Add slight acceleration to growth

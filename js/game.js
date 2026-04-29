@@ -15,20 +15,7 @@ const levelNameEl = document.getElementById('ui-level-name');
 const levelFillEl = document.getElementById('ui-level-fill');
 const btnRevive = document.getElementById('btn-revive');
 
-// --- ASSETS SYSTEM (PREMIUM) ---
-const ASSETS_PATHS = {
-  jungle_far: 'assets/jungle_far_1777502232362.png',
-  desert_far: 'assets/desert_far_1777502254948.png',
-  night_city_far: 'assets/night_city_far_1777502279274.png',
-  mountain_far: 'assets/mountain_far_1777502425600.png',
-  synthwave_far: 'assets/synthwave_far_1777502530639.png'
-};
-let loadedAssets = {};
-for (let k in ASSETS_PATHS) {
-  const img = new Image();
-  img.src = ASSETS_PATHS[k];
-  loadedAssets[k] = img;
-}
+
 
 
 // Update UI top bar color
@@ -645,14 +632,17 @@ function openShopPreview(id) {
   document.getElementById('modal-shop').classList.remove('hidden');
 }
 
-// Side-Profile AAA+ Vector Character Rendering (Stylized & Structural)
+// Side-Profile AAA+ Path2D Vector Character Rendering
 function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time) {
   const skinData = SHOP_DB.find(x => x.id === skinId) || SHOP_DB[0];
   targetCtx.save();
 
+  // Base transforms
   let bounceY = 0;
-  let legAngle1 = 0, legAngle2 = 0;
-  let armAngle1 = 0, armAngle2 = 0;
+  let legAngle1 = 0;
+  let legAngle2 = 0;
+  let armAngle1 = 0;
+  let armAngle2 = 0;
 
   if (state === 'IDLE') {
     bounceY = Math.sin(time * 3) * (s * 0.05);
@@ -666,70 +656,125 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     armAngle2 = -legAngle2 * 0.8;
   }
 
+  // Translate up so feet touch 0, apply squash
   targetCtx.translate(0, -s + bounceY);
   targetCtx.scale(1.0 + (1.0 - character.squash)*0.5, character.squash);
-  
+  const id = skinData.id;
   const colors = skinData.colors;
-  const bodyColor = colors.body || '#222';
 
-  // HELPER: Thick Limb
-  function drawThickLimb(x, y, w, h, angle, color, isBack) {
-    targetCtx.save();
-    targetCtx.translate(x, y);
-    targetCtx.rotate(angle);
-    if(isBack) targetCtx.globalAlpha = 0.6;
-    targetCtx.fillStyle = color;
-    targetCtx.beginPath();
-    targetCtx.roundRect(-w/2, 0, w, h, w/2);
-    targetCtx.fill();
-    targetCtx.restore();
-  }
+  // Back Arm & Leg
+  drawLimbPath(targetCtx, -s*0.1, s*0.6, s*0.15, s*0.4, legAngle2, colors.body || '#222', true);
+  drawLimbPath(targetCtx, 0, s*0.3, s*0.12, s*0.35, armAngle2, colors.body || '#222', true, null);
 
-  // Back Limbs
-  drawThickLimb(-s*0.05, s*0.6, s*0.18, s*0.4, legAngle2, bodyColor, true);
-  drawThickLimb(0, s*0.35, s*0.15, s*0.35, armAngle2, bodyColor, true);
-
-  // Torso (The "Beef")
-  targetCtx.fillStyle = bodyColor;
-  if (skinData.id === 'gold') {
-    let g = targetCtx.createLinearGradient(0, s*0.2, 0, s*0.7);
-    g.addColorStop(0, '#fef08a'); g.addColorStop(1, '#eab308');
+  // Body Path Details
+  if (id === 'gold') {
+    let g = targetCtx.createLinearGradient(0, s*0.2, 0, s*0.7); 
+    g.addColorStop(0, '#fef08a'); g.addColorStop(0.3, '#eab308'); 
+    g.addColorStop(0.7, '#a16207'); g.addColorStop(1, '#422006');
     targetCtx.fillStyle = g;
-  }
-  if (skinData.id === 'galaxy') {
-    let g = targetCtx.createLinearGradient(0, s*0.2, 0, s*0.7);
-    g.addColorStop(0, '#b517ff'); g.addColorStop(1, '#00e5ff');
+    targetCtx.shadowColor = '#eab308'; targetCtx.shadowBlur = 15;
+  } else if (id === 'galaxy') {
+    let g = targetCtx.createRadialGradient(0,s*0.4,0, 0,s*0.4,s*0.5); 
+    g.addColorStop(0, '#b517ff'); g.addColorStop(0.5, '#6b21a8'); g.addColorStop(1, '#00e5ff');
     targetCtx.fillStyle = g;
+    targetCtx.shadowColor = '#00e5ff'; targetCtx.shadowBlur = 15;
+  } else if (id === 'hoodie') {
+    targetCtx.fillStyle = '#e11d48';
+  } else if (id === 'cyber') {
+    targetCtx.fillStyle = '#0891b2';
+  } else {
+    targetCtx.fillStyle = colors.body || '#111';
   }
+  
   targetCtx.beginPath();
-  targetCtx.roundRect(-s*0.2, s*0.25, s*0.4, s*0.45, s*0.1);
-  targetCtx.fill();
-
-  // Head
-  targetCtx.save();
-  targetCtx.translate(0, s*0.1);
-  targetCtx.fillStyle = bodyColor;
-  if(skinData.id==='galaxy') targetCtx.fillStyle = '#000';
-  targetCtx.beginPath();
-  targetCtx.arc(0, 0, s*0.18, 0, Math.PI*2);
+  targetCtx.moveTo(-s*0.2, s*0.3);
+  targetCtx.quadraticCurveTo(-s*0.25, s*0.5, -s*0.15, s*0.7);
+  targetCtx.lineTo(s*0.15, s*0.7);
+  targetCtx.quadraticCurveTo(s*0.25, s*0.5, s*0.2, s*0.3);
   targetCtx.fill();
   
-  // Face / Details
-  if (skinData.id === 'ninja') {
-    targetCtx.fillStyle = colors.face;
-    targetCtx.beginPath(); targetCtx.arc(s*0.05, 0, s*0.1, -1, 1); targetCtx.fill();
-    targetCtx.fillStyle = colors.band;
-    targetCtx.fillRect(-s*0.18, -s*0.05, s*0.36, s*0.05);
-  } else if (skinData.id === 'cyber') {
-    targetCtx.fillStyle = colors.glow;
-    targetCtx.shadowBlur = 10; targetCtx.shadowColor = colors.glow;
-    targetCtx.fillRect(s*0.05, -s*0.05, s*0.15, s*0.05);
+  // Subtle body details
+  if (id === 'classic' || id === 'ninja') {
+    let highlight = targetCtx.createLinearGradient(-s*0.2, s*0.3, s*0.2, s*0.7);
+    highlight.addColorStop(0, 'rgba(255,255,255,0.15)'); highlight.addColorStop(1, 'transparent');
+    targetCtx.fillStyle = highlight;
+    targetCtx.fill();
   }
+
+  targetCtx.shadowBlur = 0;
+
+  if (id === 'galaxy') {
+    targetCtx.fillStyle = '#fff';
+    for(let i=0; i<8; i++) {
+      targetCtx.beginPath(); 
+      targetCtx.arc((Math.random()-0.5)*s*0.3, s*0.3 + Math.random()*s*0.4, Math.random()*s*0.03, 0, Math.PI*2); 
+      targetCtx.fill();
+    }
+    targetCtx.strokeStyle = 'rgba(255,255,255,0.4)'; targetCtx.lineWidth=1;
+    targetCtx.beginPath(); targetCtx.arc(0, s*0.5, s*0.15, 0, Math.PI*2); targetCtx.stroke();
+  }
+
+  if (id === 'cyber') {
+    targetCtx.shadowColor = colors.glow; targetCtx.shadowBlur = 10;
+    targetCtx.strokeStyle = colors.glow; targetCtx.lineWidth = 2;
+    targetCtx.beginPath(); targetCtx.moveTo(-s*0.1, s*0.4); targetCtx.lineTo(0, s*0.5); targetCtx.lineTo(-s*0.05, s*0.6); targetCtx.stroke();
+    targetCtx.shadowBlur = 0;
+  }
+  
+  if (id === 'hoodie') {
+    targetCtx.strokeStyle = '#9f1239'; targetCtx.lineWidth = 3;
+    targetCtx.beginPath(); targetCtx.moveTo(0, s*0.3); targetCtx.lineTo(0, s*0.6); targetCtx.stroke();
+  }
+
+  // Head Path
+  targetCtx.save();
+  if (id === 'hoodie') {
+    targetCtx.fillStyle = colors.head;
+    targetCtx.beginPath(); targetCtx.arc(0, s*0.2, s*0.35, Math.PI, 0); targetCtx.fill();
+    targetCtx.fillRect(-s*0.35, s*0.2, s*0.7, s*0.2);
+    targetCtx.fillStyle = colors.faceShadow;
+    targetCtx.beginPath(); targetCtx.arc(s*0.1, s*0.3, s*0.2, 0, Math.PI*2); targetCtx.fill();
+  } else {
+    targetCtx.fillStyle = colors.head || '#111';
+    if(id==='galaxy') targetCtx.fillStyle = '#000';
+    targetCtx.beginPath(); targetCtx.arc(0, s*0.2, s*0.3, 0, Math.PI*2); targetCtx.fill();
+  }
+
+  // Eyes
+  if (id === 'gold' || id === 'galaxy' || id === 'classic') {
+    targetCtx.fillStyle = (id === 'gold') ? '#111' : '#fff';
+    targetCtx.beginPath(); targetCtx.arc(s*0.15, s*0.15, s*0.05, 0, Math.PI*2); targetCtx.fill();
+  } else if (id === 'ninja') {
+    targetCtx.fillStyle = colors.face;
+    targetCtx.beginPath(); targetCtx.ellipse(s*0.1, s*0.2, s*0.15, s*0.1, 0, 0, Math.PI*2); targetCtx.fill();
+    targetCtx.fillStyle = colors.band;
+    targetCtx.fillRect(-s*0.3, 0, s*0.65, s*0.12);
+  }
+
+  // Draw Equipment
+  if (hatId === 'cap' && loadedIcons['hat_cap']) targetCtx.drawImage(loadedIcons['hat_cap'], -s*0.4, -s*0.3, s*0.8, s*0.5);
+  if (faceId === 'glasses' && loadedIcons['face_glasses']) targetCtx.drawImage(loadedIcons['face_glasses'], -s*0.15, s*0.1, s*0.6, s*0.25);
+
   targetCtx.restore();
 
-  // Front Limbs
-  drawThickLimb(s*0.05, s*0.6, s*0.18, s*0.4, legAngle1, bodyColor, false);
-  drawThickLimb(0, s*0.35, s*0.15, s*0.35, armAngle1, bodyColor, false);
+  // Front Arm & Leg
+  drawLimbPath(targetCtx, s*0.1, s*0.6, s*0.15, s*0.4, legAngle1, colors.body || '#111', false);
+  drawLimbPath(targetCtx, 0, s*0.3, s*0.12, s*0.35, armAngle1, colors.body || '#111', false, wpnId);
+
+  targetCtx.restore();
+}
+
+function drawLimbPath(targetCtx, x, y, w, h, angle, color, isBack, wpnId) {
+  targetCtx.save();
+  targetCtx.translate(x, y); targetCtx.rotate(angle);
+  targetCtx.fillStyle = isBack ? '#000' : color;
+  targetCtx.beginPath(); targetCtx.roundRect(-w/2, 0, w, h, w/2); 
+  targetCtx.fill();
+  
+  if (!isBack && wpnId && loadedIcons['wpn_sword']) {
+    targetCtx.translate(0, h);
+    targetCtx.drawImage(loadedIcons['wpn_sword'], -w, -h*1.2, w*3, h*1.8);
+  }
 
   targetCtx.restore();
 }
@@ -746,16 +791,16 @@ function setupInitialState() {
 
 // 10 Biome System with Names
 const BIOMES = [
-  { name: 'JUNGLE MIST', far: 'jungle_far', platDirt: '#064e3b', platTop: '#4ade80' }, 
-  { name: 'BARREN DESERT', far: 'desert_far', platDirt: '#713f12', platTop: '#eab308' }, 
-  { name: 'NEON NIGHTS', far: 'night_city_far', platDirt: '#020617', platTop: '#00e5ff' }, 
-  { name: 'SNOWY PEAKS', far: 'mountain_far', platDirt: '#1e293b', platTop: '#94a3b8' }, 
-  { name: 'SYNTH HORIZON', far: 'synthwave_far', platDirt: '#01030b', platTop: '#ff2a7a' }, 
-  { name: 'DEEP FOREST', far: 'jungle_far', platDirt: '#210c01', platTop: '#15803d' }, 
-  { name: 'SAND DUNES', far: 'desert_far', platDirt: '#713f12', platTop: '#facc15' }, 
-  { name: 'CYBERPUNK', far: 'night_city_far', platDirt: '#170832', platTop: '#00e5ff' },  
-  { name: 'LAVA WORLD', far: 'mountain_far', platDirt: '#2a0a0a', platTop: '#ef4444' }, 
-  { name: 'BASE HQ', far: 'night_city_far', platDirt: '#000833', platTop: '#00d2ff' }  
+  { name: 'GREEN HILLS', skyTop: '#38bdf8', skyBot: '#fde047', mtn1: '#15803d', mtn2: '#166534', platDirt: '#451a03', platTop: '#4ade80' }, 
+  { name: 'SUNSET MOUNTAIN', skyTop: '#f97316', skyBot: '#ec4899', mtn1: '#9d174d', mtn2: '#831843', platDirt: '#4a044e', platTop: '#fcd34d' }, 
+  { name: 'NEON CITY', skyTop: '#0f172a', skyBot: '#1e1b4b', mtn1: '#312e81', mtn2: '#1e1b4b', platDirt: '#020617', platTop: '#00e5ff' }, 
+  { name: 'SPACE STATION', skyTop: '#000000', skyBot: '#0f172a', mtn1: '#1e293b', mtn2: '#0f172a', platDirt: '#334155', platTop: '#94a3b8' }, 
+  { name: 'CYBER GRID', skyTop: '#064e3b', skyBot: '#021a14', mtn1: '#065f46', mtn2: '#047857', platDirt: '#01030b', platTop: '#10b981' }, 
+  { name: 'DEEP FOREST', skyTop: '#0284c7', skyBot: '#047857', mtn1: '#065f46', mtn2: '#064e3b', platDirt: '#210c01', platTop: '#15803d' }, 
+  { name: 'BARREN DESERT', skyTop: '#fef08a', skyBot: '#facc15', mtn1: '#ca8a04', mtn2: '#a16207', platDirt: '#713f12', platTop: '#eab308' }, 
+  { name: 'FLOATING RUINS', skyTop: '#c084fc', skyBot: '#7e22ce', mtn1: '#6b21a8', mtn2: '#581c87', platDirt: '#170832', platTop: '#d8b4fe' },  
+  { name: 'LAVA WORLD', skyTop: '#450a0a', skyBot: '#7f1d1d', mtn1: '#991b1b', mtn2: '#7f1d1d', platDirt: '#2a0a0a', platTop: '#ef4444' }, 
+  { name: 'BASE HQ', skyTop: '#0052ff', skyBot: '#0033cc', mtn1: '#002299', mtn2: '#001166', platDirt: '#000833', platTop: '#00d2ff' }  
 ];
 
 function updateLevelUI() {
@@ -1116,37 +1161,7 @@ function update(dt) {
   if (scaleAmount > 1.0) { scaleAmount -= dt / 1000; if (scaleAmount < 1.0) scaleAmount = 1.0; }
 }
 
-// --- BACKGROUND SYSTEM (REBUILT FOR PREMIUM QUALITY) ---
 function drawBackground() {
-  const bIdx = Math.min(level - 1, BIOMES.length - 1);
-  const b = BIOMES[bIdx];
-  
-  // Layer 1: The Cinematic Backdrop
-  const farAsset = loadedAssets[b.far];
-  if (farAsset && farAsset.complete && farAsset.naturalWidth !== 0) {
-    // Parallax scrolling the image
-    let scrollX = (cameraX * 0.1) % W;
-    ctx.drawImage(farAsset, -scrollX, 0, W, H);
-    ctx.drawImage(farAsset, W - scrollX, 0, W, H);
-  } else {
-    // Fallback if image not loaded: use the biome sky gradient
-    let skyG = ctx.createLinearGradient(0, 0, 0, H);
-    skyG.addColorStop(0, b.skyTop || '#1e293b');
-    skyG.addColorStop(1, b.skyBot || '#0f172a');
-    ctx.fillStyle = skyG; ctx.fillRect(0, 0, W, H);
-  }
-
-  // Layer 2: Atmosphere / Fog / Shading
-  let fog = ctx.createLinearGradient(0, 0, 0, H);
-  fog.addColorStop(0, 'rgba(0,0,0,0)');
-  fog.addColorStop(0.7, 'rgba(0,0,0,0.1)');
-  fog.addColorStop(1, 'rgba(0,0,0,0.4)');
-  ctx.fillStyle = fog;
-  ctx.fillRect(0, 0, W, H);
-}
-
-// Old procedural functions kept for reference if needed, but not used now
-function _old_drawBackground() {
   const bIdx = Math.min(level - 1, BIOMES.length - 1);
   const b = BIOMES[bIdx];
   let groundY = H - platformHeight;
@@ -1310,16 +1325,8 @@ function _old_drawBackground() {
     });
   }
   else if (bIdx === 9) { // BASE HQ
-    drawLayer(0.15, 250, (r) => { ctx.fillStyle = b.mtn1; ctx.fillRect(-80, -H*0.8, 160, H*0.8); ctx.fillStyle = '#000'; ctx.fillRect(-70, -H*0.7, 140, H*0.6); });
-    drawLayer(0.30, 180, (r,r2) => { 
-      ctx.fillStyle = b.mtn2; 
-      ctx.beginPath(); ctx.moveTo(0,-H*0.4); ctx.lineTo(40,-H*0.3); ctx.lineTo(40,-H*0.1); ctx.lineTo(0,0); ctx.lineTo(-40,-H*0.1); ctx.lineTo(-40,-H*0.3); ctx.fill();
-    });
-    drawLayer(0.45, 200, (r, r2) => {
-      ctx.fillStyle = '#000833'; ctx.fillRect(-30, -60-r*20, 60, 60+r*20);
-      ctx.fillStyle = '#0284c7'; ctx.fillRect(-20, -50-r*20, 40, 30);
-      ctx.fillStyle = '#ffffff'; ctx.font = "bold 12px 'Fredoka One'"; ctx.fillText("BASE", -18, -30-r*20);
-    });
+    drawLayer(0.15, 400, (r) => { ctx.fillStyle = b.mtn1; ctx.fillRect(-40, -H, 80, H); ctx.fillStyle = '#0052ff'; ctx.fillRect(-20, -H, 40, H); });
+    drawLayer(0.30, 300, (r, r2) => { ctx.fillStyle = b.mtn2; ctx.beginPath(); ctx.moveTo(-50,0); ctx.lineTo(0,-H); ctx.lineTo(50,0); ctx.fill(); });
   }
 }
 

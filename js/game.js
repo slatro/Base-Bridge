@@ -1495,24 +1495,3 @@ setTimeout(() => {
   resize(); setupInitialState();
   requestAnimationFrame(time => { lastTime = time; loop(time); });
 }, 100);
-
-    { state: 'WALK', time: 0.1 },
-    { state: 'WALK', time: 0.25 },
-    { state: 'WALK', time: 0.4 },
-    { state: 'WALK', time: 0.55 },
-    { state: 'JUMP', time: 0 }
-  ];
-  
-  frames.forEach((f, i) => {
-    tctx.save();
-    tctx.translate(i * frameW + frameW/2, frameH * 0.9);
-    renderSkeleton(tctx, skinId, null, null, null, 150, f.state, f.time);
-    tctx.restore();
-  });
-  
-  const link = document.createElement('a');
-  link.download = skinId + '_spritesheet.png';
-  link.href = canvas.toDataURL();
-  link.click();
-  console.log('Sprite sheet generated and downloaded!');
-}

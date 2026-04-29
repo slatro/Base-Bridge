@@ -28,6 +28,7 @@ window.submitScoreToFirebase = async function(score) {
         
         // 2. Add new score
         currentBoard.push({
+            uuid: localStorage.getItem('bb_v1_uuid') || "unknown",
             addr: username, // show username on the board
             score: score,
             timestamp: new Date().getTime()

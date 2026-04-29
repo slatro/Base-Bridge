@@ -32,8 +32,32 @@ const AVATAR_COLORS = [
   '#111111', '#e11d48', '#0891b2', '#f59e0b', '#8b5cf6', '#10b981', '#ec4899', '#3b82f6', '#f43f5e', '#84cc16',
   '#14b8a6', '#6366f1', '#a855f7', '#d946ef', '#f97316', '#64748b', '#000000', '#ffffff', '#7dd3fc', '#fef08a'
 ];
-let selectedAvatar = localStorage.getItem('bb_v1_avatar') || '#111111';
-let currentUsername = localStorage.getItem('bb_v1_username') || 'Player';
+if (!localStorage.getItem('bb_v1_uuid')) {
+    localStorage.setItem('bb_v1_uuid', 'u-' + Math.random().toString(36).substr(2, 9));
+}
+
+let currentUsername = localStorage.getItem('bb_v1_username');
+if (!currentUsername) {
+    currentUsername = "Player";
+    (async () => {
+        try {
+            const countUrl = 'https://kvdb.io/3Bz5so9xQFGY6vAGb68Mfx/player_count';
+            let res = await fetch(`${countUrl}?t=${new Date().getTime()}`, { cache: 'no-store' });
+            let count = 0;
+            if (res.ok) count = parseInt(await res.text()) || 0;
+            count++;
+            await fetch(countUrl, { method: 'POST', body: count.toString() });
+            
+            if (!localStorage.getItem('bb_v1_username')) {
+                currentUsername = "Player " + count;
+                localStorage.setItem('bb_v1_username', currentUsername);
+                if (typeof updateProfileUI === 'function') updateProfileUI();
+            }
+        } catch (e) { console.error("Could not fetch player count", e); }
+    })();
+}
+
+let selectedAvatar = localStorage.getItem('bb_v1_avatar') || '#00e5ff';
 
 function getAvatarSVG(color) {
   return `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="40" fill="%23${color.replace('#','')}"/><circle cx="35" cy="45" r="5" fill="%23fff"/><circle cx="65" cy="45" r="5" fill="%23fff"/></svg>`;
@@ -127,11 +151,34 @@ async function initWeb3() {
     document.getElementById('modal-backdrop').classList.remove('hidden');
     document.getElementById('modal-profile').classList.remove('hidden');
   });
-  if(btnSaveProfile) btnSaveProfile.addEventListener("click", () => {
+  if(btnSaveProfile) btnSaveProfile.addEventListener("click", async () => {
     let name = inputUsername.value.trim();
-    if(name.length > 0) {
+    if(name.length > 0 && name !== currentUsername) {
       currentUsername = name;
       localStorage.setItem('bb_v1_username', currentUsername);
+      
+      // Update leaderboard retroactively
+      if (typeof window.fetchFirebaseLeaderboard === 'function') {
+          try {
+              let board = await window.fetchFirebaseLeaderboard();
+              let myUUID = localStorage.getItem('bb_v1_uuid');
+              let modified = false;
+              board.forEach(entry => {
+                  if (entry.uuid === myUUID && entry.addr !== currentUsername) {
+                      entry.addr = currentUsername;
+                      modified = true;
+                  }
+              });
+              if (modified) {
+                  const KVDB_BUCKET = "3Bz5so9xQFGY6vAGb68Mfx";
+                  await fetch(`https://kvdb.io/${KVDB_BUCKET}/leaderboard`, {
+                      method: 'POST',
+                      body: JSON.stringify(board)
+                  });
+                  if (typeof updateLeaderboardUI === 'function') updateLeaderboardUI();
+              }
+          } catch(e) { console.error("Could not update leaderboard name", e); }
+      }
     }
     localStorage.setItem('bb_v1_avatar', selectedAvatar);
     updateProfileUI();

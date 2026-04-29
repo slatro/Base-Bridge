@@ -789,42 +789,29 @@ function setupInitialState() {
   updateLevelUI();
 }
 
-// --- BACKGROUND ASSETS SYSTEM ---
-const BIOME_LAYERS = [
-  { id: 'jungle', name: 'JUNGLE MIST', skyTop: '#38bdf8', skyBot: '#fde047', platTop: '#4ade80', mtn2: '#166534', platDirt: '#451a03' },
-  { id: 'desert', name: 'BARREN DESERT', skyTop: '#fef08a', skyBot: '#facc15', platTop: '#eab308', mtn2: '#a16207', platDirt: '#713f12' },
-  { id: 'neon',   name: 'NEON NIGHTS', skyTop: '#0f172a', skyBot: '#1e1b4b', platTop: '#00e5ff', mtn2: '#1e1b4b', platDirt: '#020617' },
-  { id: 'space',  name: 'SNOWY PEAKS', skyTop: '#000000', skyBot: '#0f172a', platTop: '#94a3b8', mtn2: '#0f172a', platDirt: '#334155' },
-  { id: 'cyber',  name: 'SYNTH HORIZON', skyTop: '#064e3b', skyBot: '#021a14', platTop: '#ff2a7a', mtn2: '#047857', platDirt: '#01030b' }
+// 10 Biome System with Names
+const BIOMES = [
+  { name: 'GREEN HILLS', skyTop: '#38bdf8', skyBot: '#fde047', mtn1: '#15803d', mtn2: '#166534', platDirt: '#451a03', platTop: '#4ade80' }, 
+  { name: 'SUNSET MOUNTAIN', skyTop: '#f97316', skyBot: '#ec4899', mtn1: '#9d174d', mtn2: '#831843', platDirt: '#4a044e', platTop: '#fcd34d' }, 
+  { name: 'NEON CITY', skyTop: '#0f172a', skyBot: '#1e1b4b', mtn1: '#312e81', mtn2: '#1e1b4b', platDirt: '#020617', platTop: '#00e5ff' }, 
+  { name: 'SPACE STATION', skyTop: '#000000', skyBot: '#0f172a', mtn1: '#1e293b', mtn2: '#0f172a', platDirt: '#334155', platTop: '#94a3b8' }, 
+  { name: 'CYBER GRID', skyTop: '#064e3b', skyBot: '#021a14', mtn1: '#065f46', mtn2: '#047857', platDirt: '#01030b', platTop: '#10b981' }, 
+  { name: 'DEEP FOREST', skyTop: '#0284c7', skyBot: '#047857', mtn1: '#065f46', mtn2: '#064e3b', platDirt: '#210c01', platTop: '#15803d' }, 
+  { name: 'BARREN DESERT', skyTop: '#fef08a', skyBot: '#facc15', mtn1: '#ca8a04', mtn2: '#a16207', platDirt: '#713f12', platTop: '#eab308' }, 
+  { name: 'FLOATING RUINS', skyTop: '#c084fc', skyBot: '#7e22ce', mtn1: '#6b21a8', mtn2: '#581c87', platDirt: '#170832', platTop: '#d8b4fe' },  
+  { name: 'LAVA WORLD', skyTop: '#450a0a', skyBot: '#7f1d1d', mtn1: '#991b1b', mtn2: '#7f1d1d', platDirt: '#2a0a0a', platTop: '#ef4444' }, 
+  { name: 'BASE HQ', skyTop: '#0052ff', skyBot: '#0033cc', mtn1: '#002299', mtn2: '#001166', platDirt: '#000833', platTop: '#00d2ff' }  
 ];
 
-const loadedBgAssets = {};
-BIOME_LAYERS.forEach(b => {
-  loadedBgAssets[b.id] = {
-    sky: new Image(),
-    far: new Image(),
-    mid: new Image(),
-    front: new Image()
-  };
-  loadedBgAssets[b.id].sky.src = `assets/backgrounds/${b.id}/sky.png`;
-  loadedBgAssets[b.id].far.src = `assets/backgrounds/${b.id}/far.png`;
-  loadedBgAssets[b.id].mid.src = `assets/backgrounds/${b.id}/mid.png`;
-  loadedBgAssets[b.id].front.src = `assets/backgrounds/${b.id}/front.png`;
-});
-
 function updateLevelUI() {
-  const bIdx = Math.min(level - 1, BIOME_LAYERS.length - 1);
-  const biome = BIOME_LAYERS[bIdx];
+  const bIdx = Math.min(level - 1, BIOMES.length - 1);
+  const biome = BIOMES[bIdx];
   levelNameEl.innerText = biome.name;
   
-  // Dynamic UI color based on biome (hardcoded for UI consistency)
-  const colors = { jungle: '#4ade80', desert: '#facc15', neon: '#00e5ff', space: '#94a3b8', cyber: '#ff2a7a' };
-  const c = colors[biome.id] || '#00e5ff';
-  
-  levelFillEl.style.background = c;
-  levelFillEl.style.boxShadow = `0 0 10px ${c}, 0 0 20px ${c}`;
-  levelNameEl.style.color = c;
-  levelNameEl.style.textShadow = `0 2px 4px rgba(0,0,0,0.8), 0 0 15px ${c}`;
+  levelFillEl.style.background = biome.platTop;
+  levelFillEl.style.boxShadow = `0 0 10px ${biome.platTop}, 0 0 20px ${biome.platTop}`;
+  levelNameEl.style.color = biome.platTop;
+  levelNameEl.style.textShadow = `0 2px 4px rgba(0,0,0,0.8), 0 0 15px ${biome.platTop}`;
   
   let progress = (score % 10) / 10 * 100;
   levelFillEl.style.width = `${progress}%`;
@@ -1175,34 +1162,172 @@ function update(dt) {
 }
 
 function drawBackground() {
-  const bIdx = Math.min(level - 1, BIOME_LAYERS.length - 1);
-  const biome = BIOME_LAYERS[bIdx];
-  const assets = loadedBgAssets[biome.id];
-  let drift = (Date.now() / 1000) * 10;
-
-  // 1. SKY GRADIENT FALLBACK (Ensures no black screen)
-  let g = ctx.createLinearGradient(0, 0, 0, H); 
-  g.addColorStop(0, biome.skyTop || '#38bdf8'); 
-  g.addColorStop(1, biome.skyBot || '#fde047');
+  const bIdx = Math.min(level - 1, BIOMES.length - 1);
+  const b = BIOMES[bIdx];
+  let groundY = H - platformHeight;
+  
+  // Layer 0: Sky
+  let g = ctx.createLinearGradient(0,0,0,H); g.addColorStop(0, b.skyTop); g.addColorStop(1, b.skyBot);
   ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  
+  // Layer 0.5: Celestials
+  ctx.save();
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+  if ([0,2,3,4,5,7,8,9].includes(bIdx)) {
+    for(let i=0; i<100; i++) {
+       let sx = ((i*123) - cameraX*0.01) % W; if(sx<0) sx+=W;
+       let sy = (i*47) % (groundY);
+       let size = Math.abs(Math.sin(i)) * 2;
+       ctx.fillRect(sx, sy, size, size);
+    }
+  }
+  
+  if (bIdx === 3 || bIdx === 8) { // Planet
+    let px = (W * 0.7 - cameraX * 0.05) % (W * 1.5); if (px < -200) px += W * 1.5;
+    ctx.beginPath(); ctx.arc(px, H * 0.3, 120, 0, Math.PI * 2); 
+    ctx.fillStyle = bIdx === 3 ? '#9d4edd' : '#7f1d1d'; ctx.fill();
+    ctx.fillStyle = 'rgba(0,0,0,0.5)';
+    ctx.beginPath(); ctx.arc(px-30, H*0.3+30, 120, 0, Math.PI*2); ctx.fill();
+  } else if (bIdx === 1 || bIdx === 6 || bIdx === 4) { // Sun
+    let px = (W * 0.3 - cameraX * 0.05) % (W * 1.5); if (px < -200) px += W * 1.5;
+    ctx.beginPath(); ctx.arc(px, H * 0.4, 80, 0, Math.PI * 2); 
+    if(bIdx === 4) {
+      // Synthwave sun
+      let sunG = ctx.createLinearGradient(0, H*0.4-80, 0, H*0.4+80);
+      sunG.addColorStop(0, '#f97316'); sunG.addColorStop(1, '#ec4899');
+      ctx.fillStyle = sunG; ctx.fill();
+      ctx.fillStyle = b.skyBot;
+      for(let i=0; i<5; i++) ctx.fillRect(px-80, H*0.4 + i*15, 160, 4+i);
+    } else {
+      ctx.fillStyle = bIdx === 1 ? '#ffb703' : '#fef08a'; ctx.fill();
+    }
+  }
+  ctx.restore();
 
-  function drawLayer(img, speedFactor, opacity = 1) {
-    if (!img || !img.complete || img.naturalWidth === 0) return;
-    ctx.globalAlpha = opacity;
-    let scrollX = ((cameraX * speedFactor) + (drift * speedFactor)) % W;
-    if (scrollX < 0) scrollX += W;
-    
-    // Draw two copies for seamless looping
-    ctx.drawImage(img, -scrollX, 0, W, H);
-    ctx.drawImage(img, W - scrollX, 0, W, H);
-    ctx.globalAlpha = 1.0;
+  // Helper for Parallax Loops
+  function drawLayer(speedFactor, gap, drawFn) {
+    let speed = cameraX * speedFactor;
+    let num = Math.ceil(W / gap) + 2;
+    let start = Math.floor(speed / gap) * gap;
+    for(let i=0; i<num; i++) {
+      let x = (start + i*gap) - speed;
+      let rand = Math.abs(Math.sin((start + i*gap)*0.1));
+      let rand2 = Math.abs(Math.cos((start + i*gap)*0.13));
+      ctx.save();
+      ctx.translate(x, groundY);
+      drawFn(rand, rand2, x, start + i*gap);
+      ctx.restore();
+    }
   }
 
-  // Draw image layers if available
-  drawLayer(assets.sky, 0.05);
-  drawLayer(assets.far, 0.15, 0.7);
-  drawLayer(assets.mid, 0.35, 0.9);
-  drawLayer(assets.front, 0.65, 1.0);
+  // BIOME SPECIFIC DRAWING
+  if (bIdx === 0) { // GREEN HILLS
+    drawLayer(0.15, W*0.5, (r) => { ctx.fillStyle = b.mtn1; ctx.beginPath(); ctx.ellipse(0, 0, W*0.4, H*0.3 + r*H*0.1, 0, Math.PI, 0); ctx.fill(); });
+    drawLayer(0.30, W*0.35, (r) => { ctx.fillStyle = b.mtn2; ctx.beginPath(); ctx.ellipse(0, 0, W*0.3, H*0.2 + r*H*0.1, 0, Math.PI, 0); ctx.fill(); });
+    drawLayer(0.45, W*0.15, (r, r2) => {
+      let th = 80 + r*60;
+      ctx.fillStyle = '#1e293b'; ctx.fillRect(-4, -20, 8, 20); // trunk
+      ctx.fillStyle = '#0f766e';
+      ctx.beginPath(); ctx.moveTo(0, -th); ctx.lineTo(-25-r2*10, -20); ctx.lineTo(25+r2*10, -20); ctx.fill();
+      ctx.fillStyle = '#047857';
+      ctx.beginPath(); ctx.moveTo(0, -th); ctx.lineTo(-20-r2*10, -th*0.4); ctx.lineTo(20+r2*10, -th*0.4); ctx.fill();
+    });
+  } 
+  else if (bIdx === 1) { // SUNSET MOUNTAIN
+    drawLayer(0.15, W*0.4, (r) => { ctx.fillStyle = b.mtn1; ctx.beginPath(); ctx.moveTo(-W*0.3, 0); ctx.lineTo(0, -H*0.4 - r*H*0.2); ctx.lineTo(W*0.3, 0); ctx.fill(); });
+    drawLayer(0.30, W*0.25, (r) => { ctx.fillStyle = b.mtn2; ctx.beginPath(); ctx.moveTo(-W*0.2, 0); ctx.lineTo(0, -H*0.25 - r*H*0.15); ctx.lineTo(W*0.2, 0); ctx.fill(); });
+  }
+  else if (bIdx === 2) { // NEON CITY
+    drawLayer(0.15, 120, (r, r2) => { 
+      ctx.fillStyle = b.mtn1; let h = 100+r*200; let w = 60+r2*40; 
+      ctx.fillRect(-w/2, -h, w, h); 
+    });
+    drawLayer(0.30, 150, (r, r2) => { 
+      ctx.fillStyle = b.mtn2; let h = 80+r*150; let w = 50+r2*30; 
+      ctx.fillRect(-w/2, -h, w, h); 
+    });
+    drawLayer(0.45, 200, (r, r2) => { 
+      ctx.fillStyle = '#020617'; let h = 150+r*150; let w = 80+r2*40; 
+      ctx.fillRect(-w/2, -h, w, h);
+      ctx.fillStyle = b.platTop;
+      for(let y=20; y<h-20; y+=25) {
+        if(r2 > 0.5) ctx.fillRect(-w/2+10, -h+y, w-20, 10);
+        else { ctx.fillRect(-w/2+10, -h+y, 15, 15); ctx.fillRect(w/2-25, -h+y, 15, 15); }
+      }
+    });
+  }
+  else if (bIdx === 3) { // SPACE STATION
+    drawLayer(0.15, 300, (r) => { ctx.fillStyle = '#1e293b'; ctx.fillRect(-20, -H, 40, H); ctx.fillRect(-150, -H*0.8, 300, 20); });
+    drawLayer(0.30, 200, (r) => { ctx.fillStyle = '#0f172a'; ctx.beginPath(); ctx.moveTo(-30,0); ctx.lineTo(-20,-H); ctx.lineTo(20,-H); ctx.lineTo(30,0); ctx.fill(); });
+    drawLayer(0.45, 250, (r, r2) => { 
+      ctx.fillStyle = '#334155'; ctx.fillRect(-40, -80-r*40, 80, 80+r*40);
+      ctx.fillStyle = '#0284c7'; ctx.fillRect(-30, -70-r*40, 60, 40);
+      ctx.fillStyle = '#ffffff'; ctx.font = "bold 14px 'Nunito'"; ctx.fillText("BASED", -22, -45-r*40);
+    });
+  }
+  else if (bIdx === 4) { // CYBER GRID
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.6)'; ctx.fillRect(0, groundY, W, H - groundY);
+    drawLayer(0.15, 100, (r) => { ctx.fillStyle = b.mtn1; ctx.fillRect(-2, -H, 4, H); }); // Vertical grid lines
+    drawLayer(0.30, 200, (r, r2) => { 
+      ctx.fillStyle = b.mtn2; let h = 100+r*150;
+      ctx.fillRect(-15, -h, 30, h); 
+      ctx.fillStyle = b.platTop; ctx.fillRect(-5, -h-20, 10, 20);
+    });
+  }
+  else if (bIdx === 5) { // DEEP FOREST
+    ctx.fillStyle = 'rgba(0, 10, 5, 0.7)'; ctx.fillRect(0, groundY, W, H - groundY);
+    drawLayer(0.15, 150, (r) => { ctx.fillStyle = b.mtn1; ctx.fillRect(-15, -H, 30, H); ctx.beginPath(); ctx.arc(0, -H*0.6+r*50, 80, 0, Math.PI*2); ctx.fill(); });
+    drawLayer(0.30, 200, (r,r2) => { ctx.fillStyle = b.mtn2; ctx.fillRect(-25, -H, 50, H); ctx.beginPath(); ctx.ellipse(0, -H*0.7, 120, 80+r*40, 0, Math.PI, 0); ctx.fill(); });
+    drawLayer(0.45, W*0.2, (r, r2) => {
+      let th = 100 + r*80;
+      ctx.fillStyle = '#1e293b'; ctx.fillRect(-6, -20, 12, 20); // trunk
+      ctx.fillStyle = '#064e3b';
+      ctx.beginPath(); ctx.moveTo(0, -th); ctx.lineTo(-30-r2*10, -20); ctx.lineTo(30+r2*10, -20); ctx.fill();
+      ctx.fillStyle = '#065f46';
+      ctx.beginPath(); ctx.moveTo(0, -th); ctx.lineTo(-25-r2*10, -th*0.4); ctx.lineTo(25+r2*10, -th*0.4); ctx.fill();
+    });
+  }
+  else if (bIdx === 6) { // BARREN DESERT
+    drawLayer(0.15, W*0.5, (r) => { ctx.fillStyle = b.mtn1; ctx.beginPath(); ctx.moveTo(-W*0.3, 0); ctx.quadraticCurveTo(0, -H*0.3 - r*H*0.1, W*0.3, 0); ctx.fill(); });
+    drawLayer(0.30, W*0.3, (r) => { ctx.fillStyle = b.mtn2; ctx.beginPath(); ctx.moveTo(-W*0.2, 0); ctx.quadraticCurveTo(0, -H*0.2 - r*H*0.1, W*0.2, 0); ctx.fill(); });
+    drawLayer(0.45, 180, (r, r2) => {
+      ctx.fillStyle = '#065f46'; let ch = 60+r*60;
+      ctx.beginPath(); ctx.roundRect(-8, -ch, 16, ch, 8); ctx.fill();
+      if(r > 0.3) { ctx.beginPath(); ctx.roundRect(-24, -ch+20, 16, 8, 4); ctx.fill(); ctx.beginPath(); ctx.roundRect(-24, -ch+10, 8, 18, 4); ctx.fill(); }
+      if(r2 > 0.3) { ctx.beginPath(); ctx.roundRect(8, -ch+30, 20, 8, 4); ctx.fill(); ctx.beginPath(); ctx.roundRect(20, -ch+15, 8, 23, 4); ctx.fill(); }
+    });
+  }
+  else if (bIdx === 7) { // FLOATING RUINS
+    ctx.fillStyle = 'rgba(10, 0, 25, 0.6)'; ctx.fillRect(0, groundY, W, H - groundY);
+    drawLayer(0.15, 300, (r, r2) => { ctx.fillStyle = b.mtn1; ctx.beginPath(); ctx.ellipse(0, -H*0.5-r*100, 80+r2*40, 40+r*20, 0, 0, Math.PI*2); ctx.fill(); });
+    drawLayer(0.30, 250, (r, r2) => { ctx.fillStyle = b.mtn2; ctx.beginPath(); ctx.ellipse(0, -H*0.3-r2*100, 60+r*20, 30+r2*10, 0, 0, Math.PI*2); ctx.fill(); });
+    drawLayer(0.45, 180, (r, r2) => {
+      let th = 50 + r*30;
+      ctx.fillStyle = '#4a044e'; ctx.fillRect(-4, -th, 8, th); // trunk
+      ctx.fillStyle = b.platTop;
+      ctx.beginPath(); ctx.arc(0, -th, 20+r2*10, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(-15, -th+10, 15+r*5, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(15, -th+10, 15+r*5, 0, Math.PI*2); ctx.fill();
+    });
+  }
+  else if (bIdx === 8) { // LAVA WORLD
+    drawLayer(0.15, W*0.4, (r) => { 
+      ctx.fillStyle = b.mtn1; 
+      ctx.beginPath(); ctx.moveTo(-W*0.2, 0); ctx.lineTo(-20, -H*0.4-r*100); ctx.lineTo(20, -H*0.4-r*100); ctx.lineTo(W*0.2, 0); ctx.fill(); 
+      ctx.fillStyle = '#ef4444';
+      ctx.beginPath(); ctx.moveTo(-15, -H*0.4-r*100); ctx.lineTo(0, -H*0.3-r*80); ctx.lineTo(15, -H*0.4-r*100); ctx.fill();
+    });
+    drawLayer(0.30, W*0.3, (r) => { 
+      ctx.fillStyle = b.mtn2; 
+      ctx.beginPath(); ctx.moveTo(-W*0.15, 0); ctx.lineTo(-10, -H*0.2-r*50); ctx.lineTo(10, -H*0.2-r*50); ctx.lineTo(W*0.15, 0); ctx.fill(); 
+      ctx.fillStyle = '#f97316';
+      ctx.beginPath(); ctx.moveTo(-8, -H*0.2-r*50); ctx.lineTo(0, -H*0.1-r*40); ctx.lineTo(8, -H*0.2-r*50); ctx.fill();
+    });
+  }
+  else if (bIdx === 9) { // BASE HQ
+    drawLayer(0.15, 400, (r) => { ctx.fillStyle = b.mtn1; ctx.fillRect(-40, -H, 80, H); ctx.fillStyle = '#0052ff'; ctx.fillRect(-20, -H, 40, H); });
+    drawLayer(0.30, 300, (r, r2) => { ctx.fillStyle = b.mtn2; ctx.beginPath(); ctx.moveTo(-50,0); ctx.lineTo(0,-H); ctx.lineTo(50,0); ctx.fill(); });
+  }
 }
 
 let lastDt = 16;
@@ -1216,8 +1341,8 @@ function draw() {
   ctx.save();
   ctx.translate(-cameraX, 0);
   
-  const bIdx = Math.min(level - 1, BIOME_LAYERS.length - 1);
-  const b = BIOME_LAYERS[bIdx];
+  const bIdx = Math.min(level - 1, BIOMES.length - 1);
+  const b = BIOMES[bIdx];
 
   for (let i = 0; i < platforms.length; i++) {
     const p = platforms[i];
@@ -1258,7 +1383,7 @@ function draw() {
     }
     
     if (p.bridgeL) {
-      const bColor = BIOME_LAYERS[Math.min(level - 1, BIOME_LAYERS.length - 1)].platTop;
+      const bColor = BIOMES[Math.min(level - 1, BIOMES.length - 1)].platTop;
       ctx.save(); ctx.translate(p.x + p.w, H - platformHeight); ctx.rotate(Math.PI / 2);
       ctx.fillStyle = '#111'; ctx.fillRect(0, -p.bridgeL, bridge.thickness, p.bridgeL);
       ctx.setLineDash([10, 5]); ctx.strokeStyle = bColor; ctx.lineWidth = 2; ctx.strokeRect(0, -p.bridgeL, bridge.thickness, p.bridgeL);
@@ -1267,7 +1392,7 @@ function draw() {
   }
   
   if (gameState !== STATES.PLAYING || bridge.length > 0) {
-    const bColor = BIOME_LAYERS[Math.min(level - 1, BIOME_LAYERS.length - 1)].platTop;
+    const bColor = BIOMES[Math.min(level - 1, BIOMES.length - 1)].platTop;
     ctx.save(); ctx.translate(bridge.x, bridge.y); ctx.rotate(bridge.angle);
     ctx.fillStyle = '#111'; ctx.fillRect(0, -bridge.length, bridge.thickness, bridge.length);
     ctx.setLineDash([10, 5]); ctx.strokeStyle = bColor; ctx.lineWidth = 2; ctx.strokeRect(0, -bridge.length, bridge.thickness, bridge.length);
@@ -1311,7 +1436,7 @@ function drawPreviewCanvas() {
   else if(prevSkin === 'gold') bIdx = 3;
   else if(prevSkin === 'hoodie') bIdx = 4;
   else if(prevSkin === 'galaxy') bIdx = 5;
-  const biome = BIOME_LAYERS[bIdx];
+  const biome = BIOMES[bIdx];
 
   // Draw Biome Background
   let bg = prevCtx.createLinearGradient(0, 0, 0, prevCanvas.height);

@@ -28,9 +28,13 @@ const inputUsername = document.getElementById("username-input");
 const btnSaveProfile = document.getElementById("btn-save-profile");
 const avatarGrid = document.getElementById("avatar-grid");
 
-const AVATAR_COLORS = [
-  '#111111', '#e11d48', '#0891b2', '#f59e0b', '#8b5cf6', '#10b981', '#ec4899', '#3b82f6', '#f43f5e', '#84cc16',
-  '#14b8a6', '#6366f1', '#a855f7', '#d946ef', '#f97316', '#64748b', '#000000', '#ffffff', '#7dd3fc', '#fef08a'
+const AVATAR_LIST = [
+  { id: 'classic', svg: `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="45" fill="%23222"/><circle cx="35" cy="40" r="5" fill="%23fff"/><circle cx="65" cy="40" r="5" fill="%23fff"/></svg>` },
+  { id: 'ninja', svg: `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="45" fill="%231a1a1a"/><rect x="5" y="30" width="90" height="12" fill="%23ef4444"/><circle cx="35" cy="45" r="5" fill="%23fff"/><circle cx="65" cy="45" r="5" fill="%23fff"/></svg>` },
+  { id: 'cyber', svg: `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="45" fill="%230f172a"/><circle cx="50" cy="50" r="38" fill="none" stroke="%2300e5ff" stroke-width="3"/><circle cx="35" cy="45" r="5" fill="%2300e5ff"/><circle cx="65" cy="45" r="5" fill="%2300e5ff"/></svg>` },
+  { id: 'gold', svg: `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="45" fill="%23facc15"/><circle cx="50" cy="50" r="45" fill="none" stroke="%23fef08a" stroke-width="4"/><circle cx="35" cy="45" r="5" fill="%23fff"/><circle cx="65" cy="45" r="5" fill="%23fff"/></svg>` },
+  { id: 'hoodie', svg: `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="45" fill="%23be123c"/><circle cx="50" cy="54" r="30" fill="%23111"/><circle cx="40" cy="54" r="4" fill="%23fff"/><circle cx="60" cy="54" r="4" fill="%23fff"/></svg>` },
+  { id: 'galaxy', svg: `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="45" fill="%23b517ff"/><circle cx="30" cy="30" r="2" fill="%23fff"/><circle cx="70" cy="60" r="3" fill="%23fff"/><circle cx="40" cy="75" r="1.5" fill="%23fff"/><circle cx="35" cy="45" r="5" fill="%2300e5ff"/><circle cx="65" cy="45" r="5" fill="%2300e5ff"/></svg>` }
 ];
 if (!localStorage.getItem('bb_v1_uuid')) {
     localStorage.setItem('bb_v1_uuid', 'u-' + Math.random().toString(36).substr(2, 9));
@@ -63,10 +67,11 @@ if (!currentUsername) {
     })();
 }
 
-let selectedAvatar = localStorage.getItem('bb_v1_avatar') || '#00e5ff';
+let selectedAvatar = localStorage.getItem('bb_v1_avatar') || 'classic';
 
-function getAvatarSVG(color) {
-  return `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="40" fill="%23${color.replace('#','')}"/><circle cx="35" cy="45" r="5" fill="%23fff"/><circle cx="65" cy="45" r="5" fill="%23fff"/></svg>`;
+function getAvatarSVG(id) {
+  const item = AVATAR_LIST.find(a => a.id === id) || AVATAR_LIST[0];
+  return item.svg;
 }
 
 function updateProfileUI() {
@@ -77,15 +82,18 @@ function updateProfileUI() {
 function initProfileModal() {
   if (!avatarGrid) return;
   avatarGrid.innerHTML = '';
-  AVATAR_COLORS.forEach(color => {
+  AVATAR_LIST.forEach(item => {
     const div = document.createElement('div');
-    div.style.width = '40px'; div.style.height = '40px'; div.style.borderRadius = '50%';
-    div.style.cursor = 'pointer'; div.style.background = `url('${getAvatarSVG(color)}') no-repeat center/contain`;
-    div.style.border = selectedAvatar === color ? '3px solid #00ff88' : '3px solid transparent';
+    div.style.width = '60px'; div.style.height = '60px'; div.style.borderRadius = '12px';
+    div.style.cursor = 'pointer'; div.style.background = `rgba(255,255,255,0.05) url('${item.svg}') no-repeat center/70%`;
+    div.style.border = selectedAvatar === item.id ? '3px solid #00ff88' : '1px solid rgba(255,255,255,0.1)';
+    div.style.transition = "0.2s";
     div.onclick = () => {
-      selectedAvatar = color;
-      Array.from(avatarGrid.children).forEach(c => c.style.border = '3px solid transparent');
+      selectedAvatar = item.id;
+      Array.from(avatarGrid.children).forEach(c => c.style.border = '1px solid rgba(255,255,255,0.1)');
       div.style.border = '3px solid #00ff88';
+      div.style.transform = "scale(1.1)";
+      setTimeout(() => div.style.transform = "scale(1)", 150);
     };
     avatarGrid.appendChild(div);
   });

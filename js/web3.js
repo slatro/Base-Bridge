@@ -74,20 +74,27 @@ async function initWeb3() {
   await new Promise(r => setTimeout(r, 200));
 
   const provider = window.ethereum;
+  const isDisconnected = localStorage.getItem('bb_v1_disconnected') === 'true';
 
   if (provider) {
     btnConnect.innerText = "CONNECT WALLET";
     
-    try {
-      const accounts = await provider.request({ method: "eth_accounts" });
-      if (accounts && accounts.length > 0) {
-        await handleConnect(accounts[0]);
-      }
-    } catch (e) { }
+    if (!isDisconnected) {
+      try {
+        const accounts = await provider.request({ method: "eth_accounts" });
+        if (accounts && accounts.length > 0) {
+          await handleConnect(accounts[0]);
+        }
+      } catch (e) { }
+    }
 
     provider.on('accountsChanged', async (accounts) => {
-      if (accounts && accounts.length > 0) await handleConnect(accounts[0]);
-      else handleDisconnect();
+      if (accounts && accounts.length > 0) {
+        localStorage.removeItem('bb_v1_disconnected');
+        await handleConnect(accounts[0]);
+      } else {
+        handleDisconnect();
+      }
     });
     provider.on('chainChanged', () => window.location.reload());
   } else {
@@ -102,6 +109,7 @@ async function initWeb3() {
     try {
       const accounts = await provider.request({ method: "eth_requestAccounts" });
       if (accounts && accounts.length > 0) {
+        localStorage.removeItem('bb_v1_disconnected');
         await handleConnect(accounts[0]);
       }
     } catch (error) {
@@ -165,9 +173,23 @@ async function handleConnect(account) {
   await checkNetwork();
 }
 
-function handleDisconnect() {
+async function handleDisconnect() {
   userAddress = null;
   window.userAddress = null; // GLOBAL EXPORT
+  
+  if (window.ethereum) {
+    try {
+      await window.ethereum.request({
+        method: "wallet_revokePermissions",
+        params: [{ eth_accounts: {} }]
+      });
+    } catch (error) {
+      console.log("wallet_revokePermissions not supported or failed", error);
+    }
+  }
+  
+  localStorage.setItem('bb_v1_disconnected', 'true');
+  
   if (viewConnect) viewConnect.classList.remove("hidden");
   if (viewDetails) viewDetails.classList.add("hidden");
   if (userProfileArea) userProfileArea.style.display = 'none';

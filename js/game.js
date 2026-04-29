@@ -326,15 +326,39 @@ function renderAchievements(type) {
   ];
   
   const filtered = allTasks.filter(t => t.type === type);
+  
+  // Sort actionable items to the top
+  filtered.sort((a, b) => {
+    const isDoneA = a.current >= a.target;
+    const isDoneB = b.current >= b.target;
+    const isClaimedA = localStorage.getItem('bb_v1_claimed_' + a.id) === 'true' || localStorage.getItem('bb_v1_minted_' + a.id) === 'true';
+    const isClaimedB = localStorage.getItem('bb_v1_claimed_' + b.id) === 'true' || localStorage.getItem('bb_v1_minted_' + b.id) === 'true';
+    
+    const actionableA = isDoneA && !isClaimedA;
+    const actionableB = isDoneB && !isClaimedB;
+    
+    if (actionableA && !actionableB) return -1;
+    if (!actionableA && actionableB) return 1;
+    
+    // Then show in-progress items, and finally claimed/minted ones at the bottom
+    if (!isClaimedA && isClaimedB) return -1;
+    if (isClaimedA && !isClaimedB) return 1;
+    
+    return 0;
+  });
+
   filtered.forEach(t => {
     const isDone = t.current >= t.target;
     const isClaimed = localStorage.getItem('bb_v1_claimed_' + t.id) === 'true';
+    const isMinted = localStorage.getItem('bb_v1_minted_' + t.id) === 'true';
     const progressPercent = Math.min(100, (t.current / t.target) * 100);
     
     let rightSideHTML = '';
     if (t.type === 'general') {
-      if (isDone) {
-        rightSideHTML = `<div class="btn-3d-lock" onclick="if(!window.userAddress){showInfoModal('Wallet Required', 'You must connect your wallet to mint this NFT!');return;} window.mintNFT('${t.name}', this);"><div class="check-icon-svg"></div></div>`;
+      if (isMinted) {
+        rightSideHTML = `<div class="btn-3d-lock claimed"><div class="check-icon-svg"></div></div>`;
+      } else if (isDone) {
+        rightSideHTML = `<div class="btn-3d-lock" style="background: linear-gradient(135deg, #ff2a7a, #c40049); box-shadow: 0 4px 0 #850031, inset 0 2px 4px rgba(255,255,255,0.4);" onclick="if(!window.userAddress){showInfoModal('Wallet Required', 'You must connect your wallet to mint this NFT!');return;} window.mintNFT('${t.name}', this, '${t.id}');"><span style="font-size:0.8rem; font-weight:900; color:#fff;">MINT</span></div>`;
       } else {
         rightSideHTML = `<div class="btn-3d-lock"><div class="lock-icon-svg"></div></div>`;
       }
@@ -369,6 +393,7 @@ function renderAchievements(type) {
     `;
   });
 }
+window.renderAchievements = renderAchievements;
 
 window.claimAchievement = async function(id, reward, type, btnElement) {
   if (!window.userAddress) {

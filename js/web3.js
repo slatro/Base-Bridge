@@ -435,7 +435,7 @@ const ACH_SVG = {
   cal: `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect x="15" y="30" width="70" height="60" rx="5" fill="%23fff"/><rect x="15" y="20" width="70" height="20" rx="5" fill="%23ff2a7a"/></svg>`
 };
 
-window.mintNFT = async function(nftName, btnElement) {
+window.mintNFT = async function(nftName, btnElement, taskId) {
   if (!window.userAddress) {
     showInfoModal('Wallet Required', 'You must connect your wallet to mint this NFT!');
     return;
@@ -470,13 +470,14 @@ window.mintNFT = async function(nftName, btnElement) {
     const receipt = await txResponse.wait(1);
     
     if (receipt && receipt.status === 1) {
+        if (taskId) localStorage.setItem('bb_v1_minted_' + taskId, 'true');
         showInfoModal('Success!', `Successfully minted ${nftName} on Base Network!`);
+        if (typeof window.renderAchievements === 'function') window.renderAchievements('general');
     } else {
         alert("Transaction failed on chain.");
     }
   } catch (error) {
     console.error("NFT Mint failed:", error);
-    // Silent fail if user rejected, or show error if needed
   } finally {
     if (btnElement) {
       btnElement.innerHTML = originalHTML;
@@ -485,6 +486,8 @@ window.mintNFT = async function(nftName, btnElement) {
     }
   }
 };
+
+window.renderAchievements = null; // Will be set by game.js
 
 // Ensure closeModals is truly global
 window.closeModals = function() {

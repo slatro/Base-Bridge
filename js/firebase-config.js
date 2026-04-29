@@ -6,7 +6,8 @@ const KVDB_URL = `https://kvdb.io/${KVDB_BUCKET}/leaderboard`;
 
 window.fetchFirebaseLeaderboard = async function() {
     try {
-        const response = await fetch(KVDB_URL);
+        const timestamp = new Date().getTime();
+        const response = await fetch(`${KVDB_URL}?t=${timestamp}`, { cache: 'no-store' });
         if (!response.ok) return [];
         const data = await response.json();
         if (!Array.isArray(data)) return [];

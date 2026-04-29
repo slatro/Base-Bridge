@@ -51,6 +51,12 @@ if (!currentUsername) {
             if (!localStorage.getItem('bb_v1_username')) {
                 currentUsername = "Player " + count;
                 localStorage.setItem('bb_v1_username', currentUsername);
+                
+                // Reserve this auto-assigned name
+                const myUUID = localStorage.getItem('bb_v1_uuid');
+                const userKey = `u_${currentUsername.toLowerCase().replace(/\s+/g, '')}`;
+                fetch(`https://kvdb.io/3Bz5so9xQFGY6vAGb68Mfx/${userKey}`, { method: 'POST', body: myUUID });
+
                 if (typeof updateProfileUI === 'function') updateProfileUI();
             }
         } catch (e) { console.error("Could not fetch player count", e); }
@@ -154,34 +160,66 @@ async function initWeb3() {
   if(btnSaveProfile) btnSaveProfile.addEventListener("click", async () => {
     let name = inputUsername.value.trim();
     let oldName = currentUsername;
-    if(name.length > 0 && name !== currentUsername) {
-      currentUsername = name;
-      localStorage.setItem('bb_v1_username', currentUsername);
-      
-      // Update leaderboard retroactively
-      if (typeof window.fetchFirebaseLeaderboard === 'function') {
-          try {
-              let board = await window.fetchFirebaseLeaderboard();
-              let myUUID = localStorage.getItem('bb_v1_uuid');
-              let modified = false;
-              board.forEach(entry => {
-                  if ((entry.uuid === myUUID || entry.addr === oldName) && entry.addr !== currentUsername) {
-                      entry.addr = currentUsername;
-                      entry.uuid = myUUID; // attach UUID if missing
-                      modified = true;
-                  }
-              });
-              if (modified) {
-                  const KVDB_BUCKET = "3Bz5so9xQFGY6vAGb68Mfx";
-                  await fetch(`https://kvdb.io/${KVDB_BUCKET}/leaderboard`, {
-                      method: 'POST',
-                      body: JSON.stringify(board)
-                  });
-                  if (typeof updateLeaderboardUI === 'function') updateLeaderboardUI();
+    
+    if(name.length > 0 && name !== oldName) {
+      // Check Uniqueness
+      btnSaveProfile.disabled = true;
+      btnSaveProfile.style.opacity = "0.5";
+      btnSaveProfile.innerText = "CHECKING...";
+
+      try {
+          const bucket = "3Bz5so9xQFGY6vAGb68Mfx";
+          const userKey = `u_${name.toLowerCase().replace(/\s+/g, '')}`;
+          const myUUID = localStorage.getItem('bb_v1_uuid');
+
+          const res = await fetch(`https://kvdb.io/${bucket}/${userKey}`);
+          if (res.ok) {
+              const ownerUUID = await res.text();
+              if (ownerUUID && ownerUUID.trim() !== "" && ownerUUID !== myUUID) {
+                  alert("This username is already taken! Please choose another one.");
+                  btnSaveProfile.disabled = false;
+                  btnSaveProfile.style.opacity = "1";
+                  btnSaveProfile.innerText = "SAVE";
+                  return;
               }
-          } catch(e) { console.error("Could not update leaderboard name", e); }
+          }
+
+          // Mark as taken
+          await fetch(`https://kvdb.io/${bucket}/${userKey}`, { method: 'POST', body: myUUID });
+          
+          currentUsername = name;
+          localStorage.setItem('bb_v1_username', currentUsername);
+          
+          // Update leaderboard retroactively
+          if (typeof window.fetchFirebaseLeaderboard === 'function') {
+              try {
+                  let board = await window.fetchFirebaseLeaderboard();
+                  let modified = false;
+                  board.forEach(entry => {
+                      if ((entry.uuid === myUUID || entry.addr === oldName) && entry.addr !== currentUsername) {
+                          entry.addr = currentUsername;
+                          entry.uuid = myUUID; // attach UUID if missing
+                          modified = true;
+                      }
+                  });
+                  if (modified) {
+                      await fetch(`https://kvdb.io/${bucket}/leaderboard`, {
+                          method: 'POST',
+                          body: JSON.stringify(board)
+                      });
+                      if (typeof updateLeaderboardUI === 'function') updateLeaderboardUI();
+                  }
+              } catch(e) { console.error("Could not update leaderboard name", e); }
+          }
+      } catch (e) {
+          console.error("Uniqueness check failed", e);
       }
+      
+      btnSaveProfile.disabled = false;
+      btnSaveProfile.style.opacity = "1";
+      btnSaveProfile.innerText = "SAVE";
     }
+    
     localStorage.setItem('bb_v1_avatar', selectedAvatar);
     updateProfileUI();
     window.closeModals();

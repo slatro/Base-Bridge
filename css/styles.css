@@ -39,22 +39,28 @@ h1, h2, h3, h4 { font-family: 'Fredoka One', cursive; font-weight: normal; }
   border-radius: 16px;
 }
 
-/* Redesigned 3D Monogram BB Token (Back-to-Back B's) */
+/* Redesigned 3D Squircle BB Token */
 .bb-token-small { 
   display: inline-block; width: 24px; height: 24px; 
   background: url('../assets/bb-token.png') no-repeat center/contain; 
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.4), inset 0 0 5px rgba(255,255,255,0.2);
+  filter: drop-shadow(0 0 2px rgba(0,82,255,0.8));
 }
 .bb-token-large { 
   display: inline-block; width: 64px; height: 64px; 
   background: url('../assets/bb-token.png') no-repeat center/contain; 
-  filter: drop-shadow(0 5px 10px rgba(0,0,0,0.6));
+  border-radius: 14px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.6), inset 0 0 10px rgba(255,255,255,0.3);
+  filter: drop-shadow(0 0 5px rgba(0,82,255,0.8));
 }
 
 /* Custom Base Ninja Logo */
 .main-logo-icon {
   width: 64px; height: 64px; flex-shrink: 0;
   background: url('../assets/bb-token.png') no-repeat center/contain;
+  border-radius: 14px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.4), inset 0 0 10px rgba(255,255,255,0.2);
   filter: drop-shadow(0 4px 6px rgba(0,82,255,0.6));
 }
 

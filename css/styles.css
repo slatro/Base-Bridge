@@ -54,7 +54,7 @@ h1, h2, h3, h4 { font-family: 'Fredoka One', cursive; font-weight: normal; }
 /* Custom Base Ninja Logo */
 .main-logo-icon {
   width: 64px; height: 64px; flex-shrink: 0;
-  background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="10" width="80" height="80" rx="20" fill="%230052FF"/><circle cx="50" cy="50" r="30" fill="%23111"/><rect x="20" y="35" width="60" height="15" rx="5" fill="red"/><rect x="35" y="50" width="30" height="10" rx="3" fill="%23eebb99"/><circle cx="45" cy="55" r="2" fill="black"/><circle cx="55" cy="55" r="2" fill="black"/></svg>') no-repeat center/contain;
+  background: url('../assets/bb-token.png') no-repeat center/contain;
   filter: drop-shadow(0 4px 6px rgba(0,82,255,0.6));
 }
 

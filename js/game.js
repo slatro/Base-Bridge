@@ -28,12 +28,30 @@ let dpr = window.devicePixelRatio || 1;
 let W, H;
 let platformHeight = 250;
 
-let gameState = 'MENU'; 
-let engineState = 'WAITING';
+const STATES = {
+  MENU: 'MENU',
+  PLAYING: 'PLAYING', // Waiting for input
+  BRIDGE_GROWING: 'BRIDGE_GROWING',
+  BRIDGE_FALLING: 'BRIDGE_FALLING',
+  CHARACTER_WALKING: 'CHARACTER_WALKING',
+  SUCCESS_TRANSITION: 'SUCCESS_TRANSITION',
+  FALLING_DOWN: 'FALLING_DOWN',
+  GAME_OVER: 'GAME_OVER',
+  GAME_WON: 'GAME_WON',
+  SHOP: 'SHOP',
+  DAILY: 'DAILY',
+  LEADERBOARD: 'LEADERBOARD',
+  ACHIEVEMENTS: 'ACHIEVEMENTS'
+};
+let gameState = STATES.MENU;
 
 let platforms = [];
 let character = { x: 0, y: 0, size: 55, rotation: 0 };
-let bridge = { x: 0, y: 0, length: 0, angle: 0, thickness: 8 };
+let bridge = { x: 0, y: 0, length: 0, angle: 0, thickness: 8, fallTime: 0 };
+let perfectStreak = 0;
+let sessionBestCombo = 0;
+let sessionPerfects = 0;
+let sessionCoins = 0;
 let score = 0;
 let bestScore = parseInt(localStorage.getItem('bb_v1_best') || '0');
 let coins = parseInt(localStorage.getItem('bb_v1_coins') || '0');
@@ -51,10 +69,32 @@ let particles = [];
 let animTime = 0; 
 let level = 1;
 
+// Time tracking & Daily Reset
+const now = new Date();
+const todayString = now.getFullYear() + '-' + (now.getMonth()+1) + '-' + now.getDate();
+let lastPlayedDay = localStorage.getItem('bb_v1_last_played_day');
+
+if (lastPlayedDay !== todayString) {
+  // Reset daily stats
+  localStorage.setItem('bb_v1_daily_games', '0');
+  localStorage.setItem('bb_v1_daily_score', '0');
+  localStorage.setItem('bb_v1_daily_perfects', '0');
+  localStorage.setItem('bb_v1_last_played_day', todayString);
+  // Reset claim status for daily tasks
+  for(let i=1; i<=10; i++) {
+    localStorage.removeItem('bb_v1_claimed_d' + i);
+  }
+}
+
 // Metrics for Achievements
 function incMetric(key, amt=1) {
   let val = parseInt(localStorage.getItem(key) || '0');
   localStorage.setItem(key, val + amt);
+  
+  // Auto-increment daily equivalent
+  if (key === 'bb_v1_total_games') incMetric('bb_v1_daily_games', amt);
+  if (key === 'bb_v1_total_score') incMetric('bb_v1_daily_score', amt); // Wait, score needs to be checked
+  if (key === 'bb_v1_total_perfects') incMetric('bb_v1_daily_perfects', amt);
 }
 
 const SVG_ICONS = {
@@ -98,10 +138,11 @@ const SHOP_DB = [
 let ownedItems = JSON.parse(localStorage.getItem('bb_v1_owned') || '["classic"]');
 
 // Audio Context
+let isMuted = false;
 let actx, osc, gainNode;
 function initAudio() { if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)(); if (actx.state === 'suspended') actx.resume(); }
 function playSound(type) {
-  if (!actx) return;
+  if (!actx || isMuted) return;
   const o = actx.createOscillator(); const g = actx.createGain();
   o.connect(g); g.connect(actx.destination); const now = actx.currentTime;
   if (type === 'drop') {
@@ -113,13 +154,25 @@ function playSound(type) {
   } else if (type === 'fail') {
     o.type = 'sawtooth'; o.frequency.setValueAtTime(200, now); o.frequency.exponentialRampToValueAtTime(50, now + 0.5);
     g.gain.setValueAtTime(0.3, now); g.gain.exponentialRampToValueAtTime(0.01, now + 0.5); o.start(now); o.stop(now + 0.5);
+  } else if (type === 'click') {
+    o.type = 'sine'; o.frequency.setValueAtTime(800, now); o.frequency.exponentialRampToValueAtTime(100, now + 0.05);
+    g.gain.setValueAtTime(0.1, now); g.gain.exponentialRampToValueAtTime(0.01, now + 0.05); o.start(now); o.stop(now + 0.05);
+  } else if (type === 'coin') {
+    o.type = 'sine'; o.frequency.setValueAtTime(987.77, now); o.frequency.setValueAtTime(1318.51, now + 0.1);
+    g.gain.setValueAtTime(0.1, now); g.gain.linearRampToValueAtTime(0, now + 0.3); o.start(now); o.stop(now + 0.3);
+  } else if (type === 'levelup') {
+    o.type = 'square'; o.frequency.setValueAtTime(261.63, now); o.frequency.setValueAtTime(329.63, now + 0.1); o.frequency.setValueAtTime(392.00, now + 0.2); o.frequency.setValueAtTime(523.25, now + 0.3);
+    g.gain.setValueAtTime(0, now); g.gain.linearRampToValueAtTime(0.2, now + 0.1); g.gain.linearRampToValueAtTime(0, now + 0.5); o.start(now); o.stop(now + 0.5);
+  } else if (type === 'success') {
+    o.type = 'sine'; o.frequency.setValueAtTime(440, now); o.frequency.setValueAtTime(554.37, now + 0.1); o.frequency.setValueAtTime(659.25, now + 0.2);
+    g.gain.setValueAtTime(0, now); g.gain.linearRampToValueAtTime(0.2, now + 0.1); g.gain.linearRampToValueAtTime(0, now + 0.4); o.start(now); o.stop(now + 0.4);
   }
 }
 function startGrowSound() {
-  if (!actx) return;
+  if (!actx || isMuted) return;
   osc = actx.createOscillator(); gainNode = actx.createGain();
-  osc.type = 'triangle'; osc.frequency.setValueAtTime(200, actx.currentTime); osc.frequency.exponentialRampToValueAtTime(800, actx.currentTime + 2.0);
-  gainNode.gain.setValueAtTime(0, actx.currentTime); gainNode.gain.linearRampToValueAtTime(0.1, actx.currentTime + 0.05);
+  osc.type = 'sine'; osc.frequency.setValueAtTime(100, actx.currentTime); osc.frequency.linearRampToValueAtTime(400, actx.currentTime + 2);
+  gainNode.gain.setValueAtTime(0.1, actx.currentTime);
   osc.connect(gainNode); gainNode.connect(actx.destination); osc.start();
 }
 function stopGrowSound() { if (gainNode) { gainNode.gain.linearRampToValueAtTime(0, actx.currentTime + 0.05); setTimeout(() => { if (osc) { osc.stop(); osc.disconnect(); osc = null; } }, 50); } }
@@ -128,7 +181,7 @@ function resize() {
   const rect = canvas.parentElement.getBoundingClientRect(); W = rect.width; H = rect.height;
   canvas.width = W * dpr; canvas.height = H * dpr; ctx.scale(dpr, dpr);
   platformHeight = Math.min(H * 0.4, 300);
-  if (engineState === 'WAITING' || gameState === 'MENU') { bridge.y = H - platformHeight; character.y = H - platformHeight; }
+  if (gameState === STATES.PLAYING || gameState === STATES.MENU) { bridge.y = H - platformHeight; character.y = H - platformHeight; }
 }
 window.addEventListener('resize', resize);
 
@@ -255,6 +308,10 @@ function renderAchievements(type) {
   const mPerfects = parseInt(localStorage.getItem('bb_v1_total_perfects')||'0');
   const mScore = parseInt(localStorage.getItem('bb_v1_best')||'0');
   
+  const dGames = parseInt(localStorage.getItem('bb_v1_daily_games')||'0');
+  const dPerfects = parseInt(localStorage.getItem('bb_v1_daily_perfects')||'0');
+  const dScore = parseInt(localStorage.getItem('bb_v1_daily_score')||'0');
+  
   const allTasks = [
     // General (NFT Badges - 30 Tasks)
     { id: 'g1', type: 'general', name: 'First Steps NFT', desc: 'Play your first game. Mints a Base NFT.', target: 1, current: mGames },
@@ -292,16 +349,16 @@ function renderAchievements(type) {
     { id: 'g30', type: 'general', name: 'Base Network Legend', desc: 'Get 5000 perfect landings. Mints a Base NFT.', target: 5000, current: mPerfects },
 
     // Daily (10 Tasks)
-    { id: 'd1', type: 'daily', name: 'Rookie Builder', desc: 'Play 5 games.', target: 5, current: mGames, reward: 5 },
-    { id: 'd2', type: 'daily', name: 'Bridge Master', desc: 'Score 10 points.', target: 10, current: mScore, reward: 5 },
-    { id: 'd3', type: 'daily', name: 'Perfect Landing', desc: 'Get 5 perfects.', target: 5, current: mPerfects, reward: 5 },
-    { id: 'd4', type: 'daily', name: 'Frequent Flyer', desc: 'Play 10 games.', target: 10, current: mGames, reward: 10 },
-    { id: 'd5', type: 'daily', name: 'Flawless', desc: 'Get 10 perfects.', target: 10, current: mPerfects, reward: 10 },
-    { id: 'd6', type: 'daily', name: 'Dedicated', desc: 'Play 15 games.', target: 15, current: mGames, reward: 15 },
-    { id: 'd7', type: 'daily', name: 'Pro Builder', desc: 'Score 20 points.', target: 20, current: mScore, reward: 5 },
-    { id: 'd8', type: 'daily', name: 'Eagle Eye', desc: 'Get 15 perfects.', target: 15, current: mPerfects, reward: 15 },
-    { id: 'd9', type: 'daily', name: 'Marathoner', desc: 'Play 25 games.', target: 25, current: mGames, reward: 25 },
-    { id: 'd10', type: 'daily', name: 'Unstoppable', desc: 'Score 30 points.', target: 30, current: mScore, reward: 5 },
+    { id: 'd1', type: 'daily', name: 'Rookie Builder', desc: 'Play 5 games today.', target: 5, current: dGames, reward: 5 },
+    { id: 'd2', type: 'daily', name: 'Bridge Master', desc: 'Score 10 points in a game today.', target: 10, current: dScore, reward: 5 },
+    { id: 'd3', type: 'daily', name: 'Perfect Landing', desc: 'Get 5 perfects today.', target: 5, current: dPerfects, reward: 5 },
+    { id: 'd4', type: 'daily', name: 'Frequent Flyer', desc: 'Play 10 games today.', target: 10, current: dGames, reward: 10 },
+    { id: 'd5', type: 'daily', name: 'Flawless', desc: 'Get 10 perfects today.', target: 10, current: dPerfects, reward: 10 },
+    { id: 'd6', type: 'daily', name: 'Dedicated', desc: 'Play 15 games today.', target: 15, current: dGames, reward: 15 },
+    { id: 'd7', type: 'daily', name: 'Pro Builder', desc: 'Score 20 points in a game today.', target: 20, current: dScore, reward: 5 },
+    { id: 'd8', type: 'daily', name: 'Eagle Eye', desc: 'Get 15 perfects today.', target: 15, current: dPerfects, reward: 15 },
+    { id: 'd9', type: 'daily', name: 'Marathoner', desc: 'Play 25 games today.', target: 25, current: dGames, reward: 25 },
+    { id: 'd10', type: 'daily', name: 'Unstoppable', desc: 'Score 30 points in a game today.', target: 30, current: dScore, reward: 5 },
 
     // Weekly (10 Tasks)
     { id: 'w1', type: 'weekly', name: 'Veteran', desc: 'Play 50 games.', target: 50, current: mGames, reward: 50 },
@@ -522,7 +579,10 @@ function openShopPreview(id) {
         if(item.type === 'skin') closeModals(); else backToShop();
       };
     } else {
+      btn.innerText = "INSUFFICIENT BB";
+      btn.classList.replace('btn-green', 'btn-gray');
       btn.disabled = true;
+      btn.onclick = null;
     }
   }
 
@@ -780,11 +840,12 @@ function updateLevelUI() {
 function startGame() {
   initAudio();
   score = 0; level = 1;
+  perfectStreak = 0; sessionBestCombo = 0; sessionPerfects = 0; sessionCoins = 0;
   window.newRecordReached = false;
   scoreEl.innerText = score;
   cameraX = 0; targetCameraX = 0; currentPlatformIndex = 0; particles = []; scaleAmount = 1.0; shakeAmount = 0;
   setupInitialState();
-  gameState = 'PLAYING'; engineState = 'WAITING';
+  gameState = STATES.PLAYING;
   document.querySelector('.gh-center').style.opacity = '1';
   const headerUI = document.getElementById('game-header-ui');
   if (headerUI) {
@@ -802,7 +863,7 @@ function startGame() {
 function reviveGame() {
   if (coins >= 50) {
     coins -= 50; localStorage.setItem('bb_v1_coins', coins); uiCoinsEl.innerText = coins;
-    gameState = 'PLAYING'; engineState = 'WAITING';
+    gameState = STATES.PLAYING;
     
     // Reset to current platform safely
     const currP = platforms[currentPlatformIndex];
@@ -831,7 +892,7 @@ function generatePlatform() {
 
 function resetBridge() {
   const curr = platforms[currentPlatformIndex];
-  bridge.x = curr.x + curr.w; bridge.y = H - platformHeight; bridge.length = 0; bridge.angle = 0;
+  bridge.x = curr.x + curr.w; bridge.y = H - platformHeight; bridge.length = 0; bridge.angle = 0; bridge.fallTime = 0;
 }
 
 function spawnConfetti(x, y) {
@@ -852,24 +913,49 @@ function spawnSparks(x, y) {
   }
 }
 
-function addCoins(amount) { coins += amount; uiCoinsEl.innerText = coins; localStorage.setItem('bb_v1_coins', coins); }
+function addCoins(amount) { 
+  coins += amount; 
+  uiCoinsEl.innerText = coins; 
+  localStorage.setItem('bb_v1_coins', coins); 
+  playSound('coin');
+  incMetric('bb_v1_total_score', amount); 
+}
 
 function checkLanding() {
   incMetric('bb_v1_total_bridges', 1);
   const nextP = platforms[currentPlatformIndex + 1];
   const bridgeTip = bridge.x + bridge.length;
+  
   if (bridgeTip >= nextP.x && bridgeTip <= nextP.x + nextP.w) {
     success = true; platforms[currentPlatformIndex].bridgeL = bridge.length; 
     
-    const perfectW = 20;
+    // Dynamic Perfect Zone Width based on Level
+    let basePerfectRatio = 0.20;
+    let shrinkFactor = Math.max(0.05, basePerfectRatio - (level * 0.015)); // Shrinks up to level 10
+    const perfectW = Math.max(10, nextP.w * shrinkFactor);
     const perfectX = nextP.x + (nextP.w / 2) - (perfectW / 2);
+    
     if (bridgeTip >= perfectX && bridgeTip <= perfectX + perfectW) {
-      score += 2; addCoins(2); scaleAmount = 1.05;
+      perfectStreak++;
+      sessionPerfects++;
+      if (perfectStreak > sessionBestCombo) sessionBestCombo = perfectStreak;
+      
+      let comboBonus = Math.floor(perfectStreak / 2); // 1 extra coin every 2 perfects
+      let totalCoins = 1 + comboBonus; // Base 1 + Combo
+      
+      score += 2; addCoins(totalCoins); sessionCoins += totalCoins; scaleAmount = 1.05;
       incMetric('bb_v1_total_perfects', 1);
-      spawnSparks(bridgeTip, H - platformHeight); perfectEl.innerText = "PERFECT! +2"; perfectEl.classList.add('show'); setTimeout(() => perfectEl.classList.remove('show'), 1000);
+      spawnSparks(bridgeTip, H - platformHeight); 
+      
+      let msg = "PERFECT! +2";
+      if (perfectStreak > 1) msg += ` (COMBO x${perfectStreak})`;
+      perfectEl.innerText = msg; 
+      perfectEl.classList.add('show'); 
+      setTimeout(() => perfectEl.classList.remove('show'), 1000);
       playSound('perfect');
     } else {
-      score += 1; addCoins(1);
+      perfectStreak = 0; // Reset streak on normal success
+      score += 1; addCoins(1); sessionCoins += 1; // Base 1 coin
     }
     scoreEl.innerText = score;
     
@@ -887,18 +973,30 @@ function checkLanding() {
       levelNameEl.classList.remove('level-flash');
       void levelNameEl.offsetWidth; // trigger reflow
       levelNameEl.classList.add('level-flash');
+      playSound('levelup');
     }
     updateLevelUI();
-  } else { success = false; }
-  engineState = 'WALKING';
+  } else { 
+    success = false; 
+    perfectStreak = 0; // Reset streak on failure
+  }
+  gameState = STATES.CHARACTER_WALKING;
 }
 
 function triggerGameOver() {
-  gameState = 'GAME_OVER'; shakeAmount = 25; playSound('fail');
+  gameState = STATES.GAME_OVER; shakeAmount = 25; playSound('fail');
   let isNewBest = false;
   if (score > bestScore) { bestScore = score; bestEl.innerText = bestScore; localStorage.setItem('bb_v1_best', bestScore); isNewBest = true; }
-  finalScoreEl.innerText = score;
-  let sessions = JSON.parse(localStorage.getItem('bb_v1_sessions') || '[]'); sessions.push({ addr: window.userAddress || "Local Session", score: score, date: new Date().getTime() }); localStorage.setItem('bb_v1_sessions', JSON.stringify(sessions));
+  let dailyScore = parseInt(localStorage.getItem('bb_v1_daily_score')||'0');
+  if (score > dailyScore) localStorage.setItem('bb_v1_daily_score', score);
+  
+  // Update the detailed stats
+  document.getElementById('go-score').innerText = score;
+  document.getElementById('go-best').innerText = bestScore;
+  document.getElementById('go-bb').innerText = sessionCoins;
+  document.getElementById('go-perfects').innerText = sessionPerfects;
+  document.getElementById('go-combo').innerText = sessionBestCombo;
+  document.getElementById('go-level').innerText = level;
   updateLeaderboardUI();
   
   document.querySelector('.gh-center').style.opacity = '0';
@@ -922,7 +1020,7 @@ function triggerGameOver() {
 }
 
 function triggerGameWon() {
-  gameState = 'GAME_WON'; 
+  gameState = STATES.GAME_WON; 
   playSound('perfect');
   spawnConfetti(cameraX + W/2, H/2);
   
@@ -931,12 +1029,19 @@ function triggerGameWon() {
   
   let isNewBest = false;
   if (score > bestScore) { bestScore = score; bestEl.innerText = bestScore; localStorage.setItem('bb_v1_best', bestScore); isNewBest = true; }
+  let dailyScore = parseInt(localStorage.getItem('bb_v1_daily_score')||'0');
+  if (score > dailyScore) localStorage.setItem('bb_v1_daily_score', score);
   
   document.querySelector('.go-title').innerText = "CONGRATULATIONS!";
   document.querySelector('.go-title').style.color = '#10b981';
-  finalScoreEl.innerText = score;
   
-  let sessions = JSON.parse(localStorage.getItem('bb_v1_sessions') || '[]'); sessions.push({ addr: window.userAddress || "Local Session", score: score, date: new Date().getTime() }); localStorage.setItem('bb_v1_sessions', JSON.stringify(sessions));
+  // Update the detailed stats
+  document.getElementById('go-score').innerText = score;
+  document.getElementById('go-best').innerText = bestScore;
+  document.getElementById('go-bb').innerText = sessionCoins;
+  document.getElementById('go-perfects').innerText = sessionPerfects;
+  document.getElementById('go-combo').innerText = sessionBestCombo;
+  document.getElementById('go-level').innerText = level;
   updateLeaderboardUI();
   
   document.querySelector('.gh-center').style.opacity = '0';
@@ -959,21 +1064,21 @@ function triggerGameWon() {
 }
 
 function handlePointerDown(e) {
-  if (e.target.tagName === 'BUTTON' || gameState !== 'PLAYING') return;
+  if (e.target.tagName === 'BUTTON' || gameState !== STATES.PLAYING) return;
   if (!window.userAddress) {
     showInfoModal('Wallet Required', 'You must connect your wallet to play the game!');
     return;
   }
   initAudio();
-  if (engineState === 'WAITING') { 
-    engineState = 'GROWING'; startGrowSound();
+  if (gameState === STATES.PLAYING) { 
+    gameState = STATES.BRIDGE_GROWING; startGrowSound();
     if(!localStorage.getItem('bb_v1_tut_done')) { localStorage.setItem('bb_v1_tut_done', 'true'); tutEl.classList.add('hidden'); }
   }
 }
 
 function handlePointerUp(e) {
-  if (e.target.tagName === 'BUTTON' || gameState !== 'PLAYING') return;
-  if (engineState === 'GROWING') { engineState = 'FALLING'; stopGrowSound(); playSound('drop'); }
+  if (e.target.tagName === 'BUTTON') return;
+  if (gameState === STATES.BRIDGE_GROWING) { gameState = STATES.BRIDGE_FALLING; stopGrowSound(); playSound('drop'); }
 }
 
 const canvasArea = document.getElementById('canvas-wrapper');
@@ -986,47 +1091,85 @@ document.getElementById('btn-restart').addEventListener('click', startGame);
 document.getElementById('btn-start-overlay').addEventListener('click', startGame);
 document.getElementById('btn-revive').addEventListener('click', reviveGame);
 
+document.getElementById('fc-skill')?.addEventListener('click', () => {
+  if (typeof showInfoModal === 'function') {
+    showInfoModal('Skill Based Gameplay', 'Hold to grow the bridge. Release to cross. Perfect landing gives bonus points and combo multiplier. Levels get harder dynamically!');
+  }
+});
+document.getElementById('fc-daily')?.addEventListener('click', () => {
+  document.getElementById('btn-achievements')?.click();
+  const dailyTab = document.querySelector('.ach-tab[data-tab="daily"]');
+  if (dailyTab) dailyTab.click();
+});
+document.getElementById('fc-compete')?.addEventListener('click', () => {
+  document.getElementById('btn-leaderboard')?.click();
+});
+document.getElementById('fc-own')?.addEventListener('click', () => {
+  document.getElementById('btn-equipment')?.click();
+});
+
+document.getElementById('btn-mute-toggle')?.addEventListener('click', (e) => {
+  isMuted = !isMuted;
+  e.target.innerText = isMuted ? '🔇' : '🔊';
+  if (!isMuted) playSound('click');
+});
+
+// Global Button Sounds
+document.addEventListener('click', (e) => {
+  if (e.target.tagName === 'BUTTON' || e.target.closest('.btn') || e.target.closest('.feature-card') || e.target.closest('.skin-item')) {
+    playSound('click');
+  }
+});
+
 function update(dt) {
   animTime += dt/1000;
-  if (gameState !== 'PLAYING') return;
+  
+  // Only process physics/movement if not in menus
+  if ([STATES.MENU, STATES.SHOP, STATES.DAILY, STATES.LEADERBOARD, STATES.ACHIEVEMENTS, STATES.GAME_OVER, STATES.GAME_WON].includes(gameState)) return;
 
-  if (engineState === 'GROWING') {
-    bridge.length += (H * 0.8) * (dt / 1000); 
+  if (gameState === STATES.BRIDGE_GROWING) {
+    // Add slight acceleration to growth
+    bridge.length += (H * 0.8 + bridge.length * 0.5) * (dt / 1000); 
     let maxL = (cameraX + W) - bridge.x; if (bridge.length > maxL) bridge.length = maxL;
   } 
-  else if (engineState === 'FALLING') {
-    bridge.angle += (dt / 1000) * (Math.PI * 3); 
-    if (bridge.angle >= Math.PI / 2) { bridge.angle = Math.PI / 2; checkLanding(); }
+  else if (gameState === STATES.BRIDGE_FALLING) {
+    bridge.fallTime += (dt / 1000);
+    // easeOutCubic: 1 - Math.pow(1 - t, 3)
+    let t = Math.min(bridge.fallTime / 0.5, 1.0); // 0.5s fall duration
+    let easeOutCubic = 1 - Math.pow(1 - t, 3);
+    bridge.angle = easeOutCubic * (Math.PI / 2);
+    
+    if (t >= 1.0) { bridge.angle = Math.PI / 2; checkLanding(); }
   }
-  else if (engineState === 'WALKING') {
+  else if (gameState === STATES.CHARACTER_WALKING) {
     character.x += (W * 0.4) * (dt / 1000);
     let targetX;
     if (success) {
       const nextP = platforms[currentPlatformIndex + 1];
       targetX = nextP.x + nextP.w - character.size*1.5;
       if (character.x >= targetX) {
-        character.x = targetX; engineState = 'TRANSITIONING'; currentPlatformIndex++;
+        character.x = targetX; gameState = STATES.SUCCESS_TRANSITION; currentPlatformIndex++;
         targetCameraX = platforms[currentPlatformIndex].x - W * 0.1; generatePlatform();
       }
     } else {
       targetX = bridge.x + bridge.length;
-      if (character.x >= targetX) { character.x = targetX; engineState = 'FALLING_DOWN'; }
+      if (character.x >= targetX) { character.x = targetX; gameState = STATES.FALLING_DOWN; }
     }
   }
-  else if (engineState === 'TRANSITIONING') {
+  else if (gameState === STATES.SUCCESS_TRANSITION) {
     let camSpeed = (targetCameraX - cameraX) * 8 * (dt / 1000); cameraX += camSpeed;
     if (Math.abs(targetCameraX - cameraX) < 1) { 
       cameraX = targetCameraX; 
       if (level > 10) {
-        triggerGameWon(); engineState = 'GAME_OVER_IDLE';
+        triggerGameWon();
       } else {
-        resetBridge(); engineState = 'WAITING'; 
+        resetBridge(); gameState = STATES.PLAYING; 
       }
     }
   }
-  else if (engineState === 'FALLING_DOWN') {
+  else if (gameState === STATES.FALLING_DOWN) {
     character.y += (H * 0.9) * (dt / 1000); character.rotation += (dt / 1000) * Math.PI * 2; bridge.angle += (dt / 1000) * Math.PI * 2; 
-    if (character.y > H + character.size*2) { triggerGameOver(); engineState = 'GAME_OVER_IDLE'; }
+    if (character.y > H + character.size*2) { triggerGameOver(); }
   }
   
   if (scaleAmount > 1.0) { scaleAmount -= dt / 1000; if (scaleAmount < 1.0) scaleAmount = 1.0; }
@@ -1253,7 +1396,9 @@ function draw() {
       ctx.fillStyle = '#ffffff';
       ctx.shadowColor = '#ffffff';
       ctx.shadowBlur = 15;
-      const perfectW = 20;
+      let basePerfectRatio = 0.20;
+      let shrinkFactor = Math.max(0.05, basePerfectRatio - (level * 0.015));
+      const perfectW = Math.max(10, p.w * shrinkFactor);
       const perfectX = p.x + (p.w / 2) - (perfectW / 2);
       ctx.fillRect(perfectX, H - platformHeight - 5, perfectW, 5);
       ctx.shadowBlur = 0;
@@ -1268,7 +1413,7 @@ function draw() {
     }
   }
   
-  if (engineState !== 'WAITING' || bridge.length > 0) {
+  if (gameState !== STATES.PLAYING || bridge.length > 0) {
     const bColor = BIOMES[Math.min(level - 1, BIOMES.length - 1)].platTop;
     ctx.save(); ctx.translate(bridge.x, bridge.y); ctx.rotate(bridge.angle);
     ctx.fillStyle = '#111'; ctx.fillRect(0, -bridge.length, bridge.thickness, bridge.length);
@@ -1280,8 +1425,8 @@ function draw() {
   ctx.save();
   ctx.translate(character.x + character.size/2, character.y);
   ctx.rotate(character.rotation);
-  let state = (engineState === 'WALKING' && success) ? 'WALK' : 'IDLE';
-  if(engineState === 'FALLING_DOWN') state = 'IDLE';
+  let state = (gameState === STATES.CHARACTER_WALKING && success) ? 'WALK' : 'IDLE';
+  if(gameState === STATES.FALLING_DOWN) state = 'IDLE';
   renderSkeleton(ctx, currentSkin, equippedHat, equippedWeapon, equippedFace, character.size, state, animTime);
   ctx.restore();
   

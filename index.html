@@ -63,7 +63,15 @@
           </div>
           <div class="game-overlay hidden" id="game-over-overlay">
             <h2 class="go-title">GAME OVER</h2>
-            <div class="game-over-stats"><span>Score:</span> <span id="final-score">0</span></div>
+            <div class="game-over-stats">
+              <div class="go-stat-row"><span>SCORE:</span> <strong id="go-score" style="color:#00ff88;">0</strong></div>
+              <div class="go-stat-row"><span>BEST:</span> <strong id="go-best">0</strong></div>
+              <div class="go-stat-row"><span>BB EARNED:</span> <strong id="go-bb" style="color:#00e5ff;">0</strong></div>
+              <div class="go-stat-row"><span>PERFECTS:</span> <strong id="go-perfects">0</strong></div>
+              <div class="go-stat-row"><span>BEST COMBO:</span> <strong id="go-combo">0</strong></div>
+              <div class="go-stat-row"><span>LEVEL:</span> <strong id="go-level">1</strong></div>
+            </div>
+            <div id="go-wallet-msg" style="font-size: 0.8rem; color: #a1a1aa; margin-top: 5px; margin-bottom: 10px; text-align: center;">Score saved to wallet leaderboard</div>
             <div class="go-btn-wrapper" style="display:flex; flex-direction:column; gap:15px; margin-top:20px;">
               <button class="btn btn-aaa btn-pink" id="btn-restart">PLAY AGAIN</button>
               <button class="btn btn-aaa btn-blue hidden" id="btn-submit-score">SUBMIT SCORE TO WEB3</button>
@@ -84,6 +92,7 @@
           <div class="user-profile-area" id="user-profile-area" style="display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.4); padding: 8px 15px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); width: 100%; max-width: 250px;">
             <div class="user-avatar" id="current-user-avatar" style="width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0; box-shadow: 0 0 8px rgba(0,229,255,0.5); overflow: hidden; display: flex; justify-content: center; align-items: center; background: #111;"></div>
             <span id="current-user-name" style="font-weight: 800; font-size: 1.1rem; color: #fff; flex: 1; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Player</span>
+            <div id="btn-mute-toggle" style="cursor: pointer; opacity: 0.8; font-size: 1.2rem; transition: 0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.8">🔊</div>
             <div id="btn-profile-settings" style="cursor: pointer; opacity: 0.8; font-size: 1.2rem; transition: 0.2s; padding-left: 5px;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.8">⚙️</div>
           </div>
         </div>
@@ -179,7 +188,7 @@
         <div class="dr-box">
           <div class="bb-token-large"></div>
           <div class="dr-amount">
-            <strong>50 BB TOKENS</strong>
+            <strong>10 BB TOKENS</strong>
             <span>Daily Bonus</span>
           </div>
         </div>

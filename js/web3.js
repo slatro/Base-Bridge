@@ -369,11 +369,11 @@ function initDailyReward() {
     }
     if(newBtn.disabled) return;
     
-    const success = await window.claimBBTokensOnchain(50);
+    const success = await window.claimBBTokensOnchain(10);
     if (!success) return; // Wait for transaction to be approved
     
     let coins = parseInt(localStorage.getItem('bb_v1_coins') || '0');
-    coins += 50; 
+    coins += 10; 
     localStorage.setItem('bb_v1_coins', coins);
     document.getElementById('ui-coins').innerText = coins;
     
@@ -382,7 +382,7 @@ function initDailyReward() {
     newBtn.innerText = "CLAIMED ✓";
     newBtn.disabled = true;
     
-    showInfoModal("Reward Claimed!", "You received 50 BB Tokens onchain. Come back tomorrow for more!");
+    showInfoModal("Reward Claimed!", "You received 10 BB Tokens onchain. Come back tomorrow for more!");
   });
 }
 

@@ -11,6 +11,7 @@ let userAddress = null;
 // Replace these with your actual deployed contract addresses on Base Sepolia/Mainnet
 const BB_TOKEN_ADDRESS = "0x0000000000000000000000000000000000000001"; 
 const NFT_CONTRACT_ADDRESS = "0x0000000000000000000000000000000000000002";
+const LEADERBOARD_CONTRACT_ADDRESS = "0x0000000000000000000000000000000000000003";
 
 // DOM
 const btnConnect = document.getElementById("btn-connect-wallet");
@@ -367,6 +368,70 @@ window.mintNFT = async function(nftName) {
     showInfoModal('Success!', `Successfully minted ${nftName} on Base Network!`);
   } catch (error) {
     console.error(error);
+  }
+};
+
+window.fetchOnchainLeaderboard = async function() {
+  if (typeof ethers === 'undefined') return [];
+  
+  // Create a read-only provider to fetch scores even if wallet is not connected
+  const rpcProvider = new ethers.JsonRpcProvider('https://sepolia.base.org');
+  
+  try {
+    const abi = ["function getTopScores() external view returns (tuple(address player, uint256 score)[10])"];
+    const contract = new ethers.Contract(LEADERBOARD_CONTRACT_ADDRESS, abi, rpcProvider);
+    const topScores = await contract.getTopScores();
+    
+    let formattedScores = [];
+    for (let i = 0; i < topScores.length; i++) {
+      if (topScores[i].score > 0n) {
+        formattedScores.push({
+          addr: topScores[i].player,
+          score: Number(topScores[i].score)
+        });
+      }
+    }
+    
+    // Sort descending just in case
+    formattedScores.sort((a,b) => b.score - a.score);
+    return formattedScores;
+  } catch (error) {
+    console.error("Failed to fetch on-chain leaderboard:", error);
+    return [];
+  }
+};
+
+window.submitScoreOnchain = async function(score) {
+  if (!window.userAddress) return false;
+  const provider = window.ethereum;
+  if (!provider) return false;
+
+  try {
+    const abi = ["function submitScore(uint256 score, address referrer) external"];
+    const iface = new ethers.Interface(abi);
+    
+    // Check if we have a referrer saved
+    const referrer = localStorage.getItem('bb_v1_referrer') || "0x0000000000000000000000000000000000000000";
+    
+    const data = iface.encodeFunctionData("submitScore", [score, referrer]);
+
+    const tx = {
+      from: window.userAddress,
+      to: LEADERBOARD_CONTRACT_ADDRESS,
+      value: '0x0',
+      data: data
+    };
+    
+    await provider.request({
+      method: 'eth_sendTransaction',
+      params: [tx],
+    });
+    
+    showInfoModal('Success!', 'Transaction to save your score has been submitted to Base Network!');
+    return true;
+  } catch (error) {
+    console.error("Score submission failed:", error);
+    return false;
   }
 };
 

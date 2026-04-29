@@ -54,6 +54,7 @@
             <div class="game-over-stats"><span>Score:</span> <span id="final-score">0</span></div>
             <div class="go-btn-wrapper" style="display:flex; flex-direction:column; gap:15px; margin-top:20px;">
               <button class="btn btn-aaa btn-pink" id="btn-restart">PLAY AGAIN</button>
+              <button class="btn btn-aaa btn-blue hidden" id="btn-submit-score">SUBMIT SCORE TO WEB3</button>
               <button class="btn btn-aaa btn-purple hidden" id="btn-revive">REVIVE (50 BB)</button>
             </div>
           </div>
@@ -177,9 +178,9 @@
 
       <!-- Leaderboard -->
       <div class="panel-card glass-panel leaderboard-panel" id="leaderboard-section">
-        <h3 class="panel-title">LOCAL LEADERBOARD</h3>
+        <h3 class="panel-title">GLOBAL LEADERBOARD (ON-CHAIN)</h3>
         <div class="lb-tabs">
-          <button class="lb-tab active">SESSIONS</button>
+          <button class="lb-tab active">TOP SCORES</button>
         </div>
         <div class="lb-rows" id="lb-rows-container">
           <div class="lb-empty">Play a game to see your scores here!</div>

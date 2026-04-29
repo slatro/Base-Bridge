@@ -132,32 +132,26 @@ function resize() {
 }
 window.addEventListener('resize', resize);
 
-function updateLeaderboardUI() {
+async function updateLeaderboardUI() {
   const container = document.getElementById('lb-rows-container');
-  let rawSessions = JSON.parse(localStorage.getItem('bb_v1_sessions') || '[]');
+  container.innerHTML = `<div class="lb-empty">Loading Global Leaderboard...</div>`;
   
-  let grouped = {};
-  for(let s of rawSessions) {
-     let addr = s.addr || "Local Session";
-     if (addr === "Local Session" && window.userAddress) {
-         addr = window.userAddress;
-     }
-     if(!grouped[addr] || s.score > grouped[addr].score) {
-         grouped[addr] = { score: s.score, date: s.date || new Date().getTime() };
-     }
+  let sessions = [];
+  if (typeof window.fetchOnchainLeaderboard === 'function') {
+      sessions = await window.fetchOnchainLeaderboard();
   }
-  
-  let sessions = Object.keys(grouped).map(addr => ({ addr: addr, score: grouped[addr].score, date: grouped[addr].date }));
-  localStorage.setItem('bb_v1_sessions', JSON.stringify(sessions));
-  
-  sessions.sort((a,b) => b.score - a.score);
-  if(sessions.length === 0) { container.innerHTML = `<div class="lb-empty">Play a game to see your scores here!</div>`; return; }
+
+  if(sessions.length === 0) { 
+      container.innerHTML = `<div class="lb-empty">No scores found on Base Sepolia. Be the first!</div>`; 
+      return; 
+  }
+
   let html = '';
   for(let i=0; i<Math.min(10, sessions.length); i++) {
     const s = sessions[i]; 
     let rClass = `rank-${i+1}`; if (i > 2) rClass = `rank-4`;
     let shortAddr = s.addr;
-    if (shortAddr !== "Local Session" && shortAddr.length > 10) {
+    if (shortAddr && shortAddr.length > 10) {
       shortAddr = shortAddr.substring(0, 6) + "..." + shortAddr.substring(shortAddr.length - 4);
     }
     html += `<div class="lb-row"><span class="lb-rank ${rClass}">${i+1}</span> <span class="lb-addr">${shortAddr}</span> <strong class="lb-score">${s.score}</strong></div>`;
@@ -850,6 +844,30 @@ function triggerGameOver() {
   document.querySelector('.gh-center').style.opacity = '0';
   document.querySelector('.go-title').innerText = "GAME OVER"; document.querySelector('.go-title').style.color = '#fff';
   if (coins >= 50) { btnRevive.classList.remove('hidden'); }
+  
+  const btnSubmitScore = document.getElementById('btn-submit-score');
+  if (btnSubmitScore) {
+      if (window.userAddress && score > 0) {
+          btnSubmitScore.classList.remove('hidden');
+          btnSubmitScore.innerText = "SUBMIT SCORE TO WEB3";
+          btnSubmitScore.disabled = false;
+          btnSubmitScore.onclick = async () => {
+              btnSubmitScore.innerText = "SUBMITTING...";
+              btnSubmitScore.disabled = true;
+              let success = await window.submitScoreOnchain(score);
+              if(success) {
+                  btnSubmitScore.innerText = "SUBMITTED!";
+                  updateLeaderboardUI();
+              } else {
+                  btnSubmitScore.innerText = "SUBMIT SCORE TO WEB3";
+                  btnSubmitScore.disabled = false;
+              }
+          };
+      } else {
+          btnSubmitScore.classList.add('hidden');
+      }
+  }
+
   setTimeout(() => gameOverOverlay.classList.remove('hidden'), 1000);
 }
 
@@ -872,6 +890,30 @@ function triggerGameWon() {
   
   document.querySelector('.gh-center').style.opacity = '0';
   btnRevive.classList.add('hidden'); 
+  
+  const btnSubmitScore = document.getElementById('btn-submit-score');
+  if (btnSubmitScore) {
+      if (window.userAddress && score > 0) {
+          btnSubmitScore.classList.remove('hidden');
+          btnSubmitScore.innerText = "SUBMIT SCORE TO WEB3";
+          btnSubmitScore.disabled = false;
+          btnSubmitScore.onclick = async () => {
+              btnSubmitScore.innerText = "SUBMITTING...";
+              btnSubmitScore.disabled = true;
+              let success = await window.submitScoreOnchain(score);
+              if(success) {
+                  btnSubmitScore.innerText = "SUBMITTED!";
+                  updateLeaderboardUI();
+              } else {
+                  btnSubmitScore.innerText = "SUBMIT SCORE TO WEB3";
+                  btnSubmitScore.disabled = false;
+              }
+          };
+      } else {
+          btnSubmitScore.classList.add('hidden');
+      }
+  }
+
   setTimeout(() => gameOverOverlay.classList.remove('hidden'), 1000);
 }
 

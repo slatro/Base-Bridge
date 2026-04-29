@@ -1,7 +1,7 @@
 // js/web3.js
 const BASE_MAINNET = 8453;
 const BASE_SEPOLIA = 84532;
-const TARGET_CHAIN = BASE_SEPOLIA;
+const TARGET_CHAIN = BASE_MAINNET;
 const TARGET_CHAIN_HEX = "0x" + TARGET_CHAIN.toString(16);
 
 let provider;
@@ -206,13 +206,13 @@ async function checkNetwork() {
   const chainIdHex = await provider.request({ method: 'eth_chainId' });
   const chainId = parseInt(chainIdHex, 16);
   
-  if (chainId !== 8453 && chainId !== 84532) {
+  if (chainId !== 8453) {
     lblNetwork.innerText = "Wrong Network";
     lblNetwork.style.color = "#ff2a7a";
-    btnSwitch.innerText = "Switch to Base";
+    btnSwitch.innerText = "Switch to Base Mainnet";
     btnSwitch.classList.remove("hidden");
   } else {
-    lblNetwork.innerText = chainId === 8453 ? "Base Mainnet" : "Base Sepolia";
+    lblNetwork.innerText = "Base Mainnet";
     lblNetwork.style.color = "#00ff88";
     btnSwitch.classList.add("hidden");
   }
@@ -229,10 +229,10 @@ async function switchNetwork() {
         method: 'wallet_addEthereumChain',
         params: [{
           chainId: TARGET_CHAIN_HEX,
-          chainName: 'Base Sepolia',
-          rpcUrls: ['https://sepolia.base.org'],
+          chainName: 'Base Mainnet',
+          rpcUrls: ['https://mainnet.base.org'],
           nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
-          blockExplorerUrls: ['https://sepolia.basescan.org/']
+          blockExplorerUrls: ['https://basescan.org/']
         }]
       });
     } catch (addError) {
@@ -375,7 +375,7 @@ window.fetchOnchainLeaderboard = async function() {
   if (typeof ethers === 'undefined') return [];
   
   // Create a read-only provider to fetch scores even if wallet is not connected
-  const rpcProvider = new ethers.JsonRpcProvider('https://sepolia.base.org');
+  const rpcProvider = new ethers.JsonRpcProvider('https://mainnet.base.org');
   
   try {
     const abi = ["function getTopScores() external view returns (tuple(address player, uint256 score)[10])"];

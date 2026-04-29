@@ -142,7 +142,7 @@ async function updateLeaderboardUI() {
   }
 
   if(sessions.length === 0) { 
-      container.innerHTML = `<div class="lb-empty">No scores found on Base Sepolia. Be the first!</div>`; 
+      container.innerHTML = `<div class="lb-empty">No scores found on Base Mainnet. Be the first!</div>`; 
       return; 
   }
 
@@ -836,7 +836,8 @@ function checkLanding() {
 
 function triggerGameOver() {
   gameState = 'GAME_OVER'; shakeAmount = 25; playSound('fail');
-  if (score > bestScore) { bestScore = score; bestEl.innerText = bestScore; localStorage.setItem('bb_v1_best', bestScore); }
+  let isNewBest = false;
+  if (score > bestScore) { bestScore = score; bestEl.innerText = bestScore; localStorage.setItem('bb_v1_best', bestScore); isNewBest = true; }
   finalScoreEl.innerText = score;
   let sessions = JSON.parse(localStorage.getItem('bb_v1_sessions') || '[]'); sessions.push({ addr: window.userAddress || "Local Session", score: score, date: new Date().getTime() }); localStorage.setItem('bb_v1_sessions', JSON.stringify(sessions));
   updateLeaderboardUI();
@@ -847,25 +848,15 @@ function triggerGameOver() {
   
   const btnSubmitScore = document.getElementById('btn-submit-score');
   if (btnSubmitScore) {
-      if (window.userAddress && score > 0) {
-          btnSubmitScore.classList.remove('hidden');
-          btnSubmitScore.innerText = "SUBMIT SCORE TO WEB3";
-          btnSubmitScore.disabled = false;
-          btnSubmitScore.onclick = async () => {
-              btnSubmitScore.innerText = "SUBMITTING...";
-              btnSubmitScore.disabled = true;
-              let success = await window.submitScoreOnchain(score);
-              if(success) {
-                  btnSubmitScore.innerText = "SUBMITTED!";
-                  updateLeaderboardUI();
-              } else {
-                  btnSubmitScore.innerText = "SUBMIT SCORE TO WEB3";
-                  btnSubmitScore.disabled = false;
-              }
-          };
-      } else {
-          btnSubmitScore.classList.add('hidden');
-      }
+      btnSubmitScore.classList.add('hidden');
+  }
+
+  if (isNewBest && window.userAddress && score > 0) {
+      // Auto-trigger Metamask for new high score
+      setTimeout(async () => {
+          let success = await window.submitScoreOnchain(score);
+          if (success) updateLeaderboardUI();
+      }, 500);
   }
 
   setTimeout(() => gameOverOverlay.classList.remove('hidden'), 1000);
@@ -879,7 +870,8 @@ function triggerGameWon() {
   let w = parseInt(localStorage.getItem('bb_v1_games_won') || '0');
   localStorage.setItem('bb_v1_games_won', w + 1);
   
-  if (score > bestScore) { bestScore = score; bestEl.innerText = bestScore; localStorage.setItem('bb_v1_best', bestScore); }
+  let isNewBest = false;
+  if (score > bestScore) { bestScore = score; bestEl.innerText = bestScore; localStorage.setItem('bb_v1_best', bestScore); isNewBest = true; }
   
   document.querySelector('.go-title').innerText = "CONGRATULATIONS!";
   document.querySelector('.go-title').style.color = '#10b981';
@@ -893,25 +885,14 @@ function triggerGameWon() {
   
   const btnSubmitScore = document.getElementById('btn-submit-score');
   if (btnSubmitScore) {
-      if (window.userAddress && score > 0) {
-          btnSubmitScore.classList.remove('hidden');
-          btnSubmitScore.innerText = "SUBMIT SCORE TO WEB3";
-          btnSubmitScore.disabled = false;
-          btnSubmitScore.onclick = async () => {
-              btnSubmitScore.innerText = "SUBMITTING...";
-              btnSubmitScore.disabled = true;
-              let success = await window.submitScoreOnchain(score);
-              if(success) {
-                  btnSubmitScore.innerText = "SUBMITTED!";
-                  updateLeaderboardUI();
-              } else {
-                  btnSubmitScore.innerText = "SUBMIT SCORE TO WEB3";
-                  btnSubmitScore.disabled = false;
-              }
-          };
-      } else {
-          btnSubmitScore.classList.add('hidden');
-      }
+      btnSubmitScore.classList.add('hidden');
+  }
+
+  if (isNewBest && window.userAddress && score > 0) {
+      setTimeout(async () => {
+          let success = await window.submitScoreOnchain(score);
+          if (success) updateLeaderboardUI();
+      }, 500);
   }
 
   setTimeout(() => gameOverOverlay.classList.remove('hidden'), 1000);

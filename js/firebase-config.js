@@ -1,0 +1,71 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+// TODO: Replace with your Firebase config
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT_ID.appspot.com",
+  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+
+let app, db;
+
+try {
+    // Only initialize if config is changed from dummy values
+    if (firebaseConfig.apiKey !== "YOUR_API_KEY") {
+        app = initializeApp(firebaseConfig);
+        db = getFirestore(app);
+    } else {
+        console.warn("Firebase is not configured yet. Please update js/firebase-config.js with your credentials.");
+    }
+} catch (e) {
+    console.error("Firebase initialization failed:", e);
+}
+
+window.fetchFirebaseLeaderboard = async function() {
+    if (!db) return [];
+    try {
+        const scoresRef = collection(db, "leaderboard");
+        const q = query(scoresRef, orderBy("score", "desc"), limit(10));
+        const querySnapshot = await getDocs(q);
+        
+        let formattedScores = [];
+        querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            formattedScores.push({
+                addr: data.username || data.address || "Guest",
+                score: data.score
+            });
+        });
+        return formattedScores;
+    } catch (e) {
+        console.error("Error fetching leaderboard: ", e);
+        return [];
+    }
+}
+
+window.submitScoreToFirebase = async function(score) {
+    if (!db) return false;
+    try {
+        const username = localStorage.getItem('bb_v1_username') || "Player";
+        const address = window.userAddress || "Guest";
+        
+        await addDoc(collection(db, "leaderboard"), {
+            username: username,
+            address: address,
+            score: score,
+            timestamp: new Date().getTime()
+        });
+        
+        if (typeof updateLeaderboardUI === 'function') {
+            updateLeaderboardUI();
+        }
+        return true;
+    } catch (e) {
+        console.error("Error adding document: ", e);
+        return false;
+    }
+}

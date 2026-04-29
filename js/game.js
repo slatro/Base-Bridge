@@ -137,12 +137,12 @@ async function updateLeaderboardUI() {
   container.innerHTML = `<div class="lb-empty">Loading Global Leaderboard...</div>`;
   
   let sessions = [];
-  if (typeof window.fetchOnchainLeaderboard === 'function') {
-      sessions = await window.fetchOnchainLeaderboard();
+  if (typeof window.fetchFirebaseLeaderboard === 'function') {
+      sessions = await window.fetchFirebaseLeaderboard();
   }
 
   if(sessions.length === 0) { 
-      container.innerHTML = `<div class="lb-empty">No scores found on Base Mainnet. Be the first!</div>`; 
+      container.innerHTML = `<div class="lb-empty">No scores found. Be the first!</div>`; 
       return; 
   }
 
@@ -851,12 +851,12 @@ function triggerGameOver() {
       btnSubmitScore.classList.add('hidden');
   }
 
-  if (isNewBest && window.userAddress && score > 0) {
-      // Auto-trigger Metamask for new high score
+  if (isNewBest && score > 0) {
       setTimeout(async () => {
-          let success = await window.submitScoreOnchain(score);
-          if (success) updateLeaderboardUI();
-      }, 500);
+          if (typeof window.submitScoreToFirebase === 'function') {
+              await window.submitScoreToFirebase(score);
+          }
+      }, 100);
   }
 
   setTimeout(() => gameOverOverlay.classList.remove('hidden'), 1000);
@@ -888,11 +888,12 @@ function triggerGameWon() {
       btnSubmitScore.classList.add('hidden');
   }
 
-  if (isNewBest && window.userAddress && score > 0) {
+  if (isNewBest && score > 0) {
       setTimeout(async () => {
-          let success = await window.submitScoreOnchain(score);
-          if (success) updateLeaderboardUI();
-      }, 500);
+          if (typeof window.submitScoreToFirebase === 'function') {
+              await window.submitScoreToFirebase(score);
+          }
+      }, 100);
   }
 
   setTimeout(() => gameOverOverlay.classList.remove('hidden'), 1000);

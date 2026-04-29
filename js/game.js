@@ -17,11 +17,11 @@ const btnRevive = document.getElementById('btn-revive');
 
 // --- ASSETS SYSTEM (PREMIUM) ---
 const ASSETS_PATHS = {
-  jungle_far: 'file:///Users/emreoktem/.gemini/antigravity/brain/117ee70c-2416-426a-a3c1-08f8ad79d7a4/jungle_far_1777502232362.png',
-  desert_far: 'file:///Users/emreoktem/.gemini/antigravity/brain/117ee70c-2416-426a-a3c1-08f8ad79d7a4/desert_far_1777502254948.png',
-  night_city_far: 'file:///Users/emreoktem/.gemini/antigravity/brain/117ee70c-2416-426a-a3c1-08f8ad79d7a4/night_city_far_1777502279274.png',
-  mountain_far: 'file:///Users/emreoktem/.gemini/antigravity/brain/117ee70c-2416-426a-a3c1-08f8ad79d7a4/mountain_far_1777502425600.png',
-  synthwave_far: 'file:///Users/emreoktem/.gemini/antigravity/brain/117ee70c-2416-426a-a3c1-08f8ad79d7a4/synthwave_far_1777502530639.png'
+  jungle_far: 'assets/jungle_far_1777502232362.png',
+  desert_far: 'assets/desert_far_1777502254948.png',
+  night_city_far: 'assets/night_city_far_1777502279274.png',
+  mountain_far: 'assets/mountain_far_1777502425600.png',
+  synthwave_far: 'assets/synthwave_far_1777502530639.png'
 };
 let loadedAssets = {};
 for (let k in ASSETS_PATHS) {
@@ -1123,14 +1123,17 @@ function drawBackground() {
   
   // Layer 1: The Cinematic Backdrop
   const farAsset = loadedAssets[b.far];
-  if (farAsset && farAsset.complete) {
+  if (farAsset && farAsset.complete && farAsset.naturalWidth !== 0) {
     // Parallax scrolling the image
     let scrollX = (cameraX * 0.1) % W;
     ctx.drawImage(farAsset, -scrollX, 0, W, H);
     ctx.drawImage(farAsset, W - scrollX, 0, W, H);
   } else {
-    // Fallback if image not loaded
-    ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
+    // Fallback if image not loaded: use the biome sky gradient
+    let skyG = ctx.createLinearGradient(0, 0, 0, H);
+    skyG.addColorStop(0, b.skyTop || '#1e293b');
+    skyG.addColorStop(1, b.skyBot || '#0f172a');
+    ctx.fillStyle = skyG; ctx.fillRect(0, 0, W, H);
   }
 
   // Layer 2: Atmosphere / Fog / Shading

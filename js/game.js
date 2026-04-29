@@ -789,29 +789,42 @@ function setupInitialState() {
   updateLevelUI();
 }
 
-// 10 Biome System with Names
-const BIOMES = [
-  { name: 'GREEN HILLS', skyTop: '#38bdf8', skyBot: '#fde047', mtn1: '#15803d', mtn2: '#166534', platDirt: '#451a03', platTop: '#4ade80' }, 
-  { name: 'SUNSET MOUNTAIN', skyTop: '#f97316', skyBot: '#ec4899', mtn1: '#9d174d', mtn2: '#831843', platDirt: '#4a044e', platTop: '#fcd34d' }, 
-  { name: 'NEON CITY', skyTop: '#0f172a', skyBot: '#1e1b4b', mtn1: '#312e81', mtn2: '#1e1b4b', platDirt: '#020617', platTop: '#00e5ff' }, 
-  { name: 'SPACE STATION', skyTop: '#000000', skyBot: '#0f172a', mtn1: '#1e293b', mtn2: '#0f172a', platDirt: '#334155', platTop: '#94a3b8' }, 
-  { name: 'CYBER GRID', skyTop: '#064e3b', skyBot: '#021a14', mtn1: '#065f46', mtn2: '#047857', platDirt: '#01030b', platTop: '#10b981' }, 
-  { name: 'DEEP FOREST', skyTop: '#0284c7', skyBot: '#047857', mtn1: '#065f46', mtn2: '#064e3b', platDirt: '#210c01', platTop: '#15803d' }, 
-  { name: 'BARREN DESERT', skyTop: '#fef08a', skyBot: '#facc15', mtn1: '#ca8a04', mtn2: '#a16207', platDirt: '#713f12', platTop: '#eab308' }, 
-  { name: 'FLOATING RUINS', skyTop: '#c084fc', skyBot: '#7e22ce', mtn1: '#6b21a8', mtn2: '#581c87', platDirt: '#170832', platTop: '#d8b4fe' },  
-  { name: 'LAVA WORLD', skyTop: '#450a0a', skyBot: '#7f1d1d', mtn1: '#991b1b', mtn2: '#7f1d1d', platDirt: '#2a0a0a', platTop: '#ef4444' }, 
-  { name: 'BASE HQ', skyTop: '#0052ff', skyBot: '#0033cc', mtn1: '#002299', mtn2: '#001166', platDirt: '#000833', platTop: '#00d2ff' }  
+// --- BACKGROUND ASSETS SYSTEM ---
+const BIOME_LAYERS = [
+  { id: 'jungle', name: 'JUNGLE MIST' },
+  { id: 'desert', name: 'BARREN DESERT' },
+  { id: 'neon',   name: 'NEON NIGHTS' },
+  { id: 'space',  name: 'SNOWY PEAKS' },
+  { id: 'cyber',  name: 'SYNTH HORIZON' }
 ];
 
+const loadedBgAssets = {};
+BIOME_LAYERS.forEach(b => {
+  loadedBgAssets[b.id] = {
+    sky: new Image(),
+    far: new Image(),
+    mid: new Image(),
+    front: new Image()
+  };
+  loadedBgAssets[b.id].sky.src = `assets/backgrounds/${b.id}/sky.png`;
+  loadedBgAssets[b.id].far.src = `assets/backgrounds/${b.id}/far.png`;
+  loadedBgAssets[b.id].mid.src = `assets/backgrounds/${b.id}/mid.png`;
+  loadedBgAssets[b.id].front.src = `assets/backgrounds/${b.id}/front.png`;
+});
+
 function updateLevelUI() {
-  const bIdx = Math.min(level - 1, BIOMES.length - 1);
-  const biome = BIOMES[bIdx];
+  const bIdx = Math.min(level - 1, BIOME_LAYERS.length - 1);
+  const biome = BIOME_LAYERS[bIdx];
   levelNameEl.innerText = biome.name;
   
-  levelFillEl.style.background = biome.platTop;
-  levelFillEl.style.boxShadow = `0 0 10px ${biome.platTop}, 0 0 20px ${biome.platTop}`;
-  levelNameEl.style.color = biome.platTop;
-  levelNameEl.style.textShadow = `0 2px 4px rgba(0,0,0,0.8), 0 0 15px ${biome.platTop}`;
+  // Dynamic UI color based on biome (hardcoded for UI consistency)
+  const colors = { jungle: '#4ade80', desert: '#facc15', neon: '#00e5ff', space: '#94a3b8', cyber: '#ff2a7a' };
+  const c = colors[biome.id] || '#00e5ff';
+  
+  levelFillEl.style.background = c;
+  levelFillEl.style.boxShadow = `0 0 10px ${c}, 0 0 20px ${c}`;
+  levelNameEl.style.color = c;
+  levelNameEl.style.textShadow = `0 2px 4px rgba(0,0,0,0.8), 0 0 15px ${c}`;
   
   let progress = (score % 10) / 10 * 100;
   levelFillEl.style.width = `${progress}%`;
@@ -1162,172 +1175,46 @@ function update(dt) {
 }
 
 function drawBackground() {
-  const bIdx = Math.min(level - 1, BIOMES.length - 1);
-  const b = BIOMES[bIdx];
-  let groundY = H - platformHeight;
-  let drift = (Date.now() / 1000) * 10; // Slow horizontal drift over time
-  
-  // 1. SKY LAYER (Parallax 0.05)
-  let g = ctx.createLinearGradient(0, 0, 0, H); 
-  g.addColorStop(0, b.skyTop); g.addColorStop(1, b.skyBot);
-  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-  
-  ctx.save();
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-  // Stars / Particles
-  if ([0,2,3,4,5,7,8,9].includes(bIdx)) {
-    for(let i=0; i<100; i++) {
-       let sx = ((i*123) - cameraX*0.05 - drift*0.5) % W; if(sx<0) sx+=W;
-       let sy = (i*47) % (groundY);
-       let size = Math.abs(Math.sin(i)) * 2;
-       ctx.fillRect(sx, sy, size, size);
-    }
-  }
-  // Sun / Moon / Planet
-  if (bIdx === 3 || bIdx === 8) { // Planet
-    let px = (W * 0.7 - cameraX * 0.05 - drift*0.2) % (W * 1.5); if (px < -200) px += W * 1.5;
-    ctx.beginPath(); ctx.arc(px, H * 0.3, 120, 0, Math.PI * 2); 
-    ctx.fillStyle = bIdx === 3 ? '#9d4edd' : '#7f1d1d'; ctx.fill();
-    ctx.fillStyle = 'rgba(0,0,0,0.5)';
-    ctx.beginPath(); ctx.arc(px-30, H*0.3+30, 120, 0, Math.PI*2); ctx.fill();
-  } else if (bIdx === 1 || bIdx === 6 || bIdx === 4 || bIdx === 0) { // Sun
-    let px = (W * 0.3 - cameraX * 0.05 - drift*0.2) % (W * 1.5); if (px < -200) px += W * 1.5;
-    ctx.beginPath(); ctx.arc(px, H * 0.4, 80, 0, Math.PI * 2); 
-    if(bIdx === 4) { // Synthwave sun
-      let sunG = ctx.createLinearGradient(0, H*0.4-80, 0, H*0.4+80);
-      sunG.addColorStop(0, '#f97316'); sunG.addColorStop(1, '#ec4899');
-      ctx.fillStyle = sunG; ctx.fill();
-      ctx.fillStyle = b.skyBot;
-      for(let i=0; i<5; i++) ctx.fillRect(px-80, H*0.4 + i*15, 160, 4+i);
-    } else {
-      ctx.fillStyle = bIdx === 1 ? '#ffb703' : (bIdx === 0 ? '#fef08a' : '#facc15'); ctx.fill();
-    }
-  }
-  ctx.restore();
+  const bIdx = Math.min(level - 1, BIOME_LAYERS.length - 1);
+  const biome = BIOME_LAYERS[bIdx];
+  const assets = loadedBgAssets[biome.id];
+  let drift = (Date.now() / 1000) * 10;
 
-  // Helper for rendering repeating horizontal layers
-  function drawRepeatingLayer(speedFactor, gap, alpha, blur, drawFn) {
-    let speed = cameraX * speedFactor + drift * speedFactor;
-    let num = Math.ceil(W / gap) + 2;
-    let start = Math.floor(speed / gap) * gap;
+  function drawLayer(img, speedFactor, opacity = 1) {
+    if (!img || !img.complete || img.naturalWidth === 0) return;
+    ctx.globalAlpha = opacity;
+    let scrollX = ((cameraX * speedFactor) + (drift * speedFactor)) % W;
+    if (scrollX < 0) scrollX += W;
     
-    ctx.save();
-    ctx.globalAlpha = alpha;
-    if (blur > 0) ctx.filter = `blur(${blur}px)`;
-    
-    for(let i=0; i<num; i++) {
-      let x = (start + i*gap) - speed;
-      let rand = Math.abs(Math.sin((start + i*gap)*0.1));
-      let rand2 = Math.abs(Math.cos((start + i*gap)*0.13));
-      ctx.save();
-      ctx.translate(x, groundY);
-      drawFn(rand, rand2, x, start + i*gap);
-      ctx.restore();
-    }
-    ctx.restore();
+    // Draw two copies for seamless looping
+    ctx.drawImage(img, -scrollX, 0, W, H);
+    ctx.drawImage(img, W - scrollX, 0, W, H);
+    ctx.globalAlpha = 1.0;
   }
 
-  function drawAtmosphericFog(alpha, heightScale) {
-    let fog = ctx.createLinearGradient(0, groundY - H*heightScale, 0, groundY + 50);
-    fog.addColorStop(0, 'rgba(255,255,255,0)');
-    fog.addColorStop(1, `rgba(${hexToRgb(b.skyBot)}, ${alpha})`);
-    ctx.fillStyle = fog;
-    ctx.fillRect(0, 0, W, H);
-  }
-
-  function hexToRgb(hex) {
-    let c;
-    if(/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)){
-      c= hex.substring(1).split('');
-      if(c.length== 3){ c= [c[0], c[0], c[1], c[1], c[2], c[2]]; }
-      c= '0x'+c.join('');
-      return [(c>>16)&255, (c>>8)&255, c&255].join(',');
-    }
-    return "0,0,0"; // fallback
-  }
-
-  // Define drawing functions for different biome styles
-  const drawMtn = (color, w, h) => (r, r2) => {
-    ctx.fillStyle = color;
-    ctx.beginPath(); ctx.moveTo(-w/2, 0); 
-    ctx.quadraticCurveTo(0, -h - r*h*0.5, w/2, 0); ctx.fill();
-  };
+  // Layer 1: Sky (Very slow)
+  drawLayer(assets.sky, 0.05);
   
-  const drawCity = (color, color2) => (r, r2) => {
-    let h = 100 + r*200; let w = 60 + r2*40;
-    ctx.fillStyle = color; ctx.fillRect(-w/2, -h, w, h);
-    if(color2 && r2 > 0.3) {
-      ctx.fillStyle = color2;
-      for(let y=20; y<h-20; y+=25) {
-        if(r > 0.5) ctx.fillRect(-w/2+10, -h+y, w-20, 10);
-        else { ctx.fillRect(-w/2+10, -h+y, 15, 15); ctx.fillRect(w/2-25, -h+y, 15, 15); }
-      }
-    }
-  };
+  // Atmospheric Fog 1 (Light)
+  let fog1 = ctx.createLinearGradient(0, H*0.4, 0, H);
+  fog1.addColorStop(0, 'rgba(255,255,255,0)');
+  fog1.addColorStop(1, 'rgba(255,255,255,0.1)');
+  ctx.fillStyle = fog1; ctx.fillRect(0,0,W,H);
 
-  const drawTrees = (trunk, leaf1, leaf2) => (r, r2) => {
-    let th = 80 + r*80;
-    ctx.fillStyle = trunk; ctx.fillRect(-4, -20, 8, 20);
-    ctx.fillStyle = leaf1;
-    ctx.beginPath(); ctx.moveTo(0, -th); ctx.lineTo(-30-r2*20, -20); ctx.lineTo(30+r2*20, -20); ctx.fill();
-    ctx.fillStyle = leaf2;
-    ctx.beginPath(); ctx.moveTo(0, -th); ctx.lineTo(-20-r2*20, -th*0.4); ctx.lineTo(20+r2*20, -th*0.4); ctx.fill();
-  };
+  // Layer 2: Far (Slow, slightly faded)
+  drawLayer(assets.far, 0.15, 0.7);
+  
+  // Layer 3: Mid (Medium)
+  drawLayer(assets.mid, 0.35, 0.9);
+  
+  // Atmospheric Fog 2
+  let fog2 = ctx.createLinearGradient(0, H*0.6, 0, H);
+  fog2.addColorStop(0, 'rgba(0,0,0,0)');
+  fog2.addColorStop(1, 'rgba(0,0,0,0.3)');
+  ctx.fillStyle = fog2; ctx.fillRect(0,0,W,H);
 
-  const drawTech = (color) => (r, r2) => {
-    ctx.fillStyle = color;
-    ctx.beginPath(); ctx.moveTo(-30,0); ctx.lineTo(-20, -150 - r*100); ctx.lineTo(20, -150 - r*100); ctx.lineTo(30,0); ctx.fill();
-    ctx.fillStyle = 'rgba(0,0,0,0.3)'; ctx.fillRect(-10, -140 - r*100, 20, 130 + r*100);
-  };
-
-  const drawRuins = (color, float) => (r, r2) => {
-    ctx.fillStyle = color;
-    let y = float ? -H*0.4 - r2*100 : 0;
-    ctx.beginPath(); ctx.ellipse(0, y, 60+r*40, 30+r2*20, 0, 0, Math.PI*2); ctx.fill();
-    if(r > 0.5) { ctx.fillRect(-10, y-40, 20, 40); }
-  };
-
-  // 2. FAR LAYER (Parallax 0.15, Blur 3px, Opacity 0.6)
-  let farColor = b.mtn1;
-  let farType = bIdx === 2 ? drawCity(farColor) : 
-                bIdx === 3 ? drawTech(farColor) : 
-                bIdx === 4 ? drawCity(farColor) : 
-                bIdx === 5 ? drawTrees('#111', farColor, farColor) :
-                bIdx === 7 ? drawRuins(farColor, true) :
-                bIdx === 9 ? drawCity(farColor) : drawMtn(farColor, W*0.6, H*0.4);
-  drawRepeatingLayer(0.15, W*0.3, 0.6, 3, farType);
-  drawAtmosphericFog(0.4, 0.5);
-
-  // 3. MID LAYER (Parallax 0.35, Blur 1px, Opacity 0.85)
-  let midColor = b.mtn2;
-  let midType = bIdx === 2 ? drawCity(midColor) : 
-                bIdx === 3 ? drawTech(midColor) : 
-                bIdx === 4 ? drawCity(midColor) : 
-                bIdx === 5 ? drawTrees('#111', b.mtn1, midColor) :
-                bIdx === 7 ? drawRuins(midColor, true) :
-                bIdx === 9 ? drawCity(midColor) : drawMtn(midColor, W*0.4, H*0.25);
-  drawRepeatingLayer(0.35, W*0.2, 0.85, 1, midType);
-  drawAtmosphericFog(0.6, 0.3);
-
-  // 4. FRONT LAYER (Parallax 0.65, Blur 0px, Opacity 1.0)
-  let frontColor = b.platDirt;
-  let frontTop = b.platTop;
-  let frontType = bIdx === 2 ? drawCity(frontColor, frontTop) : 
-                  bIdx === 3 ? drawTech(frontColor) : 
-                  bIdx === 4 ? drawCity(frontColor, frontTop) : 
-                  bIdx === 5 ? drawTrees(frontColor, midColor, frontTop) :
-                  bIdx === 7 ? drawRuins(frontTop, false) :
-                  bIdx === 9 ? drawCity(frontColor, frontTop) : 
-                  (bIdx === 1 || bIdx === 6 || bIdx === 8) ? drawMtn(frontColor, W*0.2, H*0.15) : 
-                  drawTrees(frontColor, midColor, frontTop); // Default to trees in foreground
-  drawRepeatingLayer(0.65, W*0.12, 1.0, 0, frontType);
-
-  // Global Foreground Shadow / Vignette at bottom
-  let fgGlow = ctx.createLinearGradient(0, groundY - 20, 0, H);
-  fgGlow.addColorStop(0, 'rgba(0,0,0,0)');
-  fgGlow.addColorStop(1, 'rgba(0,0,0,0.8)');
-  ctx.fillStyle = fgGlow;
-  ctx.fillRect(0, groundY - 20, W, H - groundY + 20);
+  // Layer 4: Front (Fast, clear)
+  drawLayer(assets.front, 0.65, 1.0);
 }
 
 let lastDt = 16;

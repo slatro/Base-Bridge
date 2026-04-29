@@ -139,6 +139,9 @@ function updateLeaderboardUI() {
   let grouped = {};
   for(let s of rawSessions) {
      let addr = s.addr || "Local Session";
+     if (addr === "Local Session" && window.userAddress) {
+         addr = window.userAddress;
+     }
      if(!grouped[addr] || s.score > grouped[addr].score) {
          grouped[addr] = { score: s.score, date: s.date || new Date().getTime() };
      }

@@ -170,6 +170,8 @@ async function handleConnect(account) {
   refInput.value = `${window.location.origin}${window.location.pathname}?ref=${userAddress}`;
   lblBest.innerText = localStorage.getItem('bb_v1_best') || "0";
   
+  if (typeof updateLeaderboardUI === 'function') updateLeaderboardUI();
+  
   await checkNetwork();
 }
 
@@ -193,6 +195,8 @@ async function handleDisconnect() {
   if (viewConnect) viewConnect.classList.remove("hidden");
   if (viewDetails) viewDetails.classList.add("hidden");
   if (userProfileArea) userProfileArea.style.display = 'none';
+  
+  if (typeof updateLeaderboardUI === 'function') updateLeaderboardUI();
 }
 
 async function checkNetwork() {

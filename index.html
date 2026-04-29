@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Base Bridge</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
+</head>
+<body>
+  
+  <div id="app">
+    
+    <!-- Top Row: Game & Menu -->
+    <section class="top-row">
+      <!-- Game Card -->
+      <div class="game-card">
+        <!-- Overlay Header -->
+        <div class="game-header">
+          <div class="gh-left">
+            <div class="gh-stat">
+              <span class="gh-label">SCORE</span>
+              <span class="gh-val" id="ui-score">0</span>
+            </div>
+            <div class="gh-stat">
+              <span class="gh-label">BEST</span>
+              <span class="gh-val" id="ui-best">0</span>
+            </div>
+          </div>
+          <div class="gh-center">
+            <div class="gh-level-text" id="ui-level-name">GREEN HILLS</div>
+            <div class="gh-level-bar"><div class="gh-level-fill" id="ui-level-fill"></div></div>
+          </div>
+          <div class="gh-right">
+            <div class="gh-coins"><div class="bb-token-small"></div> <span id="ui-coins">0</span></div>
+          </div>
+        </div>
+
+        <!-- Canvas -->
+        <div class="canvas-wrapper" id="canvas-wrapper">
+          <canvas id="gameCanvas"></canvas>
+          
+          <div id="perfect-msg" class="hidden">RESCUED! +2</div>
+          <div id="tutorial-msg" class="tutorial-overlay hidden">
+            <div class="tut-icon-svg"></div>
+            <div class="tut-text">Tap and hold to build the bridge.</div>
+          </div>
+          <div class="game-overlay hidden" id="game-over-overlay">
+            <h2 class="go-title">GAME OVER</h2>
+            <div class="game-over-stats"><span>Score:</span> <span id="final-score">0</span></div>
+            <div class="go-btn-wrapper" style="display:flex; flex-direction:column; gap:15px; margin-top:20px;">
+              <button class="btn btn-aaa btn-pink" id="btn-restart">PLAY AGAIN</button>
+              <button class="btn btn-aaa btn-purple hidden" id="btn-revive">REVIVE (50 BB)</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Menu Card -->
+      <div class="menu-card glass-panel">
+        <div class="menu-top">
+          <div class="user-badge hidden" id="user-badge">
+            <div class="user-avatar"></div>
+            <span id="wallet-address-top">0xAB...1234</span>
+          </div>
+        </div>
+        <div class="menu-title-area">
+          <div class="main-logo-icon"></div>
+          <h1 class="menu-title">BASE<br>BRIDGE</h1>
+        </div>
+        
+        <div class="menu-buttons">
+          <button class="btn btn-aaa btn-pink" id="btn-play">PLAY</button>
+          <button class="btn btn-aaa btn-purple" id="btn-leaderboard">LEADERBOARD</button>
+          <button class="btn btn-aaa btn-blue" id="btn-achievements">ACHIEVEMENTS</button>
+          <button class="btn btn-aaa btn-green" id="btn-equipment">SHOP</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Row -->
+    <section class="features-row">
+      <div class="feature-card glass-panel" id="fc-skill">
+        <div class="fc-icon"><div class="svg-feat-rescue"></div></div>
+        <div class="fc-text">
+          <h4>RESCUE MISSIONS</h4>
+          <p>Time your builds. Rescue characters.</p>
+        </div>
+      </div>
+      <div class="feature-card glass-panel" id="fc-daily">
+        <div class="fc-icon"><div class="svg-feat-daily"></div></div>
+        <div class="fc-text">
+          <h4>DAILY REWARDS</h4>
+          <p>Play daily and earn BB Tokens.</p>
+        </div>
+      </div>
+      <div class="feature-card glass-panel" id="fc-compete">
+        <div class="fc-icon"><div class="svg-feat-compete"></div></div>
+        <div class="fc-text">
+          <h4>COMPETE & EARN</h4>
+          <p>Top players get real rewards.</p>
+        </div>
+      </div>
+      <div class="feature-card glass-panel" id="fc-own">
+        <div class="fc-icon"><div class="svg-feat-gear"></div></div>
+        <div class="fc-text">
+          <h4>GEAR UP</h4>
+          <p>Equip items and skins.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Panels Row -->
+    <section class="panels-row">
+      
+      <!-- Onchain Integrations -->
+      <div class="panel-card glass-panel onchain-panel" id="onchain-panel">
+        <h3 class="panel-title">ONCHAIN INTEGRATIONS</h3>
+        
+        <!-- Pre-connection View -->
+        <div id="onchain-connect-view" class="oc-connect-view">
+          <p>Connect your wallet to enable Web3 features, save your score onchain, and start referring friends.</p>
+          <button class="btn btn-aaa btn-blue" id="btn-connect-wallet">Checking Wallet...</button>
+        </div>
+
+        <!-- Post-connection View -->
+        <div id="onchain-details-view" class="oc-list hidden">
+          <div class="oc-item">
+            <div class="oc-left"><span class="oc-icon-svg svg-net"></span> Connected to Base</div>
+            <strong class="oc-val" id="network-status">No</strong>
+          </div>
+          <div class="oc-item">
+            <div class="oc-left"><span class="oc-icon-svg svg-wallet"></span> Wallet Connected</div>
+            <strong class="oc-val" id="wallet-address">--</strong>
+          </div>
+          <div class="oc-item">
+            <div class="oc-left"><span class="oc-icon-svg svg-star"></span> Best Score</div>
+            <strong class="oc-val" id="onchain-best">0</strong>
+          </div>
+          <div class="oc-item">
+            <div class="oc-left"><span class="oc-icon-svg svg-link"></span> Referrals</div>
+            <strong class="oc-val" id="onchain-refs">0</strong>
+          </div>
+          <div class="oc-action">
+            <button class="btn btn-switch-small hidden" id="btn-switch-network">Switch to Base</button>
+          </div>
+          <div class="referral-box mt-2">
+            <input type="text" id="ref-link-input" readonly value="">
+            <button class="btn btn-small" id="btn-copy-ref">Copy Link</button>
+          </div>
+          <div id="referred-by-text" class="ref-credit hidden">Referred by: <span></span></div>
+        </div>
+      </div>
+
+      <!-- Daily Reward -->
+      <div class="panel-card glass-panel daily-reward-panel">
+        <h3 class="panel-title">DAILY REWARD</h3>
+        <p class="panel-subtitle">Come back every day to claim<br>your on-chain reward!</p>
+        <div class="dr-box">
+          <div class="bb-token-large"></div>
+          <div class="dr-amount">
+            <strong>50 BB TOKENS</strong>
+            <span>Daily Bonus</span>
+          </div>
+        </div>
+        <div class="dr-btn-wrapper">
+          <button class="btn btn-aaa btn-green" id="btn-claim-daily">CLAIM REWARD</button>
+        </div>
+      </div>
+
+      <!-- Leaderboard -->
+      <div class="panel-card glass-panel leaderboard-panel" id="leaderboard-section">
+        <h3 class="panel-title">LOCAL LEADERBOARD</h3>
+        <div class="lb-tabs">
+          <button class="lb-tab active">SESSIONS</button>
+        </div>
+        <div class="lb-rows" id="lb-rows-container">
+          <div class="lb-empty">Play a game to see your scores here!</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Skins Footer (Strictly Skins Now) -->
+    <section class="skins-footer glass-panel" id="skins-section">
+      <div class="sf-left">
+        <h3>CHARACTER<br>SKINS</h3>
+        <span class="sf-sub">Choose your Hero</span>
+      </div>
+      
+      <div class="sf-center" id="skins-list">
+        <!-- Skins populated by JS -->
+      </div>
+      
+      <div class="sf-right">
+        <!-- Built on Base Badge -->
+        <div class="built-on-base-pill">
+          <div class="bob-logo-square"></div>
+          <div class="bob-text">Built on <strong>BASE</strong></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- GLOBAL MODALS -->
+  <div id="modal-backdrop" class="modal-backdrop hidden">
+    
+    <!-- Info Modal -->
+    <div id="modal-info" class="modal-card hidden">
+      <h2 id="modal-info-title">Title</h2>
+      <p id="modal-info-desc">Description</p>
+      <button class="btn btn-aaa btn-blue" onclick="closeModals()">OK</button>
+    </div>
+
+    <!-- Achievements Modal -->
+    <div id="modal-achievements" class="modal-card modal-large hidden">
+      <h2>ACHIEVEMENTS</h2>
+      <div class="ach-tabs">
+        <button class="ach-tab active" data-tab="general">NFT BADGES</button>
+        <button class="ach-tab" data-tab="daily">DAILY</button>
+        <button class="ach-tab" data-tab="weekly">WEEKLY</button>
+      </div>
+      <div class="achievements-list" id="achievements-list">
+        <!-- Populated dynamically via JS -->
+      </div>
+      <button class="btn btn-aaa btn-pink mt-4" onclick="closeModals()">CLOSE</button>
+    </div>
+
+    <!-- Massive Equipment Shop Modal -->
+    <div id="modal-equip-shop" class="modal-card modal-large hidden">
+      <h2>SHOP</h2>
+      <div class="ach-tabs">
+        <button class="equip-tab active" data-tab="hat">HATS</button>
+        <button class="equip-tab" data-tab="weapon">WEAPONS</button>
+      </div>
+      <div class="equip-grid" id="equip-list">
+        <!-- Populated dynamically via JS -->
+      </div>
+      <button class="btn btn-aaa btn-pink mt-4" onclick="closeModals()">CLOSE</button>
+    </div>
+
+    <!-- Live Character Preview Panel -->
+    <div id="modal-shop" class="modal-card modal-shop-layout hidden">
+      <div class="shop-left">
+        <canvas id="previewCanvas" width="300" height="400"></canvas>
+      </div>
+      <div class="shop-right">
+        <h2 id="preview-name">Item</h2>
+        <div class="preview-rarity" id="preview-rarity">Rarity</div>
+        <div class="preview-price"><div class="bb-token-small"></div> <span id="preview-cost">0</span></div>
+        <p class="preview-desc" id="preview-desc">Description</p>
+        <div class="preview-actions" style="display:flex; flex-direction:row; gap: 15px; margin-top: 20px;">
+          <button class="btn btn-aaa btn-green" id="btn-buy-equip" style="flex:1;">BUY & EQUIP</button>
+          <button class="btn btn-aaa btn-gray" id="btn-preview-close" style="flex:1;">BACK</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="js/web3.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>

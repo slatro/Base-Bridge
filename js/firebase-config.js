@@ -26,13 +26,24 @@ window.submitScoreToFirebase = async function(score) {
         // 1. Fetch current leaderboard
         let currentBoard = await window.fetchFirebaseLeaderboard();
         
-        // 2. Add new score
-        currentBoard.push({
-            uuid: localStorage.getItem('bb_v1_uuid') || "unknown",
-            addr: username, // show username on the board
-            score: score,
-            timestamp: new Date().getTime()
-        });
+        let myUUID = localStorage.getItem('bb_v1_uuid') || "unknown";
+        let existingIndex = currentBoard.findIndex(e => e.uuid === myUUID || (e.addr === username && username !== "Player"));
+        
+        if (existingIndex >= 0) {
+            if (score > currentBoard[existingIndex].score) {
+                currentBoard[existingIndex].score = score;
+                currentBoard[existingIndex].timestamp = new Date().getTime();
+            }
+            currentBoard[existingIndex].addr = username;
+            currentBoard[existingIndex].uuid = myUUID;
+        } else {
+            currentBoard.push({
+                uuid: myUUID,
+                addr: username,
+                score: score,
+                timestamp: new Date().getTime()
+            });
+        }
         
         // 3. Sort descending and keep top 10
         currentBoard.sort((a,b) => b.score - a.score);

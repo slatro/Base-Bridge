@@ -153,6 +153,7 @@ async function initWeb3() {
   });
   if(btnSaveProfile) btnSaveProfile.addEventListener("click", async () => {
     let name = inputUsername.value.trim();
+    let oldName = currentUsername;
     if(name.length > 0 && name !== currentUsername) {
       currentUsername = name;
       localStorage.setItem('bb_v1_username', currentUsername);
@@ -164,8 +165,9 @@ async function initWeb3() {
               let myUUID = localStorage.getItem('bb_v1_uuid');
               let modified = false;
               board.forEach(entry => {
-                  if (entry.uuid === myUUID && entry.addr !== currentUsername) {
+                  if ((entry.uuid === myUUID || entry.addr === oldName) && entry.addr !== currentUsername) {
                       entry.addr = currentUsername;
+                      entry.uuid = myUUID; // attach UUID if missing
                       modified = true;
                   }
               });

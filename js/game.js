@@ -632,151 +632,133 @@ function openShopPreview(id) {
   document.getElementById('modal-shop').classList.remove('hidden');
 }
 
-// Side-Profile AAA+ Path2D Vector Character Rendering
+// --- PREMIUM PROCEDURAL CHARACTER SYSTEM ---
 function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time) {
   const skinData = SHOP_DB.find(x => x.id === skinId) || SHOP_DB[0];
+  const colors = skinData.colors;
   targetCtx.save();
 
-  // Base transforms
+  // Animation Logic (Procedural 6-Frame System)
   let bounceY = 0;
-  let legAngle1 = 0;
-  let legAngle2 = 0;
-  let armAngle1 = 0;
-  let armAngle2 = 0;
+  let legAngle1 = 0, legAngle2 = 0;
+  let armAngle1 = 0, armAngle2 = 0;
+  let bodyLean = 0;
+  let headTilt = 0;
 
   if (state === 'IDLE') {
-    bounceY = Math.sin(time * 3) * (s * 0.05);
-    armAngle1 = Math.sin(time * 2) * 0.1;
-    armAngle2 = -Math.sin(time * 2) * 0.1;
-  } else if (state === 'WALK') {
-    bounceY = Math.abs(Math.sin(time * 15)) * (s * 0.1);
-    legAngle1 = Math.sin(time * 15) * 0.6;
-    legAngle2 = -Math.sin(time * 15) * 0.6;
-    armAngle1 = -legAngle1 * 0.8;
-    armAngle2 = -legAngle2 * 0.8;
+    // Idle Frame: Breathing effect
+    let breathe = Math.sin(time * 2.5);
+    bounceY = breathe * (s * 0.02);
+    headTilt = breathe * 0.05;
+  } 
+  else if (state === 'WALK') {
+    // 4 Walking Frames cycle
+    let walkCycle = time * 12;
+    bounceY = Math.abs(Math.sin(walkCycle)) * (s * 0.06);
+    legAngle1 = Math.sin(walkCycle) * 0.7;
+    legAngle2 = -Math.sin(walkCycle) * 0.7;
+    armAngle1 = -legAngle1 * 0.9;
+    armAngle2 = -legAngle2 * 0.9;
+    bodyLean = 0.12; 
+  }
+  else if (state === 'JUMP') {
+    // Jump Frame: Extended limbs
+    bounceY = -s * 0.1;
+    legAngle1 = 0.4; legAngle2 = -0.2;
+    armAngle1 = -1.2; armAngle2 = 0.5;
+    bodyLean = -0.05;
   }
 
-  // Translate up so feet touch 0, apply squash
   targetCtx.translate(0, -s + bounceY);
-  targetCtx.scale(1.0 + (1.0 - character.squash)*0.5, character.squash);
-  const id = skinData.id;
-  const colors = skinData.colors;
-
-  // Back Arm & Leg
-  drawLimbPath(targetCtx, -s*0.1, s*0.6, s*0.15, s*0.4, legAngle2, colors.body || '#222', true);
-  drawLimbPath(targetCtx, 0, s*0.3, s*0.12, s*0.35, armAngle2, colors.body || '#222', true, null);
-
-  // Body Path Details
-  if (id === 'gold') {
-    let g = targetCtx.createLinearGradient(0, s*0.2, 0, s*0.7); 
-    g.addColorStop(0, '#fef08a'); g.addColorStop(0.3, '#eab308'); 
-    g.addColorStop(0.7, '#a16207'); g.addColorStop(1, '#422006');
-    targetCtx.fillStyle = g;
-    targetCtx.shadowColor = '#eab308'; targetCtx.shadowBlur = 15;
-  } else if (id === 'galaxy') {
-    let g = targetCtx.createRadialGradient(0,s*0.4,0, 0,s*0.4,s*0.5); 
-    g.addColorStop(0, '#b517ff'); g.addColorStop(0.5, '#6b21a8'); g.addColorStop(1, '#00e5ff');
-    targetCtx.fillStyle = g;
-    targetCtx.shadowColor = '#00e5ff'; targetCtx.shadowBlur = 15;
-  } else if (id === 'hoodie') {
-    targetCtx.fillStyle = '#e11d48';
-  } else if (id === 'cyber') {
-    targetCtx.fillStyle = '#0891b2';
-  } else {
-    targetCtx.fillStyle = colors.body || '#111';
-  }
+  targetCtx.rotate(bodyLean);
   
+  // Character Shadow (Dynamic)
+  targetCtx.fillStyle = 'rgba(0,0,0,0.15)';
   targetCtx.beginPath();
-  targetCtx.moveTo(-s*0.2, s*0.3);
-  targetCtx.quadraticCurveTo(-s*0.25, s*0.5, -s*0.15, s*0.7);
-  targetCtx.lineTo(s*0.15, s*0.7);
-  targetCtx.quadraticCurveTo(s*0.25, s*0.5, s*0.2, s*0.3);
+  targetCtx.ellipse(0, s - bounceY, s*0.4, s*0.1, 0, 0, Math.PI*2);
   targetCtx.fill();
-  
-  // Subtle body details
-  if (id === 'classic' || id === 'ninja') {
-    let highlight = targetCtx.createLinearGradient(-s*0.2, s*0.3, s*0.2, s*0.7);
-    highlight.addColorStop(0, 'rgba(255,255,255,0.15)'); highlight.addColorStop(1, 'transparent');
-    targetCtx.fillStyle = highlight;
-    targetCtx.fill();
-  }
 
-  targetCtx.shadowBlur = 0;
+  // 1. BACK LIMBS
+  drawProLimb(targetCtx, -s*0.1, s*0.6, s*0.18, s*0.45, legAngle2, colors.body, true);
+  drawProLimb(targetCtx, s*0.05, s*0.35, s*0.12, s*0.4, armAngle2, colors.body, true);
 
-  if (id === 'galaxy') {
-    targetCtx.fillStyle = '#fff';
-    for(let i=0; i<8; i++) {
-      targetCtx.beginPath(); 
-      targetCtx.arc((Math.random()-0.5)*s*0.3, s*0.3 + Math.random()*s*0.4, Math.random()*s*0.03, 0, Math.PI*2); 
-      targetCtx.fill();
-    }
-    targetCtx.strokeStyle = 'rgba(255,255,255,0.4)'; targetCtx.lineWidth=1;
-    targetCtx.beginPath(); targetCtx.arc(0, s*0.5, s*0.15, 0, Math.PI*2); targetCtx.stroke();
-  }
+  // 2. MAIN BODY
+  drawProBody(targetCtx, s, colors);
 
-  if (id === 'cyber') {
-    targetCtx.shadowColor = colors.glow; targetCtx.shadowBlur = 10;
-    targetCtx.strokeStyle = colors.glow; targetCtx.lineWidth = 2;
-    targetCtx.beginPath(); targetCtx.moveTo(-s*0.1, s*0.4); targetCtx.lineTo(0, s*0.5); targetCtx.lineTo(-s*0.05, s*0.6); targetCtx.stroke();
-    targetCtx.shadowBlur = 0;
-  }
-  
-  if (id === 'hoodie') {
-    targetCtx.strokeStyle = '#9f1239'; targetCtx.lineWidth = 3;
-    targetCtx.beginPath(); targetCtx.moveTo(0, s*0.3); targetCtx.lineTo(0, s*0.6); targetCtx.stroke();
-  }
-
-  // Head Path
+  // 3. HEAD
   targetCtx.save();
-  if (id === 'hoodie') {
-    targetCtx.fillStyle = colors.head;
-    targetCtx.beginPath(); targetCtx.arc(0, s*0.2, s*0.35, Math.PI, 0); targetCtx.fill();
-    targetCtx.fillRect(-s*0.35, s*0.2, s*0.7, s*0.2);
-    targetCtx.fillStyle = colors.faceShadow;
-    targetCtx.beginPath(); targetCtx.arc(s*0.1, s*0.3, s*0.2, 0, Math.PI*2); targetCtx.fill();
-  } else {
-    targetCtx.fillStyle = colors.head || '#111';
-    if(id==='galaxy') targetCtx.fillStyle = '#000';
-    targetCtx.beginPath(); targetCtx.arc(0, s*0.2, s*0.3, 0, Math.PI*2); targetCtx.fill();
-  }
-
-  // Eyes
-  if (id === 'gold' || id === 'galaxy' || id === 'classic') {
-    targetCtx.fillStyle = (id === 'gold') ? '#111' : '#fff';
-    targetCtx.beginPath(); targetCtx.arc(s*0.15, s*0.15, s*0.05, 0, Math.PI*2); targetCtx.fill();
-  } else if (id === 'ninja') {
-    targetCtx.fillStyle = colors.face;
-    targetCtx.beginPath(); targetCtx.ellipse(s*0.1, s*0.2, s*0.15, s*0.1, 0, 0, Math.PI*2); targetCtx.fill();
-    targetCtx.fillStyle = colors.band;
-    targetCtx.fillRect(-s*0.3, 0, s*0.65, s*0.12);
-  }
-
-  // Draw Equipment
-  if (hatId === 'cap' && loadedIcons['hat_cap']) targetCtx.drawImage(loadedIcons['hat_cap'], -s*0.4, -s*0.3, s*0.8, s*0.5);
-  if (faceId === 'glasses' && loadedIcons['face_glasses']) targetCtx.drawImage(loadedIcons['face_glasses'], -s*0.15, s*0.1, s*0.6, s*0.25);
-
+  targetCtx.translate(0, s*0.25);
+  targetCtx.rotate(headTilt);
+  drawProHead(targetCtx, s, skinId, colors);
+  drawProFace(targetCtx, s, skinId, colors);
   targetCtx.restore();
 
-  // Front Arm & Leg
-  drawLimbPath(targetCtx, s*0.1, s*0.6, s*0.15, s*0.4, legAngle1, colors.body || '#111', false);
-  drawLimbPath(targetCtx, 0, s*0.3, s*0.12, s*0.35, armAngle1, colors.body || '#111', false, wpnId);
+  // 4. FRONT LIMBS
+  drawProLimb(targetCtx, -s*0.1, s*0.6, s*0.2, s*0.45, legAngle1, colors.body, false);
+  drawProLimb(targetCtx, -s*0.05, s*0.35, s*0.14, s*0.4, armAngle1, colors.body, false);
 
   targetCtx.restore();
 }
 
-function drawLimbPath(targetCtx, x, y, w, h, angle, color, isBack, wpnId) {
-  targetCtx.save();
-  targetCtx.translate(x, y); targetCtx.rotate(angle);
-  targetCtx.fillStyle = isBack ? '#000' : color;
-  targetCtx.beginPath(); targetCtx.roundRect(-w/2, 0, w, h, w/2); 
-  targetCtx.fill();
-  
-  if (!isBack && wpnId && loadedIcons['wpn_sword']) {
-    targetCtx.translate(0, h);
-    targetCtx.drawImage(loadedIcons['wpn_sword'], -w, -h*1.2, w*3, h*1.8);
-  }
+function drawProLimb(ctx, x, y, w, l, angle, color, isBack) {
+  ctx.save();
+  ctx.translate(x, y); ctx.rotate(angle);
+  ctx.strokeStyle = '#000'; ctx.lineWidth = w * 0.2; ctx.lineCap = 'round';
+  let g = ctx.createLinearGradient(0, 0, w, 0);
+  g.addColorStop(0, color); g.addColorStop(1, isBack ? shadeColor(color, -30) : shadeColor(color, 20));
+  ctx.fillStyle = g;
+  ctx.beginPath(); ctx.roundRect(-w/2, 0, w, l, w/2); ctx.stroke(); ctx.fill();
+  ctx.restore();
+}
 
-  targetCtx.restore();
+function drawProBody(ctx, s, colors) {
+  let w = s * 0.45; let h = s * 0.5;
+  ctx.strokeStyle = '#000'; ctx.lineWidth = 3;
+  let g = ctx.createLinearGradient(-w/2, s*0.3, w/2, s*0.3);
+  g.addColorStop(0, colors.body); g.addColorStop(0.5, shadeColor(colors.body, 15)); g.addColorStop(1, colors.body);
+  ctx.fillStyle = g;
+  ctx.beginPath(); ctx.moveTo(-w/2, s*0.3);
+  ctx.bezierCurveTo(-w*0.6, s*0.5, -w*0.4, s*0.8, 0, s*0.8);
+  ctx.bezierCurveTo(w*0.4, s*0.8, w*0.6, s*0.5, w/2, s*0.3);
+  ctx.closePath(); ctx.stroke(); ctx.fill();
+}
+
+function drawProHead(ctx, s, id, colors) {
+  let r = s * 0.38;
+  ctx.strokeStyle = '#000'; ctx.lineWidth = 4;
+  let g = ctx.createRadialGradient(-r*0.3, -r*0.3, r*0.1, 0, 0, r);
+  g.addColorStop(0, colors.head || '#222'); g.addColorStop(1, shadeColor(colors.head || '#222', -20));
+  ctx.fillStyle = g;
+  ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI*2); ctx.stroke(); ctx.fill();
+}
+
+function drawProFace(ctx, s, id, colors) {
+  let r = s * 0.38;
+  if (id === 'ninja') {
+    ctx.fillStyle = colors.face;
+    ctx.beginPath(); ctx.ellipse(r*0.3, r*0.1, r*0.6, r*0.4, 0, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = colors.band; ctx.fillRect(-r, -r*0.2, r*2, r*0.3);
+  } else {
+    ctx.fillStyle = colors.face || '#fbcfe8';
+    ctx.beginPath(); ctx.ellipse(r*0.3, r*0.1, r*0.6, r*0.4, 0, 0, Math.PI*2); ctx.fill();
+  }
+  // Eyes
+  ctx.fillStyle = '#000'; ctx.beginPath(); 
+  ctx.arc(r*0.3, 0, r*0.08, 0, Math.PI*2); ctx.arc(r*0.6, 0, r*0.08, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#fff'; ctx.beginPath(); 
+  ctx.arc(r*0.32, -r*0.02, r*0.03, 0, Math.PI*2); ctx.arc(r*0.62, -r*0.02, r*0.03, 0, Math.PI*2); ctx.fill();
+}
+
+function shadeColor(color, percent) {
+  let R = parseInt(color.substring(1,3),16);
+  let G = parseInt(color.substring(3,5),16);
+  let B = parseInt(color.substring(5,7),16);
+  R = parseInt(R * (100 + percent) / 100); G = parseInt(G * (100 + percent) / 100); B = parseInt(B * (100 + percent) / 100);
+  R = (R<255)?R:255; G = (G<255)?G:255; B = (B<255)?B:255;
+  let RR = ((R.toString(16).length==1)?"0"+R.toString(16):R.toString(16));
+  let GG = ((G.toString(16).length==1)?"0"+G.toString(16):G.toString(16));
+  let BB = ((B.toString(16).length==1)?"0"+B.toString(16):B.toString(16));
+  return "#"+RR+GG+BB;
 }
 
 function setupInitialState() {
@@ -1403,8 +1385,11 @@ function draw() {
   ctx.save();
   ctx.translate(character.x + character.size/2, character.y);
   ctx.rotate(character.rotation);
-  let state = (gameState === STATES.CHARACTER_WALKING && success) ? 'WALK' : 'IDLE';
-  if(gameState === STATES.FALLING_DOWN) state = 'IDLE';
+  let state = 'IDLE';
+  if (gameState === STATES.CHARACTER_WALKING && success) state = 'WALK';
+  if (gameState === STATES.FALLING_DOWN || gameState === STATES.BRIDGE_GROWING) state = 'IDLE';
+  if (gameState === STATES.BRIDGE_FALLING) state = 'JUMP'; // Preview jump pose
+  
   renderSkeleton(ctx, currentSkin, equippedHat, equippedWeapon, equippedFace, character.size, state, animTime);
   ctx.restore();
   
@@ -1471,3 +1456,34 @@ setTimeout(() => {
   resize(); setupInitialState();
   requestAnimationFrame(time => { lastTime = time; loop(time); });
 }, 100);
+
+// --- SPRITE SHEET GENERATOR (DEBUG UTILITY) ---
+function exportCharacterSpriteSheet(skinId = 'ninja') {
+  const frameW = 256, frameH = 256;
+  const canvas = document.createElement('canvas');
+  canvas.width = frameW * 6; canvas.height = frameH;
+  const tctx = canvas.getContext('2d');
+  
+  // States: 1 Idle, 4 Walking, 1 Jump
+  const frames = [
+    { state: 'IDLE', time: 0 },
+    { state: 'WALK', time: 0.1 },
+    { state: 'WALK', time: 0.25 },
+    { state: 'WALK', time: 0.4 },
+    { state: 'WALK', time: 0.55 },
+    { state: 'JUMP', time: 0 }
+  ];
+  
+  frames.forEach((f, i) => {
+    tctx.save();
+    tctx.translate(i * frameW + frameW/2, frameH * 0.9);
+    renderSkeleton(tctx, skinId, null, null, null, 150, f.state, f.time);
+    tctx.restore();
+  });
+  
+  const link = document.createElement('a');
+  link.download = skinId + '_spritesheet.png';
+  link.href = canvas.toDataURL();
+  link.click();
+  console.log('Sprite sheet generated and downloaded!');
+}

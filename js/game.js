@@ -15,6 +15,22 @@ const levelNameEl = document.getElementById('ui-level-name');
 const levelFillEl = document.getElementById('ui-level-fill');
 const btnRevive = document.getElementById('btn-revive');
 
+// --- ASSETS SYSTEM (PREMIUM) ---
+const ASSETS_PATHS = {
+  jungle_far: 'file:///Users/emreoktem/.gemini/antigravity/brain/117ee70c-2416-426a-a3c1-08f8ad79d7a4/jungle_far_1777502232362.png',
+  desert_far: 'file:///Users/emreoktem/.gemini/antigravity/brain/117ee70c-2416-426a-a3c1-08f8ad79d7a4/desert_far_1777502254948.png',
+  night_city_far: 'file:///Users/emreoktem/.gemini/antigravity/brain/117ee70c-2416-426a-a3c1-08f8ad79d7a4/night_city_far_1777502279274.png',
+  mountain_far: 'file:///Users/emreoktem/.gemini/antigravity/brain/117ee70c-2416-426a-a3c1-08f8ad79d7a4/mountain_far_1777502425600.png',
+  synthwave_far: 'file:///Users/emreoktem/.gemini/antigravity/brain/117ee70c-2416-426a-a3c1-08f8ad79d7a4/synthwave_far_1777502530639.png'
+};
+let loadedAssets = {};
+for (let k in ASSETS_PATHS) {
+  const img = new Image();
+  img.src = ASSETS_PATHS[k];
+  loadedAssets[k] = img;
+}
+
+
 // Update UI top bar color
 function updateBiomeUI(currentBiome) {
   const levelFill = document.getElementById('ui-level-fill');
@@ -89,12 +105,22 @@ if (lastPlayedDay !== todayString) {
 // Metrics for Achievements
 function incMetric(key, amt=1) {
   let val = parseInt(localStorage.getItem(key) || '0');
-  localStorage.setItem(key, val + amt);
+  let newVal = val + amt;
+  localStorage.setItem(key, newVal);
   
-  // Auto-increment daily equivalent
-  if (key === 'bb_v1_total_games') incMetric('bb_v1_daily_games', amt);
-  if (key === 'bb_v1_total_score') incMetric('bb_v1_daily_score', amt); // Wait, score needs to be checked
-  if (key === 'bb_v1_total_perfects') incMetric('bb_v1_daily_perfects', amt);
+  if (key === 'bb_v1_total_games') {
+    let dGames = parseInt(localStorage.getItem('bb_v1_daily_games') || '0');
+    localStorage.setItem('bb_v1_daily_games', dGames + amt);
+  }
+  if (key === 'bb_v1_total_perfects') {
+    let dPerf = parseInt(localStorage.getItem('bb_v1_daily_perfects') || '0');
+    localStorage.setItem('bb_v1_daily_perfects', dPerf + amt);
+  }
+}
+
+function updateDailyBestScore(s) {
+  let dBest = parseInt(localStorage.getItem('bb_v1_daily_score') || '0');
+  if (s > dBest) localStorage.setItem('bb_v1_daily_score', s);
 }
 
 const SVG_ICONS = {
@@ -168,6 +194,24 @@ function playSound(type) {
     g.gain.setValueAtTime(0, now); g.gain.linearRampToValueAtTime(0.2, now + 0.1); g.gain.linearRampToValueAtTime(0, now + 0.4); o.start(now); o.stop(now + 0.4);
   }
 }
+
+isMuted = localStorage.getItem('bb_v1_muted') === 'true';
+function updateMuteUI() {
+  const btn = document.getElementById('btn-mute-toggle');
+  if (btn) btn.innerText = isMuted ? '🔇' : '🔊';
+}
+
+function toggleMute() {
+  isMuted = !isMuted;
+  localStorage.setItem('bb_v1_muted', isMuted);
+  updateMuteUI();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const btnMute = document.getElementById('btn-mute-toggle');
+  if (btnMute) btnMute.addEventListener('click', toggleMute);
+  updateMuteUI();
+});
 function startGrowSound() {
   if (!actx || isMuted) return;
   osc = actx.createOscillator(); gainNode = actx.createGain();
@@ -224,8 +268,9 @@ function renderSkinsShop() {
     const activeClass = isActive ? 'active' : '';
     const priceTxt = isOwned ? 'Owned' : `<div class="bb-token-small" style="width:14px;height:14px;"></div> ${s.cost}`;
     
+    const rarityClass = s.rarity ? s.rarity.toLowerCase() : 'common';
     let html = `
-      <div class="skin-item ${lockedClass} ${activeClass}" data-id="${s.id}">
+      <div class="skin-item ${lockedClass} ${activeClass} ${rarityClass}" data-id="${s.id}">
         <div class="skin-avatar ${s.icon}-avatar"></div>
         <span>${s.name}<br><span class="skin-price">${priceTxt}</span></span>
       </div>
@@ -251,8 +296,9 @@ function renderEquipmentShop(typeFilter) {
     const activeClass = isActive ? 'active' : '';
     const priceTxt = isOwned ? 'Owned' : `<div class="bb-token-small" style="width:14px;height:14px;"></div> ${s.cost}`;
     
+    const rarityClass = s.rarity ? s.rarity.toLowerCase() : 'common';
     let html = `
-      <div class="equip-item ${lockedClass} ${activeClass}" data-id="${s.id}">
+      <div class="equip-item ${lockedClass} ${activeClass} ${rarityClass}" data-id="${s.id}">
         <img src='${SVG_ICONS[s.iconId]}' width="40" height="40" style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));">
         <span>${s.name}<br><span class="skin-price">${priceTxt}</span></span>
       </div>
@@ -599,17 +645,14 @@ function openShopPreview(id) {
   document.getElementById('modal-shop').classList.remove('hidden');
 }
 
-// Side-Profile AAA+ Path2D Vector Character Rendering
+// Side-Profile AAA+ Vector Character Rendering (Stylized & Structural)
 function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time) {
   const skinData = SHOP_DB.find(x => x.id === skinId) || SHOP_DB[0];
   targetCtx.save();
 
-  // Base transforms
   let bounceY = 0;
-  let legAngle1 = 0;
-  let legAngle2 = 0;
-  let armAngle1 = 0;
-  let armAngle2 = 0;
+  let legAngle1 = 0, legAngle2 = 0;
+  let armAngle1 = 0, armAngle2 = 0;
 
   if (state === 'IDLE') {
     bounceY = Math.sin(time * 3) * (s * 0.05);
@@ -623,175 +666,70 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     armAngle2 = -legAngle2 * 0.8;
   }
 
-  // Translate up so feet touch 0, apply squash
   targetCtx.translate(0, -s + bounceY);
   targetCtx.scale(1.0 + (1.0 - character.squash)*0.5, character.squash);
-  const id = skinData.id;
+  
   const colors = skinData.colors;
+  const bodyColor = colors.body || '#222';
 
-  // Back Arm & Leg
-  drawLimbPath(targetCtx, -s*0.1, s*0.6, s*0.15, s*0.4, legAngle2, colors.body || '#222', true);
-  drawLimbPath(targetCtx, 0, s*0.3, s*0.12, s*0.35, armAngle2, colors.body || '#222', true, null);
-
-  // Body Path Details
-  if (id === 'gold') {
-    let g = targetCtx.createLinearGradient(0, s*0.2, 0, s*0.7); 
-    g.addColorStop(0, '#fef08a'); g.addColorStop(0.3, '#eab308'); 
-    g.addColorStop(0.7, '#a16207'); g.addColorStop(1, '#422006');
-    targetCtx.fillStyle = g;
-    targetCtx.shadowColor = '#eab308'; targetCtx.shadowBlur = 15;
-  } else if (id === 'galaxy') {
-    let g = targetCtx.createRadialGradient(0,s*0.4,0, 0,s*0.4,s*0.5); 
-    g.addColorStop(0, '#b517ff'); g.addColorStop(0.5, '#6b21a8'); g.addColorStop(1, '#00e5ff');
-    targetCtx.fillStyle = g;
-    targetCtx.shadowColor = '#00e5ff'; targetCtx.shadowBlur = 15;
-  } else if (id === 'hoodie') {
-    targetCtx.fillStyle = '#e11d48';
-  } else if (id === 'cyber') {
-    targetCtx.fillStyle = '#0891b2';
-  } else {
-    targetCtx.fillStyle = colors.body || '#111';
+  // HELPER: Thick Limb
+  function drawThickLimb(x, y, w, h, angle, color, isBack) {
+    targetCtx.save();
+    targetCtx.translate(x, y);
+    targetCtx.rotate(angle);
+    if(isBack) targetCtx.globalAlpha = 0.6;
+    targetCtx.fillStyle = color;
+    targetCtx.beginPath();
+    targetCtx.roundRect(-w/2, 0, w, h, w/2);
+    targetCtx.fill();
+    targetCtx.restore();
   }
-  
+
+  // Back Limbs
+  drawThickLimb(-s*0.05, s*0.6, s*0.18, s*0.4, legAngle2, bodyColor, true);
+  drawThickLimb(0, s*0.35, s*0.15, s*0.35, armAngle2, bodyColor, true);
+
+  // Torso (The "Beef")
+  targetCtx.fillStyle = bodyColor;
+  if (skinData.id === 'gold') {
+    let g = targetCtx.createLinearGradient(0, s*0.2, 0, s*0.7);
+    g.addColorStop(0, '#fef08a'); g.addColorStop(1, '#eab308');
+    targetCtx.fillStyle = g;
+  }
+  if (skinData.id === 'galaxy') {
+    let g = targetCtx.createLinearGradient(0, s*0.2, 0, s*0.7);
+    g.addColorStop(0, '#b517ff'); g.addColorStop(1, '#00e5ff');
+    targetCtx.fillStyle = g;
+  }
   targetCtx.beginPath();
-  targetCtx.moveTo(-s*0.2, s*0.3);
-  targetCtx.quadraticCurveTo(-s*0.25, s*0.5, -s*0.15, s*0.7);
-  targetCtx.lineTo(s*0.15, s*0.7);
-  targetCtx.quadraticCurveTo(s*0.25, s*0.5, s*0.2, s*0.3);
+  targetCtx.roundRect(-s*0.2, s*0.25, s*0.4, s*0.45, s*0.1);
+  targetCtx.fill();
+
+  // Head
+  targetCtx.save();
+  targetCtx.translate(0, s*0.1);
+  targetCtx.fillStyle = bodyColor;
+  if(skinData.id==='galaxy') targetCtx.fillStyle = '#000';
+  targetCtx.beginPath();
+  targetCtx.arc(0, 0, s*0.18, 0, Math.PI*2);
   targetCtx.fill();
   
-  // Subtle body details
-  if (id === 'classic' || id === 'ninja') {
-    let highlight = targetCtx.createLinearGradient(-s*0.2, s*0.3, s*0.2, s*0.7);
-    highlight.addColorStop(0, 'rgba(255,255,255,0.15)'); highlight.addColorStop(1, 'transparent');
-    targetCtx.fillStyle = highlight;
-    targetCtx.fill();
-  }
-
-  targetCtx.shadowBlur = 0;
-
-  if (id === 'galaxy') {
-    targetCtx.fillStyle = '#fff';
-    for(let i=0; i<8; i++) {
-      targetCtx.beginPath(); 
-      targetCtx.arc((Math.random()-0.5)*s*0.3, s*0.3 + Math.random()*s*0.4, Math.random()*s*0.03, 0, Math.PI*2); 
-      targetCtx.fill();
-    }
-    targetCtx.strokeStyle = 'rgba(255,255,255,0.4)'; targetCtx.lineWidth=1;
-    targetCtx.beginPath(); targetCtx.arc(0, s*0.5, s*0.15, 0, Math.PI*2); targetCtx.stroke();
-  }
-
-  if (id === 'cyber') {
-    targetCtx.shadowColor = colors.glow; targetCtx.shadowBlur = 10;
-    targetCtx.strokeStyle = colors.glow; targetCtx.lineWidth = 2;
-    targetCtx.beginPath(); targetCtx.moveTo(-s*0.1, s*0.4); targetCtx.lineTo(0, s*0.5); targetCtx.lineTo(-s*0.05, s*0.6); targetCtx.stroke();
-    targetCtx.beginPath(); targetCtx.moveTo(s*0.1, s*0.45); targetCtx.lineTo(0, s*0.55); targetCtx.stroke();
-    targetCtx.shadowBlur = 0;
-  }
-  
-  if (id === 'hoodie') {
-    targetCtx.strokeStyle = '#9f1239'; targetCtx.lineWidth = 3;
-    targetCtx.beginPath(); targetCtx.moveTo(0, s*0.3); targetCtx.lineTo(0, s*0.6); targetCtx.stroke();
-    targetCtx.beginPath(); targetCtx.moveTo(-s*0.1, s*0.3); targetCtx.lineTo(-s*0.05, s*0.45); targetCtx.stroke();
-    targetCtx.beginPath(); targetCtx.moveTo(s*0.1, s*0.3); targetCtx.lineTo(s*0.05, s*0.45); targetCtx.stroke();
-  }
-  
-  if (id === 'gold') {
-    targetCtx.fillStyle = 'rgba(255,255,255,0.5)';
-    targetCtx.beginPath(); targetCtx.moveTo(-s*0.1, s*0.3); targetCtx.lineTo(s*0.1, s*0.3); targetCtx.lineTo(0, s*0.7); targetCtx.fill();
-  }
-
-  // Head Path
-  targetCtx.save();
-  targetCtx.translate(0, 0);
-  
-  if (id === 'hoodie') {
-    targetCtx.fillStyle = colors.head;
-    targetCtx.beginPath(); targetCtx.arc(0, s*0.2, s*0.35, Math.PI, 0); targetCtx.fill();
-    targetCtx.fillRect(-s*0.35, s*0.2, s*0.7, s*0.2);
-    targetCtx.fillStyle = colors.faceShadow;
-    targetCtx.beginPath(); targetCtx.arc(s*0.1, s*0.3, s*0.2, 0, Math.PI*2); targetCtx.fill();
-  } else {
-    targetCtx.fillStyle = (id==='gold') ? colors.head : (colors.head || '#111');
-    if(id==='galaxy') targetCtx.fillStyle = '#000';
-    targetCtx.beginPath(); targetCtx.arc(0, s*0.2, s*0.3, 0, Math.PI*2); targetCtx.fill();
-  }
-
-  // Eyes (Gold & Galaxy)
-  if (id === 'gold' || id === 'galaxy' || id === 'classic') {
-    targetCtx.fillStyle = (id === 'gold') ? '#111' : '#fff';
-    targetCtx.beginPath(); targetCtx.arc(s*0.15, s*0.15, s*0.05, 0, Math.PI*2); targetCtx.fill();
-  } else if (id === 'ninja') {
+  // Face / Details
+  if (skinData.id === 'ninja') {
     targetCtx.fillStyle = colors.face;
-    targetCtx.beginPath(); targetCtx.ellipse(s*0.1, s*0.2, s*0.15, s*0.1, 0, 0, Math.PI*2); targetCtx.fill();
-    targetCtx.fillStyle = '#000'; targetCtx.beginPath(); targetCtx.arc(s*0.15, s*0.2, s*0.03, 0, Math.PI*2); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.arc(s*0.05, 0, s*0.1, -1, 1); targetCtx.fill();
     targetCtx.fillStyle = colors.band;
-    targetCtx.fillRect(-s*0.3, 0, s*0.65, s*0.12);
-    targetCtx.beginPath(); targetCtx.moveTo(-s*0.3, s*0.05); targetCtx.lineTo(-s*0.6, 0); targetCtx.lineTo(-s*0.5, s*0.15); targetCtx.fill();
-  } else if (id === 'cyber') {
-    targetCtx.shadowColor = colors.glow; targetCtx.shadowBlur = 10; targetCtx.fillStyle = colors.glow;
-    targetCtx.fillRect(s*0.1, s*0.15, s*0.2, s*0.08); targetCtx.shadowBlur = 0;
+    targetCtx.fillRect(-s*0.18, -s*0.05, s*0.36, s*0.05);
+  } else if (skinData.id === 'cyber') {
+    targetCtx.fillStyle = colors.glow;
+    targetCtx.shadowBlur = 10; targetCtx.shadowColor = colors.glow;
+    targetCtx.fillRect(s*0.05, -s*0.05, s*0.15, s*0.05);
   }
-
-  // Draw Face Equipment SVG
-  if (faceId === 'cigar' && loadedIcons['face_cigar']) {
-    targetCtx.drawImage(loadedIcons['face_cigar'], s*0.1, s*0.15, s*0.3, s*0.2);
-  } else if (faceId === 'visor' && loadedIcons['face_visor']) {
-    targetCtx.drawImage(loadedIcons['face_visor'], -s*0.1, 0, s*0.5, s*0.25);
-  } else if (faceId === 'mask' && loadedIcons['face_mask']) {
-    targetCtx.drawImage(loadedIcons['face_mask'], -s*0.2, s*0.15, s*0.6, s*0.3);
-  } else if (faceId === 'glasses' && loadedIcons['face_glasses']) {
-    targetCtx.drawImage(loadedIcons['face_glasses'], -s*0.15, s*0.1, s*0.6, s*0.25);
-  } else if (faceId === 'beard' && loadedIcons['face_beard']) {
-    targetCtx.drawImage(loadedIcons['face_beard'], -s*0.2, s*0.2, s*0.7, s*0.5);
-  }
-
-  // Draw Hat Equipment SVG
-  if (hatId === 'cap' && loadedIcons['hat_cap']) {
-    targetCtx.drawImage(loadedIcons['hat_cap'], -s*0.4, -s*0.3, s*0.8, s*0.5);
-  } else if (hatId === 'crown' && loadedIcons['hat_crown']) {
-    targetCtx.drawImage(loadedIcons['hat_crown'], -s*0.4, -s*0.35, s*0.8, s*0.6);
-  } else if (hatId === 'halo' && loadedIcons['hat_halo']) {
-    targetCtx.drawImage(loadedIcons['hat_halo'], -s*0.45, -s*0.3, s*0.9, s*0.5);
-  }
-
   targetCtx.restore();
 
-  // Front Arm & Leg
-  drawLimbPath(targetCtx, s*0.1, s*0.6, s*0.15, s*0.4, legAngle1, colors.body || '#111', false);
-  drawLimbPath(targetCtx, 0, s*0.3, s*0.12, s*0.35, armAngle1, colors.body || '#111', false, wpnId);
-
-  targetCtx.restore();
-}
-
-function drawLimbPath(targetCtx, x, y, w, h, angle, color, isBack, wpnId) {
-  targetCtx.save();
-  targetCtx.translate(x, y); targetCtx.rotate(angle);
-  targetCtx.fillStyle = isBack ? '#000' : color;
-  targetCtx.beginPath(); targetCtx.roundRect(-w/2, 0, w, h, w/2); 
-  targetCtx.fill();
-  
-  // AAA Character Detail: Shoes
-  if (color !== '#111' && color !== '#222') {
-    targetCtx.fillStyle = isBack ? '#111' : '#333';
-    targetCtx.beginPath(); targetCtx.roundRect(-w/2 - w*0.2, h - w, w*1.4, w*1.2, w/3);
-    targetCtx.fill();
-  } else {
-    // Basic shoes for classic
-    targetCtx.fillStyle = isBack ? '#000' : '#222';
-    targetCtx.beginPath(); targetCtx.roundRect(-w/2, h - w, w*1.2, w*1.2, w/3);
-    targetCtx.fill();
-  }
-  
-  // Draw weapon in FRONT hand using SVG
-  if (!isBack && wpnId) {
-    targetCtx.translate(0, h); // hand position
-    if (wpnId === 'sword' && loadedIcons['wpn_sword']) {
-      targetCtx.drawImage(loadedIcons['wpn_sword'], -w, -h*1.2, w*3, h*1.8);
-    } else if (wpnId === 'lightsaber' && loadedIcons['wpn_saber']) {
-      targetCtx.drawImage(loadedIcons['wpn_saber'], -w, -h*1.2, w*3, h*1.8);
-    }
-  }
+  // Front Limbs
+  drawThickLimb(s*0.05, s*0.6, s*0.18, s*0.4, legAngle1, bodyColor, false);
+  drawThickLimb(0, s*0.35, s*0.15, s*0.35, armAngle1, bodyColor, false);
 
   targetCtx.restore();
 }
@@ -808,16 +746,16 @@ function setupInitialState() {
 
 // 10 Biome System with Names
 const BIOMES = [
-  { name: 'GREEN HILLS', skyTop: '#38bdf8', skyBot: '#fde047', mtn1: '#15803d', mtn2: '#166534', platDirt: '#451a03', platTop: '#4ade80' }, 
-  { name: 'SUNSET MOUNTAIN', skyTop: '#f97316', skyBot: '#ec4899', mtn1: '#9d174d', mtn2: '#831843', platDirt: '#4a044e', platTop: '#fcd34d' }, 
-  { name: 'NEON CITY', skyTop: '#0f172a', skyBot: '#1e1b4b', mtn1: '#312e81', mtn2: '#1e1b4b', platDirt: '#020617', platTop: '#00e5ff' }, 
-  { name: 'SPACE STATION', skyTop: '#000000', skyBot: '#0f172a', mtn1: '#1e293b', mtn2: '#0f172a', platDirt: '#334155', platTop: '#94a3b8' }, 
-  { name: 'CYBER GRID', skyTop: '#064e3b', skyBot: '#021a14', mtn1: '#065f46', mtn2: '#047857', platDirt: '#01030b', platTop: '#10b981' }, 
-  { name: 'DEEP FOREST', skyTop: '#0284c7', skyBot: '#047857', mtn1: '#065f46', mtn2: '#064e3b', platDirt: '#210c01', platTop: '#15803d' }, 
-  { name: 'BARREN DESERT', skyTop: '#fef08a', skyBot: '#facc15', mtn1: '#ca8a04', mtn2: '#a16207', platDirt: '#713f12', platTop: '#eab308' }, 
-  { name: 'FLOATING RUINS', skyTop: '#c084fc', skyBot: '#7e22ce', mtn1: '#6b21a8', mtn2: '#581c87', platDirt: '#170832', platTop: '#d8b4fe' },  
-  { name: 'LAVA WORLD', skyTop: '#450a0a', skyBot: '#7f1d1d', mtn1: '#991b1b', mtn2: '#7f1d1d', platDirt: '#2a0a0a', platTop: '#ef4444' }, 
-  { name: 'BASE HQ', skyTop: '#0052ff', skyBot: '#0033cc', mtn1: '#002299', mtn2: '#001166', platDirt: '#000833', platTop: '#00d2ff' }  
+  { name: 'JUNGLE MIST', far: 'jungle_far', platDirt: '#064e3b', platTop: '#4ade80' }, 
+  { name: 'BARREN DESERT', far: 'desert_far', platDirt: '#713f12', platTop: '#eab308' }, 
+  { name: 'NEON NIGHTS', far: 'night_city_far', platDirt: '#020617', platTop: '#00e5ff' }, 
+  { name: 'SNOWY PEAKS', far: 'mountain_far', platDirt: '#1e293b', platTop: '#94a3b8' }, 
+  { name: 'SYNTH HORIZON', far: 'synthwave_far', platDirt: '#01030b', platTop: '#ff2a7a' }, 
+  { name: 'DEEP FOREST', far: 'jungle_far', platDirt: '#210c01', platTop: '#15803d' }, 
+  { name: 'SAND DUNES', far: 'desert_far', platDirt: '#713f12', platTop: '#facc15' }, 
+  { name: 'CYBERPUNK', far: 'night_city_far', platDirt: '#170832', platTop: '#00e5ff' },  
+  { name: 'LAVA WORLD', far: 'mountain_far', platDirt: '#2a0a0a', platTop: '#ef4444' }, 
+  { name: 'BASE HQ', far: 'night_city_far', platDirt: '#000833', platTop: '#00d2ff' }  
 ];
 
 function updateLevelUI() {
@@ -989,8 +927,7 @@ function triggerGameOver() {
   gameState = STATES.GAME_OVER; shakeAmount = 25; playSound('fail');
   let isNewBest = false;
   if (score > bestScore) { bestScore = score; bestEl.innerText = bestScore; localStorage.setItem('bb_v1_best', bestScore); isNewBest = true; }
-  let dailyScore = parseInt(localStorage.getItem('bb_v1_daily_score')||'0');
-  if (score > dailyScore) localStorage.setItem('bb_v1_daily_score', score);
+  updateDailyBestScore(score);
   
   // Update the detailed stats
   document.getElementById('go-score').innerText = score;
@@ -1031,8 +968,7 @@ function triggerGameWon() {
   
   let isNewBest = false;
   if (score > bestScore) { bestScore = score; bestEl.innerText = bestScore; localStorage.setItem('bb_v1_best', bestScore); isNewBest = true; }
-  let dailyScore = parseInt(localStorage.getItem('bb_v1_daily_score')||'0');
-  if (score > dailyScore) localStorage.setItem('bb_v1_daily_score', score);
+  updateDailyBestScore(score);
   
   document.querySelector('.go-title').innerText = "CONGRATULATIONS!";
   document.querySelector('.go-title').style.color = '#10b981';
@@ -1180,7 +1116,34 @@ function update(dt) {
   if (scaleAmount > 1.0) { scaleAmount -= dt / 1000; if (scaleAmount < 1.0) scaleAmount = 1.0; }
 }
 
+// --- BACKGROUND SYSTEM (REBUILT FOR PREMIUM QUALITY) ---
 function drawBackground() {
+  const bIdx = Math.min(level - 1, BIOMES.length - 1);
+  const b = BIOMES[bIdx];
+  
+  // Layer 1: The Cinematic Backdrop
+  const farAsset = loadedAssets[b.far];
+  if (farAsset && farAsset.complete) {
+    // Parallax scrolling the image
+    let scrollX = (cameraX * 0.1) % W;
+    ctx.drawImage(farAsset, -scrollX, 0, W, H);
+    ctx.drawImage(farAsset, W - scrollX, 0, W, H);
+  } else {
+    // Fallback if image not loaded
+    ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
+  }
+
+  // Layer 2: Atmosphere / Fog / Shading
+  let fog = ctx.createLinearGradient(0, 0, 0, H);
+  fog.addColorStop(0, 'rgba(0,0,0,0)');
+  fog.addColorStop(0.7, 'rgba(0,0,0,0.1)');
+  fog.addColorStop(1, 'rgba(0,0,0,0.4)');
+  ctx.fillStyle = fog;
+  ctx.fillRect(0, 0, W, H);
+}
+
+// Old procedural functions kept for reference if needed, but not used now
+function _old_drawBackground() {
   const bIdx = Math.min(level - 1, BIOMES.length - 1);
   const b = BIOMES[bIdx];
   let groundY = H - platformHeight;

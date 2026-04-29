@@ -75,7 +75,7 @@
             <div class="go-btn-wrapper" style="display:flex; flex-direction:column; gap:10px; margin-top:5px;">
               <button class="btn btn-aaa btn-pink" id="btn-restart">PLAY AGAIN</button>
               <button class="btn btn-aaa btn-blue hidden" id="btn-submit-score">SUBMIT SCORE TO WEB3</button>
-              <button class="btn btn-aaa btn-purple hidden" id="btn-revive">REVIVE (50 BB)</button>
+              <button class="btn btn-aaa btn-blue hidden" id="btn-revive" style="background: linear-gradient(135deg, #00e5ff, #0052ff); box-shadow: 0 0 20px rgba(0, 229, 255, 0.4); border: none; font-weight: 900; text-shadow: 0 0 10px rgba(255,255,255,0.5);">REVIVE (50 BB)</button>
             </div>
           </div>
         </div>
@@ -188,7 +188,7 @@
         <div class="dr-box">
           <div class="bb-token-large"></div>
           <div class="dr-amount">
-            <strong>10 BB TOKENS</strong>
+            <strong>50 BB TOKENS</strong>
             <span>Daily Bonus</span>
           </div>
         </div>
@@ -305,8 +305,11 @@
       </div>
     </div>
 
-  <script src="js/firebase-config.js"></script>
-  <script src="js/web3.js"></script>
-  <script src="js/game.js"></script>
+  <script>
+    // Simple helper to close all modals
+    window.closeModals = window.closeModals || function() {
+      document.querySelectorAll('.modal-card, .modal-backdrop').forEach(el => el.classList.add('hidden'));
+    };
+  </script>
 </body>
 </html>

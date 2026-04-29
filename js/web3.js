@@ -268,6 +268,13 @@ async function handleConnect(account) {
   if (typeof updateLeaderboardUI === 'function') updateLeaderboardUI();
   
   await checkNetwork();
+  const provider = window.ethereum;
+  if (provider) {
+    const chainIdHex = await provider.request({ method: 'eth_chainId' });
+    if (parseInt(chainIdHex, 16) !== BASE_MAINNET) {
+      await switchNetwork();
+    }
+  }
 }
 
 async function handleDisconnect() {
@@ -369,11 +376,11 @@ function initDailyReward() {
     }
     if(newBtn.disabled) return;
     
-    const success = await window.claimBBTokensOnchain(10);
+    const success = await window.claimBBTokensOnchain(50);
     if (!success) return; // Wait for transaction to be approved
     
     let coins = parseInt(localStorage.getItem('bb_v1_coins') || '0');
-    coins += 10; 
+    coins += 50; 
     localStorage.setItem('bb_v1_coins', coins);
     document.getElementById('ui-coins').innerText = coins;
     
@@ -382,7 +389,7 @@ function initDailyReward() {
     newBtn.innerText = "CLAIMED ✓";
     newBtn.disabled = true;
     
-    showInfoModal("Reward Claimed!", "You received 10 BB Tokens onchain. Come back tomorrow for more!");
+    showInfoModal("Reward Claimed!", "You received 50 BB Tokens onchain. Come back tomorrow for more!");
   });
 }
 

@@ -134,13 +134,30 @@ window.addEventListener('resize', resize);
 
 function updateLeaderboardUI() {
   const container = document.getElementById('lb-rows-container');
-  let sessions = JSON.parse(localStorage.getItem('bb_v1_sessions') || '[]');
+  let rawSessions = JSON.parse(localStorage.getItem('bb_v1_sessions') || '[]');
+  
+  let grouped = {};
+  for(let s of rawSessions) {
+     let addr = s.addr || "Local Session";
+     if(!grouped[addr] || s.score > grouped[addr].score) {
+         grouped[addr] = { score: s.score, date: s.date || new Date().getTime() };
+     }
+  }
+  
+  let sessions = Object.keys(grouped).map(addr => ({ addr: addr, score: grouped[addr].score, date: grouped[addr].date }));
+  localStorage.setItem('bb_v1_sessions', JSON.stringify(sessions));
+  
   sessions.sort((a,b) => b.score - a.score);
   if(sessions.length === 0) { container.innerHTML = `<div class="lb-empty">Play a game to see your scores here!</div>`; return; }
   let html = '';
   for(let i=0; i<Math.min(10, sessions.length); i++) {
-    const s = sessions[i]; let rClass = `rank-${i+1}`; if (i > 2) rClass = `rank-4`;
-    html += `<div class="lb-row"><span class="lb-rank ${rClass}">${i+1}</span> <span class="lb-addr">Local Session</span> <strong class="lb-score">${s.score}</strong></div>`;
+    const s = sessions[i]; 
+    let rClass = `rank-${i+1}`; if (i > 2) rClass = `rank-4`;
+    let shortAddr = s.addr;
+    if (shortAddr !== "Local Session" && shortAddr.length > 10) {
+      shortAddr = shortAddr.substring(0, 6) + "..." + shortAddr.substring(shortAddr.length - 4);
+    }
+    html += `<div class="lb-row"><span class="lb-rank ${rClass}">${i+1}</span> <span class="lb-addr">${shortAddr}</span> <strong class="lb-score">${s.score}</strong></div>`;
   }
   container.innerHTML = html;
 }
@@ -824,7 +841,7 @@ function triggerGameOver() {
   gameState = 'GAME_OVER'; shakeAmount = 25; playSound('fail');
   if (score > bestScore) { bestScore = score; bestEl.innerText = bestScore; localStorage.setItem('bb_v1_best', bestScore); }
   finalScoreEl.innerText = score;
-  let sessions = JSON.parse(localStorage.getItem('bb_v1_sessions') || '[]'); sessions.push({ score: score, date: new Date().getTime() }); localStorage.setItem('bb_v1_sessions', JSON.stringify(sessions));
+  let sessions = JSON.parse(localStorage.getItem('bb_v1_sessions') || '[]'); sessions.push({ addr: window.userAddress || "Local Session", score: score, date: new Date().getTime() }); localStorage.setItem('bb_v1_sessions', JSON.stringify(sessions));
   updateLeaderboardUI();
   
   document.querySelector('.gh-center').style.opacity = '0';
@@ -847,7 +864,7 @@ function triggerGameWon() {
   document.querySelector('.go-title').style.color = '#10b981';
   finalScoreEl.innerText = score;
   
-  let sessions = JSON.parse(localStorage.getItem('bb_v1_sessions') || '[]'); sessions.push({ score: score, date: new Date().getTime() }); localStorage.setItem('bb_v1_sessions', JSON.stringify(sessions));
+  let sessions = JSON.parse(localStorage.getItem('bb_v1_sessions') || '[]'); sessions.push({ addr: window.userAddress || "Local Session", score: score, date: new Date().getTime() }); localStorage.setItem('bb_v1_sessions', JSON.stringify(sessions));
   updateLeaderboardUI();
   
   document.querySelector('.gh-center').style.opacity = '0';

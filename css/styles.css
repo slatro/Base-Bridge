@@ -274,25 +274,32 @@ canvas { width: 100%; height: 100%; display: block; }
   text-shadow: none; border-bottom: 2px solid rgba(255,255,255,0.1); padding-bottom: 15px;
 }
 
-.modal-large { width: 600px; max-height: 80vh; }
+.modal-large { width: 550px; max-height: 85vh; padding: 25px; }
+.achievements-list { 
+  display: flex; flex-direction: column; gap: 10px; 
+  overflow-y: auto; text-align: left; padding-right: 10px;
+  max-height: 450px; /* Constrain list height to enable internal scrolling */
+}
+.achievements-list::-webkit-scrollbar { width: 6px; }
+.achievements-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
 
-.ach-tabs { display: flex; gap: 10px; margin-bottom: 10px; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 12px; flex-shrink: 0;}
 .ach-tab, .equip-tab { flex: 1; background: transparent; border: none; color: var(--text-dim); font-weight: 800; padding: 10px; border-radius: 8px; cursor: pointer; font-size: 0.9rem; transition: 0.2s;}
 .ach-tab.active { background: #b517ff; color: #fff; box-shadow: 0 4px 10px rgba(181, 23, 255, 0.4); }
 .equip-tab.active { background: #00e5ff; color: #000; box-shadow: 0 4px 10px rgba(0, 229, 255, 0.4); }
 
 .achieve-item { 
   background: rgba(255,255,255,0.08); backdrop-filter: blur(15px); 
-  padding: 18px 22px; border-radius: 20px; 
-  display: flex; flex-direction: column; gap: 14px; 
+  padding: 14px 18px; border-radius: 18px; 
+  display: flex; flex-direction: column; gap: 8px; 
   border: 1px solid rgba(255,255,255,0.15); transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
-  flex-shrink: 0; box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+  flex-shrink: 0; box-shadow: 0 8px 20px rgba(0,0,0,0.3);
 }
 .achieve-item:hover { transform: translateY(-3px); background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); box-shadow: 0 8px 25px rgba(0,0,0,0.3); }
 
-.ach-card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 15px; }
-.ach-text { flex: 1; font-size: 0.9rem; color: #cbd5e1; line-height: 1.4; text-align: left; }
-.ach-text strong { color: #fff; font-size: 1.1rem; display: block; margin-bottom: 2px; }
+.ach-card-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.ach-text { flex: 1; font-size: 0.85rem; color: #cbd5e1; line-height: 1.3; text-align: left; }
+.ach-text strong { color: #fff; font-size: 1.05rem; display: block; margin-bottom: 1px; }
+
 .ach-reward-tag { color: #ff2a7a; font-weight: 800; font-size: 0.85rem; margin-left: 5px; }
 
 .ach-progress-wrapper { display: flex; align-items: center; gap: 12px; margin-top: 5px; }

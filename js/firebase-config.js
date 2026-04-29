@@ -1,6 +1,3 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
-
 // TODO: Replace with your Firebase config
 const firebaseConfig = {
   apiKey: "YOUR_API_KEY",
@@ -11,13 +8,12 @@ const firebaseConfig = {
   appId: "YOUR_APP_ID"
 };
 
-let app, db;
+let db;
 
 try {
-    // Only initialize if config is changed from dummy values
     if (firebaseConfig.apiKey !== "YOUR_API_KEY") {
-        app = initializeApp(firebaseConfig);
-        db = getFirestore(app);
+        firebase.initializeApp(firebaseConfig);
+        db = firebase.firestore();
     } else {
         console.warn("Firebase is not configured yet. Please update js/firebase-config.js with your credentials.");
     }
@@ -28,9 +24,10 @@ try {
 window.fetchFirebaseLeaderboard = async function() {
     if (!db) return [];
     try {
-        const scoresRef = collection(db, "leaderboard");
-        const q = query(scoresRef, orderBy("score", "desc"), limit(10));
-        const querySnapshot = await getDocs(q);
+        const querySnapshot = await db.collection("leaderboard")
+            .orderBy("score", "desc")
+            .limit(10)
+            .get();
         
         let formattedScores = [];
         querySnapshot.forEach((doc) => {
@@ -53,7 +50,7 @@ window.submitScoreToFirebase = async function(score) {
         const username = localStorage.getItem('bb_v1_username') || "Player";
         const address = window.userAddress || "Guest";
         
-        await addDoc(collection(db, "leaderboard"), {
+        await db.collection("leaderboard").add({
             username: username,
             address: address,
             score: score,

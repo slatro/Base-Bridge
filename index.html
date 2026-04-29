@@ -69,7 +69,7 @@
             <div class="main-logo-icon"></div>
             <h1 class="menu-title">BASE<br>BRIDGE</h1>
           </div>
-          <div class="user-profile-area hidden" id="user-profile-area" style="display: none; align-items: center; gap: 10px; background: rgba(0,0,0,0.4); padding: 8px 15px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); width: 100%; max-width: 250px;">
+          <div class="user-profile-area" id="user-profile-area" style="display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.4); padding: 8px 15px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); width: 100%; max-width: 250px;">
             <div class="user-avatar" id="current-user-avatar" style="width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0; box-shadow: 0 0 8px rgba(0,229,255,0.5); overflow: hidden; display: flex; justify-content: center; align-items: center; background: #111;"></div>
             <span id="current-user-name" style="font-weight: 800; font-size: 1.1rem; color: #fff; flex: 1; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Player</span>
             <div id="btn-profile-settings" style="cursor: pointer; opacity: 0.8; font-size: 1.2rem; transition: 0.2s; padding-left: 5px;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.8">⚙️</div>
@@ -282,9 +282,9 @@
       </div>
     </div>
 
-  </div>
-
-  <script type="module" src="js/firebase-config.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
   <script src="js/web3.js"></script>
   <script src="js/game.js"></script>
 </body>

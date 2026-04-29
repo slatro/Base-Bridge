@@ -166,7 +166,6 @@ async function handleConnect(account) {
   viewDetails.classList.remove("hidden");
   
   lblAddress.innerText = shortAddr;
-  if (userProfileArea) userProfileArea.style.display = 'flex';
   
   refInput.value = `${window.location.origin}${window.location.pathname}?ref=${userAddress}`;
   lblBest.innerText = localStorage.getItem('bb_v1_best') || "0";
@@ -195,7 +194,6 @@ async function handleDisconnect() {
   
   if (viewConnect) viewConnect.classList.remove("hidden");
   if (viewDetails) viewDetails.classList.add("hidden");
-  if (userProfileArea) userProfileArea.style.display = 'none';
   
   if (typeof updateLeaderboardUI === 'function') updateLeaderboardUI();
 }

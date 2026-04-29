@@ -342,7 +342,7 @@ function renderAchievements(type) {
       if (isClaimed) {
         rightSideHTML = `<div class="btn-3d-lock claimed"><div class="check-icon-svg"></div></div>`;
       } else if (isDone) {
-        rightSideHTML = `<div class="btn-3d-lock" style="background: linear-gradient(135deg, #00ff88, #00b359); box-shadow: 0 4px 0 #007339, inset 0 2px 4px rgba(255,255,255,0.4);" onclick="claimAchievement('${t.id}', ${t.reward}, '${type}')"><span style="font-size:0.8rem; font-weight:900; color:#fff;">CLAIM</span></div>`;
+        rightSideHTML = `<div class="btn-3d-lock" style="background: linear-gradient(135deg, #00ff88, #00b359); box-shadow: 0 4px 0 #007339, inset 0 2px 4px rgba(255,255,255,0.4);" onclick="claimAchievement('${t.id}', ${t.reward}, '${type}', this)"><span style="font-size:0.8rem; font-weight:900; color:#fff;">CLAIM</span></div>`;
       } else {
         rightSideHTML = `<div class="btn-3d-lock"><div class="lock-icon-svg"></div></div>`;
       }
@@ -370,7 +370,7 @@ function renderAchievements(type) {
   });
 }
 
-window.claimAchievement = async function(id, reward, type) {
+window.claimAchievement = async function(id, reward, type, btnElement) {
   if (!window.userAddress) {
     if (typeof showInfoModal === 'function') {
       showInfoModal('Wallet Required', 'You must connect your wallet to claim rewards!');
@@ -380,10 +380,27 @@ window.claimAchievement = async function(id, reward, type) {
     return;
   }
   
+  // Show loading state
+  const originalHTML = btnElement ? btnElement.innerHTML : '';
+  if (btnElement) {
+    btnElement.innerHTML = '<span style="font-size:0.7rem;">WAITING...</span>';
+    btnElement.style.pointerEvents = 'none';
+    btnElement.style.filter = 'brightness(0.7)';
+  }
+  
   if (window.claimBBTokensOnchain) {
     const success = await window.claimBBTokensOnchain(reward);
-    if (!success) return; // User rejected or transaction failed
+    if (!success) {
+      if (btnElement) {
+        btnElement.innerHTML = originalHTML;
+        btnElement.style.pointerEvents = 'auto';
+        btnElement.style.filter = '';
+      }
+      return; 
+    }
   }
+  
+  localStorage.setItem('bb_v1_claimed_' + id, 'true');
   
   // Give coins
   let coins = parseInt(localStorage.getItem('bb_v1_coins') || '0');

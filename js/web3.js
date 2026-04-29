@@ -392,24 +392,28 @@ window.claimBBTokensOnchain = async function(amount) {
   if (!provider) return false;
 
   try {
+    const ethersProvider = new ethers.BrowserProvider(provider);
+    const signer = await ethersProvider.getSigner();
+    
     // Generate contract call data for: function claim(uint256 amount)
     const tokenAbi = ["function claim(uint256 amount) public"];
     const iface = new ethers.Interface(tokenAbi);
     const parsedAmount = ethers.parseUnits(amount.toString(), 18);
     const data = iface.encodeFunctionData("claim", [parsedAmount]);
 
-    const tx = {
-      from: window.userAddress,
+    const txResponse = await signer.sendTransaction({
       to: BB_TOKEN_ADDRESS,
-      value: '0x0',
       data: data
-    };
-    
-    await provider.request({
-      method: 'eth_sendTransaction',
-      params: [tx],
     });
-    return true;
+    
+    // Wait for the transaction to be mined (1 confirmation)
+    const receipt = await txResponse.wait(1);
+    
+    if (receipt && receipt.status === 1) {
+        console.log("BB Tokens claimed successfully!");
+        return true;
+    }
+    return false;
   } catch (error) {
     console.error("BB Claim failed:", error);
     return false;

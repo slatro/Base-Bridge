@@ -281,11 +281,25 @@ canvas { width: 100%; height: 100%; display: block; }
   max-height: 450px; /* Constrain list height to enable internal scrolling */
 }
 .achievements-list::-webkit-scrollbar { width: 6px; }
-.achievements-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+.ach-tabs { 
+  display: flex; justify-content: center; align-items: center; 
+  background: rgba(0,0,0,0.4); padding: 5px; border-radius: 16px; 
+  margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
+}
+.ach-tab, .equip-tab { 
+  flex: 1; background: transparent; border: none; color: #94a3b8; 
+  font-weight: 800; padding: 12px 15px; border-radius: 12px; 
+  cursor: pointer; font-size: 0.9rem; transition: all 0.3s;
+  position: relative; text-transform: uppercase; letter-spacing: 1px;
+}
+.ach-tab:not(:last-child)::after, .equip-tab:not(:last-child)::after {
+  content: ''; position: absolute; right: 0; top: 25%; height: 50%; width: 1px; background: rgba(255,255,255,0.15);
+}
+.ach-tab.active { background: linear-gradient(to bottom, #ff2a7a, #c40049); color: #fff; box-shadow: 0 4px 15px rgba(255, 42, 122, 0.4); }
+.equip-tab.active { background: linear-gradient(to bottom, #00e5ff, #0088cc); color: #fff; box-shadow: 0 4px 15px rgba(0, 229, 255, 0.4); }
+.ach-tab:hover:not(.active), .equip-tab:hover:not(.active) { color: #fff; background: rgba(255,255,255,0.05); }
 
-.ach-tab, .equip-tab { flex: 1; background: transparent; border: none; color: var(--text-dim); font-weight: 800; padding: 10px; border-radius: 8px; cursor: pointer; font-size: 0.9rem; transition: 0.2s;}
-.ach-tab.active { background: #b517ff; color: #fff; box-shadow: 0 4px 10px rgba(181, 23, 255, 0.4); }
-.equip-tab.active { background: #00e5ff; color: #000; box-shadow: 0 4px 10px rgba(0, 229, 255, 0.4); }
 
 .achieve-item { 
   background: rgba(255,255,255,0.08); backdrop-filter: blur(15px); 

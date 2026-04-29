@@ -791,11 +791,11 @@ function setupInitialState() {
 
 // --- BACKGROUND ASSETS SYSTEM ---
 const BIOME_LAYERS = [
-  { id: 'jungle', name: 'JUNGLE MIST' },
-  { id: 'desert', name: 'BARREN DESERT' },
-  { id: 'neon',   name: 'NEON NIGHTS' },
-  { id: 'space',  name: 'SNOWY PEAKS' },
-  { id: 'cyber',  name: 'SYNTH HORIZON' }
+  { id: 'jungle', name: 'JUNGLE MIST', skyTop: '#38bdf8', skyBot: '#fde047', platTop: '#4ade80', mtn2: '#166534' },
+  { id: 'desert', name: 'BARREN DESERT', skyTop: '#fef08a', skyBot: '#facc15', platTop: '#eab308', mtn2: '#a16207' },
+  { id: 'neon',   name: 'NEON NIGHTS', skyTop: '#0f172a', skyBot: '#1e1b4b', platTop: '#00e5ff', mtn2: '#1e1b4b' },
+  { id: 'space',  name: 'SNOWY PEAKS', skyTop: '#000000', skyBot: '#0f172a', platTop: '#94a3b8', mtn2: '#0f172a' },
+  { id: 'cyber',  name: 'SYNTH HORIZON', skyTop: '#064e3b', skyBot: '#021a14', platTop: '#ff2a7a', mtn2: '#047857' }
 ];
 
 const loadedBgAssets = {};
@@ -1180,6 +1180,12 @@ function drawBackground() {
   const assets = loadedBgAssets[biome.id];
   let drift = (Date.now() / 1000) * 10;
 
+  // 1. SKY GRADIENT FALLBACK (Ensures no black screen)
+  let g = ctx.createLinearGradient(0, 0, 0, H); 
+  g.addColorStop(0, biome.skyTop || '#38bdf8'); 
+  g.addColorStop(1, biome.skyBot || '#fde047');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+
   function drawLayer(img, speedFactor, opacity = 1) {
     if (!img || !img.complete || img.naturalWidth === 0) return;
     ctx.globalAlpha = opacity;
@@ -1192,28 +1198,10 @@ function drawBackground() {
     ctx.globalAlpha = 1.0;
   }
 
-  // Layer 1: Sky (Very slow)
+  // Draw image layers if available
   drawLayer(assets.sky, 0.05);
-  
-  // Atmospheric Fog 1 (Light)
-  let fog1 = ctx.createLinearGradient(0, H*0.4, 0, H);
-  fog1.addColorStop(0, 'rgba(255,255,255,0)');
-  fog1.addColorStop(1, 'rgba(255,255,255,0.1)');
-  ctx.fillStyle = fog1; ctx.fillRect(0,0,W,H);
-
-  // Layer 2: Far (Slow, slightly faded)
   drawLayer(assets.far, 0.15, 0.7);
-  
-  // Layer 3: Mid (Medium)
   drawLayer(assets.mid, 0.35, 0.9);
-  
-  // Atmospheric Fog 2
-  let fog2 = ctx.createLinearGradient(0, H*0.6, 0, H);
-  fog2.addColorStop(0, 'rgba(0,0,0,0)');
-  fog2.addColorStop(1, 'rgba(0,0,0,0.3)');
-  ctx.fillStyle = fog2; ctx.fillRect(0,0,W,H);
-
-  // Layer 4: Front (Fast, clear)
   drawLayer(assets.front, 0.65, 1.0);
 }
 
@@ -1270,7 +1258,7 @@ function draw() {
     }
     
     if (p.bridgeL) {
-      const bColor = BIOMES[Math.min(level - 1, BIOMES.length - 1)].platTop;
+      const bColor = BIOME_LAYERS[Math.min(level - 1, BIOME_LAYERS.length - 1)].platTop;
       ctx.save(); ctx.translate(p.x + p.w, H - platformHeight); ctx.rotate(Math.PI / 2);
       ctx.fillStyle = '#111'; ctx.fillRect(0, -p.bridgeL, bridge.thickness, p.bridgeL);
       ctx.setLineDash([10, 5]); ctx.strokeStyle = bColor; ctx.lineWidth = 2; ctx.strokeRect(0, -p.bridgeL, bridge.thickness, p.bridgeL);
@@ -1279,7 +1267,7 @@ function draw() {
   }
   
   if (gameState !== STATES.PLAYING || bridge.length > 0) {
-    const bColor = BIOMES[Math.min(level - 1, BIOMES.length - 1)].platTop;
+    const bColor = BIOME_LAYERS[Math.min(level - 1, BIOME_LAYERS.length - 1)].platTop;
     ctx.save(); ctx.translate(bridge.x, bridge.y); ctx.rotate(bridge.angle);
     ctx.fillStyle = '#111'; ctx.fillRect(0, -bridge.length, bridge.thickness, bridge.length);
     ctx.setLineDash([10, 5]); ctx.strokeStyle = bColor; ctx.lineWidth = 2; ctx.strokeRect(0, -bridge.length, bridge.thickness, bridge.length);
@@ -1323,7 +1311,7 @@ function drawPreviewCanvas() {
   else if(prevSkin === 'gold') bIdx = 3;
   else if(prevSkin === 'hoodie') bIdx = 4;
   else if(prevSkin === 'galaxy') bIdx = 5;
-  const biome = BIOMES[bIdx];
+  const biome = BIOME_LAYERS[bIdx];
 
   // Draw Biome Background
   let bg = prevCtx.createLinearGradient(0, 0, 0, prevCanvas.height);

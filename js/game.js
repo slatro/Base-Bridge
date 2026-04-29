@@ -334,7 +334,7 @@ function renderAchievements(type) {
     let rightSideHTML = '';
     if (t.type === 'general') {
       if (isDone) {
-        rightSideHTML = `<div class="btn-3d-lock" onclick="if(!window.userAddress){showInfoModal('Wallet Required', 'You must connect your wallet to mint this NFT!');return;} window.mintNFT('${t.name}');"><div class="check-icon-svg"></div></div>`;
+        rightSideHTML = `<div class="btn-3d-lock" onclick="if(!window.userAddress){showInfoModal('Wallet Required', 'You must connect your wallet to mint this NFT!');return;} window.mintNFT('${t.name}', this);"><div class="check-icon-svg"></div></div>`;
       } else {
         rightSideHTML = `<div class="btn-3d-lock"><div class="lock-icon-svg"></div></div>`;
       }

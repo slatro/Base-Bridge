@@ -172,7 +172,7 @@ canvas { width: 100%; height: 100%; display: block; }
 .panel-subtitle { font-size: 0.9rem; color: var(--text-dim); margin-bottom: 10px; flex-shrink: 0;}
 .dr-box { background: rgba(0,0,0,0.3); border-radius: 12px; padding: 15px; display: flex; align-items: center; gap: 20px; width: 100%; justify-content: center; border: 1px solid rgba(255,255,255,0.05); flex: 1; margin-bottom: 15px;}
 .dr-amount { display: flex; flex-direction: column; text-align: left; }
-.dr-amount strong { font-size: 1.2rem; color: #facc15; font-weight:900; text-shadow: 0 0 10px rgba(250,204,21,0.5);}
+.dr-amount strong { font-size: 1.2rem; color: #00e5ff; font-weight:900; text-shadow: 0 0 10px rgba(0,229,255,0.8), 0 0 20px rgba(0,229,255,0.4);}
 .dr-amount span { font-size: 0.85rem; color: #fff; font-weight: bold; }
 .dr-btn-wrapper { width: 100%; flex-shrink: 0; padding-bottom: 5px;}
 

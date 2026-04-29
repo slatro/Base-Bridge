@@ -735,6 +735,8 @@ function startGame() {
   gameState = 'PLAYING'; engineState = 'WAITING';
   document.querySelector('.gh-center').style.opacity = '1';
   gameOverOverlay.classList.add('hidden');
+  const startOverlay = document.getElementById('start-overlay');
+  if (startOverlay) startOverlay.classList.add('hidden');
   btnRevive.classList.add('hidden');
   if (!localStorage.getItem('bb_v1_tut_done')) tutEl.classList.remove('hidden');
   incMetric('bb_v1_total_games', 1);
@@ -924,6 +926,7 @@ window.addEventListener('mouseup', handlePointerUp);
 window.addEventListener('touchend', handlePointerUp);
 document.getElementById('btn-play').addEventListener('click', startGame);
 document.getElementById('btn-restart').addEventListener('click', startGame);
+document.getElementById('btn-start-overlay').addEventListener('click', startGame);
 document.getElementById('btn-revive').addEventListener('click', reviveGame);
 
 function update(dt) {

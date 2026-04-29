@@ -368,7 +368,8 @@ window.mintNFT = async function(nftName) {
     showInfoModal('Success!', `Successfully minted ${nftName} on Base Network!`);
   } catch (error) {
     console.error(error);
-
+  }
+};
 
 // Ensure closeModals is truly global
 window.closeModals = function() {

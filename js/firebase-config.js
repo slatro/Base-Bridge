@@ -1,43 +1,17 @@
-// TODO: Replace with your Firebase config
-const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
-};
+// We are using a free, serverless Key-Value database (KVDB.io) 
+// so you don't have to deal with Firebase configurations or CORS errors.
 
-let db;
-
-try {
-    if (firebaseConfig.apiKey !== "YOUR_API_KEY") {
-        firebase.initializeApp(firebaseConfig);
-        db = firebase.firestore();
-    } else {
-        console.warn("Firebase is not configured yet. Please update js/firebase-config.js with your credentials.");
-    }
-} catch (e) {
-    console.error("Firebase initialization failed:", e);
-}
+const KVDB_BUCKET = "3Bz5so9xQFGY6vAGb68Mfx";
+const KVDB_URL = `https://kvdb.io/${KVDB_BUCKET}/leaderboard`;
 
 window.fetchFirebaseLeaderboard = async function() {
-    if (!db) return [];
     try {
-        const querySnapshot = await db.collection("leaderboard")
-            .orderBy("score", "desc")
-            .limit(10)
-            .get();
+        const response = await fetch(KVDB_URL);
+        if (!response.ok) return [];
+        const data = await response.json();
+        if (!Array.isArray(data)) return [];
         
-        let formattedScores = [];
-        querySnapshot.forEach((doc) => {
-            const data = doc.data();
-            formattedScores.push({
-                addr: data.username || data.address || "Guest",
-                score: data.score
-            });
-        });
-        return formattedScores;
+        return data;
     } catch (e) {
         console.error("Error fetching leaderboard: ", e);
         return [];
@@ -45,16 +19,27 @@ window.fetchFirebaseLeaderboard = async function() {
 }
 
 window.submitScoreToFirebase = async function(score) {
-    if (!db) return false;
     try {
         const username = localStorage.getItem('bb_v1_username') || "Player";
-        const address = window.userAddress || "Guest";
         
-        await db.collection("leaderboard").add({
-            username: username,
-            address: address,
+        // 1. Fetch current leaderboard
+        let currentBoard = await window.fetchFirebaseLeaderboard();
+        
+        // 2. Add new score
+        currentBoard.push({
+            addr: username, // show username on the board
             score: score,
             timestamp: new Date().getTime()
+        });
+        
+        // 3. Sort descending and keep top 10
+        currentBoard.sort((a,b) => b.score - a.score);
+        currentBoard = currentBoard.slice(0, 10);
+        
+        // 4. Save back to KVDB
+        await fetch(KVDB_URL, {
+            method: 'POST',
+            body: JSON.stringify(currentBoard)
         });
         
         if (typeof updateLeaderboardUI === 'function') {
@@ -62,7 +47,7 @@ window.submitScoreToFirebase = async function(score) {
         }
         return true;
     } catch (e) {
-        console.error("Error adding document: ", e);
+        console.error("Error saving score: ", e);
         return false;
     }
 }

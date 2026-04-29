@@ -82,11 +82,11 @@ let equippedFace = null;
 const SHOP_DB = [
   // SKINS
   { id: 'classic', type: 'skin', name: 'Classic', rarity: 'Common', cost: 0, icon: 'classic', desc: 'A simple but polished stick hero.', colors: { body: '#222', head: '#222' } },
-  { id: 'ninja', type: 'skin', name: 'Ninja', rarity: 'Rare', cost: 120, icon: 'ninja', desc: 'Stealthy assassin with a red headband.', colors: { body: '#1a1a1a', head: '#1a1a1a', face: '#eebb99', band: '#ef4444' } },
-  { id: 'cyber', type: 'skin', name: 'Cyber', rarity: 'Epic', cost: 200, icon: 'cyber', desc: 'Neon glow lines pulsing with digital energy.', colors: { body: '#0f172a', head: '#0f172a', glow: '#00e5ff' } },
-  { id: 'gold', type: 'skin', name: 'Gold', rarity: 'Legendary', cost: 350, icon: 'gold', desc: 'Solid metallic gradient.', colors: { body: '#eab308', head: '#facc15', shine: '#fef08a' } },
-  { id: 'hoodie', type: 'skin', name: 'Hoodie', rarity: 'Rare', cost: 150, icon: 'hoodie', desc: 'Shadowed face hidden beneath a red hoodie.', colors: { body: '#e11d48', head: '#be123c', faceShadow: '#111' } },
-  { id: 'galaxy', type: 'skin', name: 'Galaxy', rarity: 'Mythic', cost: 500, icon: 'galaxy', desc: 'Contains the cosmos.', colors: { grad1: '#b517ff', grad2: '#00e5ff' } },
+  { id: 'ninja', type: 'skin', name: 'Ninja', rarity: 'Uncommon', cost: 250, icon: 'ninja', desc: 'Stealthy assassin with a red headband.', colors: { body: '#1a1a1a', head: '#1a1a1a', face: '#eebb99', band: '#ef4444' } },
+  { id: 'cyber', type: 'skin', name: 'Cyber', rarity: 'Rare', cost: 350, icon: 'cyber', desc: 'Neon glow lines pulsing with digital energy.', colors: { body: '#0f172a', head: '#0f172a', glow: '#00e5ff' } },
+  { id: 'gold', type: 'skin', name: 'Gold', rarity: 'Epic', cost: 450, icon: 'gold', desc: 'Solid metallic gradient.', colors: { body: '#eab308', head: '#facc15', shine: '#fef08a' } },
+  { id: 'hoodie', type: 'skin', name: 'Hoodie', rarity: 'Legendary', cost: 550, icon: 'hoodie', desc: 'Shadowed face hidden beneath a red hoodie.', colors: { body: '#e11d48', head: '#be123c', faceShadow: '#111' } },
+  { id: 'galaxy', type: 'skin', name: 'Galaxy', rarity: 'Mythic', cost: 750, icon: 'galaxy', desc: 'Contains the cosmos.', colors: { grad1: '#b517ff', grad2: '#00e5ff' } },
   // HATS
   { id: 'cap', type: 'hat', name: 'Baseball Cap', rarity: 'Common', cost: 50, iconId: 'hat_cap', desc: 'Keep the sun out.' },
   { id: 'crown', type: 'hat', name: 'King Crown', rarity: 'Epic', cost: 250, iconId: 'hat_crown', desc: 'Rule the bridge.' },

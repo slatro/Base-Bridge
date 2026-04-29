@@ -20,7 +20,7 @@
       <!-- Game Card -->
       <div class="game-card">
         <!-- Overlay Header -->
-        <div class="game-header">
+        <div class="game-header" id="game-header-ui" style="opacity: 0; pointer-events: none; transition: opacity 0.5s;">
           <div class="gh-left">
             <div class="gh-stat">
               <span class="gh-label">SCORE</span>
@@ -44,10 +44,16 @@
         <div class="canvas-wrapper" id="canvas-wrapper">
           <canvas id="gameCanvas"></canvas>
           
-          <div id="start-overlay" class="game-overlay" style="background: rgba(0,0,0,0.3); backdrop-filter: blur(4px);">
-            <div id="btn-start-overlay" style="width: 100px; height: 100px; background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 50%; border: 1px solid rgba(255,255,255,0.2); display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 0 15px rgba(255,255,255,0.1); transition: 0.3s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
-              <div style="width: 0; height: 0; border-top: 20px solid transparent; border-bottom: 20px solid transparent; border-left: 30px solid #fff; margin-left: 8px; filter: drop-shadow(0 0 10px rgba(0,229,255,0.5));"></div>
+          <div id="start-overlay" class="game-overlay" style="background: rgba(0,0,0,0.3); backdrop-filter: blur(8px); display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <div style="position: relative; width: 140px; height: 140px; display: flex; justify-content: center; align-items: center; margin-bottom: 25px;">
+              <div style="position: absolute; width: 100%; height: 100%; background: rgba(255,255,255,0.05); backdrop-filter: blur(5px); border-radius: 50%; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 0 30px rgba(0,229,255,0.2), inset 0 0 15px rgba(255,255,255,0.05);"></div>
+              <div class="main-logo-icon" style="width: 80px; height: 80px; filter: drop-shadow(0 0 10px #00e5ff); position: relative; z-index: 2;"></div>
             </div>
+            
+            <div id="btn-start-overlay" style="width: 120px; height: 120px; background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 50%; border: 1px solid rgba(255,255,255,0.2); display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 0 15px rgba(255,255,255,0.1); transition: 0.3s; margin-bottom: 20px;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+              <div style="width: 0; height: 0; border-top: 25px solid transparent; border-bottom: 25px solid transparent; border-left: 40px solid #fff; margin-left: 10px; filter: drop-shadow(0 0 15px rgba(255,255,255,0.6));"></div>
+            </div>
+            <div style="font-family: 'Fredoka One'; color: #fff; font-size: 1.4rem; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 0 10px rgba(0,229,255,0.8);">Tap to Play!</div>
           </div>
 
           <div id="perfect-msg" class="hidden">RESCUED! +2</div>

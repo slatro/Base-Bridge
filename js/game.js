@@ -734,6 +734,11 @@ function startGame() {
   setupInitialState();
   gameState = 'PLAYING'; engineState = 'WAITING';
   document.querySelector('.gh-center').style.opacity = '1';
+  const headerUI = document.getElementById('game-header-ui');
+  if (headerUI) {
+    headerUI.style.opacity = '1';
+    headerUI.style.pointerEvents = 'auto';
+  }
   gameOverOverlay.classList.add('hidden');
   const startOverlay = document.getElementById('start-overlay');
   if (startOverlay) startOverlay.classList.add('hidden');

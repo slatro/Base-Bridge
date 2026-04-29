@@ -791,11 +791,11 @@ function setupInitialState() {
 
 // --- BACKGROUND ASSETS SYSTEM ---
 const BIOME_LAYERS = [
-  { id: 'jungle', name: 'JUNGLE MIST', skyTop: '#38bdf8', skyBot: '#fde047', platTop: '#4ade80', mtn2: '#166534' },
-  { id: 'desert', name: 'BARREN DESERT', skyTop: '#fef08a', skyBot: '#facc15', platTop: '#eab308', mtn2: '#a16207' },
-  { id: 'neon',   name: 'NEON NIGHTS', skyTop: '#0f172a', skyBot: '#1e1b4b', platTop: '#00e5ff', mtn2: '#1e1b4b' },
-  { id: 'space',  name: 'SNOWY PEAKS', skyTop: '#000000', skyBot: '#0f172a', platTop: '#94a3b8', mtn2: '#0f172a' },
-  { id: 'cyber',  name: 'SYNTH HORIZON', skyTop: '#064e3b', skyBot: '#021a14', platTop: '#ff2a7a', mtn2: '#047857' }
+  { id: 'jungle', name: 'JUNGLE MIST', skyTop: '#38bdf8', skyBot: '#fde047', platTop: '#4ade80', mtn2: '#166534', platDirt: '#451a03' },
+  { id: 'desert', name: 'BARREN DESERT', skyTop: '#fef08a', skyBot: '#facc15', platTop: '#eab308', mtn2: '#a16207', platDirt: '#713f12' },
+  { id: 'neon',   name: 'NEON NIGHTS', skyTop: '#0f172a', skyBot: '#1e1b4b', platTop: '#00e5ff', mtn2: '#1e1b4b', platDirt: '#020617' },
+  { id: 'space',  name: 'SNOWY PEAKS', skyTop: '#000000', skyBot: '#0f172a', platTop: '#94a3b8', mtn2: '#0f172a', platDirt: '#334155' },
+  { id: 'cyber',  name: 'SYNTH HORIZON', skyTop: '#064e3b', skyBot: '#021a14', platTop: '#ff2a7a', mtn2: '#047857', platDirt: '#01030b' }
 ];
 
 const loadedBgAssets = {};
@@ -1216,8 +1216,8 @@ function draw() {
   ctx.save();
   ctx.translate(-cameraX, 0);
   
-  const bIdx = Math.min(level - 1, BIOMES.length - 1);
-  const b = BIOMES[bIdx];
+  const bIdx = Math.min(level - 1, BIOME_LAYERS.length - 1);
+  const b = BIOME_LAYERS[bIdx];
 
   for (let i = 0; i < platforms.length; i++) {
     const p = platforms[i];

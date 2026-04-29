@@ -1165,50 +1165,56 @@ function drawBackground() {
   const bIdx = Math.min(level - 1, BIOMES.length - 1);
   const b = BIOMES[bIdx];
   let groundY = H - platformHeight;
+  let drift = (Date.now() / 1000) * 10; // Slow horizontal drift over time
   
-  // Layer 0: Sky
-  let g = ctx.createLinearGradient(0,0,0,H); g.addColorStop(0, b.skyTop); g.addColorStop(1, b.skyBot);
+  // 1. SKY LAYER (Parallax 0.05)
+  let g = ctx.createLinearGradient(0, 0, 0, H); 
+  g.addColorStop(0, b.skyTop); g.addColorStop(1, b.skyBot);
   ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
   
-  // Layer 0.5: Celestials
   ctx.save();
   ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+  // Stars / Particles
   if ([0,2,3,4,5,7,8,9].includes(bIdx)) {
     for(let i=0; i<100; i++) {
-       let sx = ((i*123) - cameraX*0.01) % W; if(sx<0) sx+=W;
+       let sx = ((i*123) - cameraX*0.05 - drift*0.5) % W; if(sx<0) sx+=W;
        let sy = (i*47) % (groundY);
        let size = Math.abs(Math.sin(i)) * 2;
        ctx.fillRect(sx, sy, size, size);
     }
   }
-  
+  // Sun / Moon / Planet
   if (bIdx === 3 || bIdx === 8) { // Planet
-    let px = (W * 0.7 - cameraX * 0.05) % (W * 1.5); if (px < -200) px += W * 1.5;
+    let px = (W * 0.7 - cameraX * 0.05 - drift*0.2) % (W * 1.5); if (px < -200) px += W * 1.5;
     ctx.beginPath(); ctx.arc(px, H * 0.3, 120, 0, Math.PI * 2); 
     ctx.fillStyle = bIdx === 3 ? '#9d4edd' : '#7f1d1d'; ctx.fill();
     ctx.fillStyle = 'rgba(0,0,0,0.5)';
     ctx.beginPath(); ctx.arc(px-30, H*0.3+30, 120, 0, Math.PI*2); ctx.fill();
-  } else if (bIdx === 1 || bIdx === 6 || bIdx === 4) { // Sun
-    let px = (W * 0.3 - cameraX * 0.05) % (W * 1.5); if (px < -200) px += W * 1.5;
+  } else if (bIdx === 1 || bIdx === 6 || bIdx === 4 || bIdx === 0) { // Sun
+    let px = (W * 0.3 - cameraX * 0.05 - drift*0.2) % (W * 1.5); if (px < -200) px += W * 1.5;
     ctx.beginPath(); ctx.arc(px, H * 0.4, 80, 0, Math.PI * 2); 
-    if(bIdx === 4) {
-      // Synthwave sun
+    if(bIdx === 4) { // Synthwave sun
       let sunG = ctx.createLinearGradient(0, H*0.4-80, 0, H*0.4+80);
       sunG.addColorStop(0, '#f97316'); sunG.addColorStop(1, '#ec4899');
       ctx.fillStyle = sunG; ctx.fill();
       ctx.fillStyle = b.skyBot;
       for(let i=0; i<5; i++) ctx.fillRect(px-80, H*0.4 + i*15, 160, 4+i);
     } else {
-      ctx.fillStyle = bIdx === 1 ? '#ffb703' : '#fef08a'; ctx.fill();
+      ctx.fillStyle = bIdx === 1 ? '#ffb703' : (bIdx === 0 ? '#fef08a' : '#facc15'); ctx.fill();
     }
   }
   ctx.restore();
 
-  // Helper for Parallax Loops
-  function drawLayer(speedFactor, gap, drawFn) {
-    let speed = cameraX * speedFactor;
+  // Helper for rendering repeating horizontal layers
+  function drawRepeatingLayer(speedFactor, gap, alpha, blur, drawFn) {
+    let speed = cameraX * speedFactor + drift * speedFactor;
     let num = Math.ceil(W / gap) + 2;
     let start = Math.floor(speed / gap) * gap;
+    
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    if (blur > 0) ctx.filter = `blur(${blur}px)`;
+    
     for(let i=0; i<num; i++) {
       let x = (start + i*gap) - speed;
       let rand = Math.abs(Math.sin((start + i*gap)*0.1));
@@ -1218,116 +1224,110 @@ function drawBackground() {
       drawFn(rand, rand2, x, start + i*gap);
       ctx.restore();
     }
+    ctx.restore();
   }
 
-  // BIOME SPECIFIC DRAWING
-  if (bIdx === 0) { // GREEN HILLS
-    drawLayer(0.15, W*0.5, (r) => { ctx.fillStyle = b.mtn1; ctx.beginPath(); ctx.ellipse(0, 0, W*0.4, H*0.3 + r*H*0.1, 0, Math.PI, 0); ctx.fill(); });
-    drawLayer(0.30, W*0.35, (r) => { ctx.fillStyle = b.mtn2; ctx.beginPath(); ctx.ellipse(0, 0, W*0.3, H*0.2 + r*H*0.1, 0, Math.PI, 0); ctx.fill(); });
-    drawLayer(0.45, W*0.15, (r, r2) => {
-      let th = 80 + r*60;
-      ctx.fillStyle = '#1e293b'; ctx.fillRect(-4, -20, 8, 20); // trunk
-      ctx.fillStyle = '#0f766e';
-      ctx.beginPath(); ctx.moveTo(0, -th); ctx.lineTo(-25-r2*10, -20); ctx.lineTo(25+r2*10, -20); ctx.fill();
-      ctx.fillStyle = '#047857';
-      ctx.beginPath(); ctx.moveTo(0, -th); ctx.lineTo(-20-r2*10, -th*0.4); ctx.lineTo(20+r2*10, -th*0.4); ctx.fill();
-    });
-  } 
-  else if (bIdx === 1) { // SUNSET MOUNTAIN
-    drawLayer(0.15, W*0.4, (r) => { ctx.fillStyle = b.mtn1; ctx.beginPath(); ctx.moveTo(-W*0.3, 0); ctx.lineTo(0, -H*0.4 - r*H*0.2); ctx.lineTo(W*0.3, 0); ctx.fill(); });
-    drawLayer(0.30, W*0.25, (r) => { ctx.fillStyle = b.mtn2; ctx.beginPath(); ctx.moveTo(-W*0.2, 0); ctx.lineTo(0, -H*0.25 - r*H*0.15); ctx.lineTo(W*0.2, 0); ctx.fill(); });
+  function drawAtmosphericFog(alpha, heightScale) {
+    let fog = ctx.createLinearGradient(0, groundY - H*heightScale, 0, groundY + 50);
+    fog.addColorStop(0, 'rgba(255,255,255,0)');
+    fog.addColorStop(1, `rgba(${hexToRgb(b.skyBot)}, ${alpha})`);
+    ctx.fillStyle = fog;
+    ctx.fillRect(0, 0, W, H);
   }
-  else if (bIdx === 2) { // NEON CITY
-    drawLayer(0.15, 120, (r, r2) => { 
-      ctx.fillStyle = b.mtn1; let h = 100+r*200; let w = 60+r2*40; 
-      ctx.fillRect(-w/2, -h, w, h); 
-    });
-    drawLayer(0.30, 150, (r, r2) => { 
-      ctx.fillStyle = b.mtn2; let h = 80+r*150; let w = 50+r2*30; 
-      ctx.fillRect(-w/2, -h, w, h); 
-    });
-    drawLayer(0.45, 200, (r, r2) => { 
-      ctx.fillStyle = '#020617'; let h = 150+r*150; let w = 80+r2*40; 
-      ctx.fillRect(-w/2, -h, w, h);
-      ctx.fillStyle = b.platTop;
+
+  function hexToRgb(hex) {
+    let c;
+    if(/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)){
+      c= hex.substring(1).split('');
+      if(c.length== 3){ c= [c[0], c[0], c[1], c[1], c[2], c[2]]; }
+      c= '0x'+c.join('');
+      return [(c>>16)&255, (c>>8)&255, c&255].join(',');
+    }
+    return "0,0,0"; // fallback
+  }
+
+  // Define drawing functions for different biome styles
+  const drawMtn = (color, w, h) => (r, r2) => {
+    ctx.fillStyle = color;
+    ctx.beginPath(); ctx.moveTo(-w/2, 0); 
+    ctx.quadraticCurveTo(0, -h - r*h*0.5, w/2, 0); ctx.fill();
+  };
+  
+  const drawCity = (color, color2) => (r, r2) => {
+    let h = 100 + r*200; let w = 60 + r2*40;
+    ctx.fillStyle = color; ctx.fillRect(-w/2, -h, w, h);
+    if(color2 && r2 > 0.3) {
+      ctx.fillStyle = color2;
       for(let y=20; y<h-20; y+=25) {
-        if(r2 > 0.5) ctx.fillRect(-w/2+10, -h+y, w-20, 10);
+        if(r > 0.5) ctx.fillRect(-w/2+10, -h+y, w-20, 10);
         else { ctx.fillRect(-w/2+10, -h+y, 15, 15); ctx.fillRect(w/2-25, -h+y, 15, 15); }
       }
-    });
-  }
-  else if (bIdx === 3) { // SPACE STATION
-    drawLayer(0.15, 300, (r) => { ctx.fillStyle = '#1e293b'; ctx.fillRect(-20, -H, 40, H); ctx.fillRect(-150, -H*0.8, 300, 20); });
-    drawLayer(0.30, 200, (r) => { ctx.fillStyle = '#0f172a'; ctx.beginPath(); ctx.moveTo(-30,0); ctx.lineTo(-20,-H); ctx.lineTo(20,-H); ctx.lineTo(30,0); ctx.fill(); });
-    drawLayer(0.45, 250, (r, r2) => { 
-      ctx.fillStyle = '#334155'; ctx.fillRect(-40, -80-r*40, 80, 80+r*40);
-      ctx.fillStyle = '#0284c7'; ctx.fillRect(-30, -70-r*40, 60, 40);
-      ctx.fillStyle = '#ffffff'; ctx.font = "bold 14px 'Nunito'"; ctx.fillText("BASED", -22, -45-r*40);
-    });
-  }
-  else if (bIdx === 4) { // CYBER GRID
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.6)'; ctx.fillRect(0, groundY, W, H - groundY);
-    drawLayer(0.15, 100, (r) => { ctx.fillStyle = b.mtn1; ctx.fillRect(-2, -H, 4, H); }); // Vertical grid lines
-    drawLayer(0.30, 200, (r, r2) => { 
-      ctx.fillStyle = b.mtn2; let h = 100+r*150;
-      ctx.fillRect(-15, -h, 30, h); 
-      ctx.fillStyle = b.platTop; ctx.fillRect(-5, -h-20, 10, 20);
-    });
-  }
-  else if (bIdx === 5) { // DEEP FOREST
-    ctx.fillStyle = 'rgba(0, 10, 5, 0.7)'; ctx.fillRect(0, groundY, W, H - groundY);
-    drawLayer(0.15, 150, (r) => { ctx.fillStyle = b.mtn1; ctx.fillRect(-15, -H, 30, H); ctx.beginPath(); ctx.arc(0, -H*0.6+r*50, 80, 0, Math.PI*2); ctx.fill(); });
-    drawLayer(0.30, 200, (r,r2) => { ctx.fillStyle = b.mtn2; ctx.fillRect(-25, -H, 50, H); ctx.beginPath(); ctx.ellipse(0, -H*0.7, 120, 80+r*40, 0, Math.PI, 0); ctx.fill(); });
-    drawLayer(0.45, W*0.2, (r, r2) => {
-      let th = 100 + r*80;
-      ctx.fillStyle = '#1e293b'; ctx.fillRect(-6, -20, 12, 20); // trunk
-      ctx.fillStyle = '#064e3b';
-      ctx.beginPath(); ctx.moveTo(0, -th); ctx.lineTo(-30-r2*10, -20); ctx.lineTo(30+r2*10, -20); ctx.fill();
-      ctx.fillStyle = '#065f46';
-      ctx.beginPath(); ctx.moveTo(0, -th); ctx.lineTo(-25-r2*10, -th*0.4); ctx.lineTo(25+r2*10, -th*0.4); ctx.fill();
-    });
-  }
-  else if (bIdx === 6) { // BARREN DESERT
-    drawLayer(0.15, W*0.5, (r) => { ctx.fillStyle = b.mtn1; ctx.beginPath(); ctx.moveTo(-W*0.3, 0); ctx.quadraticCurveTo(0, -H*0.3 - r*H*0.1, W*0.3, 0); ctx.fill(); });
-    drawLayer(0.30, W*0.3, (r) => { ctx.fillStyle = b.mtn2; ctx.beginPath(); ctx.moveTo(-W*0.2, 0); ctx.quadraticCurveTo(0, -H*0.2 - r*H*0.1, W*0.2, 0); ctx.fill(); });
-    drawLayer(0.45, 180, (r, r2) => {
-      ctx.fillStyle = '#065f46'; let ch = 60+r*60;
-      ctx.beginPath(); ctx.roundRect(-8, -ch, 16, ch, 8); ctx.fill();
-      if(r > 0.3) { ctx.beginPath(); ctx.roundRect(-24, -ch+20, 16, 8, 4); ctx.fill(); ctx.beginPath(); ctx.roundRect(-24, -ch+10, 8, 18, 4); ctx.fill(); }
-      if(r2 > 0.3) { ctx.beginPath(); ctx.roundRect(8, -ch+30, 20, 8, 4); ctx.fill(); ctx.beginPath(); ctx.roundRect(20, -ch+15, 8, 23, 4); ctx.fill(); }
-    });
-  }
-  else if (bIdx === 7) { // FLOATING RUINS
-    ctx.fillStyle = 'rgba(10, 0, 25, 0.6)'; ctx.fillRect(0, groundY, W, H - groundY);
-    drawLayer(0.15, 300, (r, r2) => { ctx.fillStyle = b.mtn1; ctx.beginPath(); ctx.ellipse(0, -H*0.5-r*100, 80+r2*40, 40+r*20, 0, 0, Math.PI*2); ctx.fill(); });
-    drawLayer(0.30, 250, (r, r2) => { ctx.fillStyle = b.mtn2; ctx.beginPath(); ctx.ellipse(0, -H*0.3-r2*100, 60+r*20, 30+r2*10, 0, 0, Math.PI*2); ctx.fill(); });
-    drawLayer(0.45, 180, (r, r2) => {
-      let th = 50 + r*30;
-      ctx.fillStyle = '#4a044e'; ctx.fillRect(-4, -th, 8, th); // trunk
-      ctx.fillStyle = b.platTop;
-      ctx.beginPath(); ctx.arc(0, -th, 20+r2*10, 0, Math.PI*2); ctx.fill();
-      ctx.beginPath(); ctx.arc(-15, -th+10, 15+r*5, 0, Math.PI*2); ctx.fill();
-      ctx.beginPath(); ctx.arc(15, -th+10, 15+r*5, 0, Math.PI*2); ctx.fill();
-    });
-  }
-  else if (bIdx === 8) { // LAVA WORLD
-    drawLayer(0.15, W*0.4, (r) => { 
-      ctx.fillStyle = b.mtn1; 
-      ctx.beginPath(); ctx.moveTo(-W*0.2, 0); ctx.lineTo(-20, -H*0.4-r*100); ctx.lineTo(20, -H*0.4-r*100); ctx.lineTo(W*0.2, 0); ctx.fill(); 
-      ctx.fillStyle = '#ef4444';
-      ctx.beginPath(); ctx.moveTo(-15, -H*0.4-r*100); ctx.lineTo(0, -H*0.3-r*80); ctx.lineTo(15, -H*0.4-r*100); ctx.fill();
-    });
-    drawLayer(0.30, W*0.3, (r) => { 
-      ctx.fillStyle = b.mtn2; 
-      ctx.beginPath(); ctx.moveTo(-W*0.15, 0); ctx.lineTo(-10, -H*0.2-r*50); ctx.lineTo(10, -H*0.2-r*50); ctx.lineTo(W*0.15, 0); ctx.fill(); 
-      ctx.fillStyle = '#f97316';
-      ctx.beginPath(); ctx.moveTo(-8, -H*0.2-r*50); ctx.lineTo(0, -H*0.1-r*40); ctx.lineTo(8, -H*0.2-r*50); ctx.fill();
-    });
-  }
-  else if (bIdx === 9) { // BASE HQ
-    drawLayer(0.15, 400, (r) => { ctx.fillStyle = b.mtn1; ctx.fillRect(-40, -H, 80, H); ctx.fillStyle = '#0052ff'; ctx.fillRect(-20, -H, 40, H); });
-    drawLayer(0.30, 300, (r, r2) => { ctx.fillStyle = b.mtn2; ctx.beginPath(); ctx.moveTo(-50,0); ctx.lineTo(0,-H); ctx.lineTo(50,0); ctx.fill(); });
-  }
+    }
+  };
+
+  const drawTrees = (trunk, leaf1, leaf2) => (r, r2) => {
+    let th = 80 + r*80;
+    ctx.fillStyle = trunk; ctx.fillRect(-4, -20, 8, 20);
+    ctx.fillStyle = leaf1;
+    ctx.beginPath(); ctx.moveTo(0, -th); ctx.lineTo(-30-r2*20, -20); ctx.lineTo(30+r2*20, -20); ctx.fill();
+    ctx.fillStyle = leaf2;
+    ctx.beginPath(); ctx.moveTo(0, -th); ctx.lineTo(-20-r2*20, -th*0.4); ctx.lineTo(20+r2*20, -th*0.4); ctx.fill();
+  };
+
+  const drawTech = (color) => (r, r2) => {
+    ctx.fillStyle = color;
+    ctx.beginPath(); ctx.moveTo(-30,0); ctx.lineTo(-20, -150 - r*100); ctx.lineTo(20, -150 - r*100); ctx.lineTo(30,0); ctx.fill();
+    ctx.fillStyle = 'rgba(0,0,0,0.3)'; ctx.fillRect(-10, -140 - r*100, 20, 130 + r*100);
+  };
+
+  const drawRuins = (color, float) => (r, r2) => {
+    ctx.fillStyle = color;
+    let y = float ? -H*0.4 - r2*100 : 0;
+    ctx.beginPath(); ctx.ellipse(0, y, 60+r*40, 30+r2*20, 0, 0, Math.PI*2); ctx.fill();
+    if(r > 0.5) { ctx.fillRect(-10, y-40, 20, 40); }
+  };
+
+  // 2. FAR LAYER (Parallax 0.15, Blur 3px, Opacity 0.6)
+  let farColor = b.mtn1;
+  let farType = bIdx === 2 ? drawCity(farColor) : 
+                bIdx === 3 ? drawTech(farColor) : 
+                bIdx === 4 ? drawCity(farColor) : 
+                bIdx === 5 ? drawTrees('#111', farColor, farColor) :
+                bIdx === 7 ? drawRuins(farColor, true) :
+                bIdx === 9 ? drawCity(farColor) : drawMtn(farColor, W*0.6, H*0.4);
+  drawRepeatingLayer(0.15, W*0.3, 0.6, 3, farType);
+  drawAtmosphericFog(0.4, 0.5);
+
+  // 3. MID LAYER (Parallax 0.35, Blur 1px, Opacity 0.85)
+  let midColor = b.mtn2;
+  let midType = bIdx === 2 ? drawCity(midColor) : 
+                bIdx === 3 ? drawTech(midColor) : 
+                bIdx === 4 ? drawCity(midColor) : 
+                bIdx === 5 ? drawTrees('#111', b.mtn1, midColor) :
+                bIdx === 7 ? drawRuins(midColor, true) :
+                bIdx === 9 ? drawCity(midColor) : drawMtn(midColor, W*0.4, H*0.25);
+  drawRepeatingLayer(0.35, W*0.2, 0.85, 1, midType);
+  drawAtmosphericFog(0.6, 0.3);
+
+  // 4. FRONT LAYER (Parallax 0.65, Blur 0px, Opacity 1.0)
+  let frontColor = b.platDirt;
+  let frontTop = b.platTop;
+  let frontType = bIdx === 2 ? drawCity(frontColor, frontTop) : 
+                  bIdx === 3 ? drawTech(frontColor) : 
+                  bIdx === 4 ? drawCity(frontColor, frontTop) : 
+                  bIdx === 5 ? drawTrees(frontColor, midColor, frontTop) :
+                  bIdx === 7 ? drawRuins(frontTop, false) :
+                  bIdx === 9 ? drawCity(frontColor, frontTop) : 
+                  (bIdx === 1 || bIdx === 6 || bIdx === 8) ? drawMtn(frontColor, W*0.2, H*0.15) : 
+                  drawTrees(frontColor, midColor, frontTop); // Default to trees in foreground
+  drawRepeatingLayer(0.65, W*0.12, 1.0, 0, frontType);
+
+  // Global Foreground Shadow / Vignette at bottom
+  let fgGlow = ctx.createLinearGradient(0, groundY - 20, 0, H);
+  fgGlow.addColorStop(0, 'rgba(0,0,0,0)');
+  fgGlow.addColorStop(1, 'rgba(0,0,0,0.8)');
+  ctx.fillStyle = fgGlow;
+  ctx.fillRect(0, groundY - 20, W, H - groundY + 20);
 }
 
 let lastDt = 16;

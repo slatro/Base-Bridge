@@ -346,7 +346,7 @@ function renderAchievements(type) {
   });
 }
 
-window.claimAchievement = function(id, reward, type) {
+window.claimAchievement = async function(id, reward, type) {
   if (!window.userAddress) {
     if (typeof showInfoModal === 'function') {
       showInfoModal('Wallet Required', 'You must connect your wallet to claim rewards!');
@@ -354,6 +354,11 @@ window.claimAchievement = function(id, reward, type) {
       alert('You must connect your wallet to claim rewards!');
     }
     return;
+  }
+  
+  if (window.claimBBTokensOnchain) {
+    const success = await window.claimBBTokensOnchain(reward);
+    if (!success) return; // User rejected or transaction failed
   }
   
   // Give coins
@@ -369,6 +374,10 @@ window.claimAchievement = function(id, reward, type) {
   
   // Re-render
   renderAchievements(type);
+  
+  if (typeof showInfoModal === 'function') {
+    showInfoModal('Achievement Claimed!', `You successfully claimed ${reward} BB Tokens onchain!`);
+  }
 };
 const achTabs = document.querySelectorAll('.ach-tab');
 achTabs.forEach(t => t.addEventListener('click', (e) => {

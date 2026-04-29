@@ -8,14 +8,58 @@ let provider;
 let signer;
 let userAddress = null;
 
+// Replace these with your actual deployed contract addresses on Base Sepolia/Mainnet
+const BB_TOKEN_ADDRESS = "0x0000000000000000000000000000000000000001"; 
+const NFT_CONTRACT_ADDRESS = "0x0000000000000000000000000000000000000002";
+
 // DOM
 const btnConnect = document.getElementById("btn-connect-wallet");
 const btnSwitch = document.getElementById("btn-switch-network");
 const viewConnect = document.getElementById("onchain-connect-view");
 const viewDetails = document.getElementById("onchain-details-view");
 
-const walletAddressTop = document.getElementById("wallet-address-top");
-const userBadge = document.getElementById("user-badge");
+const userProfileArea = document.getElementById("user-profile-area");
+const currentUserName = document.getElementById("current-user-name");
+const currentUserAvatar = document.getElementById("current-user-avatar");
+const btnProfileSettings = document.getElementById("btn-profile-settings");
+const btnDisconnect = document.getElementById("btn-disconnect-wallet");
+const inputUsername = document.getElementById("username-input");
+const btnSaveProfile = document.getElementById("btn-save-profile");
+const avatarGrid = document.getElementById("avatar-grid");
+
+const AVATAR_COLORS = [
+  '#111111', '#e11d48', '#0891b2', '#f59e0b', '#8b5cf6', '#10b981', '#ec4899', '#3b82f6', '#f43f5e', '#84cc16',
+  '#14b8a6', '#6366f1', '#a855f7', '#d946ef', '#f97316', '#64748b', '#000000', '#ffffff', '#7dd3fc', '#fef08a'
+];
+let selectedAvatar = localStorage.getItem('bb_v1_avatar') || '#111111';
+let currentUsername = localStorage.getItem('bb_v1_username') || 'Player';
+
+function getAvatarSVG(color) {
+  return `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="40" fill="%23${color.replace('#','')}"/><circle cx="35" cy="45" r="5" fill="%23fff"/><circle cx="65" cy="45" r="5" fill="%23fff"/></svg>`;
+}
+
+function updateProfileUI() {
+  if (currentUserName) currentUserName.innerText = currentUsername;
+  if (currentUserAvatar) currentUserAvatar.style.background = `url('${getAvatarSVG(selectedAvatar)}') no-repeat center/contain`;
+}
+
+function initProfileModal() {
+  if (!avatarGrid) return;
+  avatarGrid.innerHTML = '';
+  AVATAR_COLORS.forEach(color => {
+    const div = document.createElement('div');
+    div.style.width = '40px'; div.style.height = '40px'; div.style.borderRadius = '50%';
+    div.style.cursor = 'pointer'; div.style.background = `url('${getAvatarSVG(color)}') no-repeat center/contain`;
+    div.style.border = selectedAvatar === color ? '3px solid #00ff88' : '3px solid transparent';
+    div.onclick = () => {
+      selectedAvatar = color;
+      Array.from(avatarGrid.children).forEach(c => c.style.border = '3px solid transparent');
+      div.style.border = '3px solid #00ff88';
+    };
+    avatarGrid.appendChild(div);
+  });
+  inputUsername.value = currentUsername;
+}
 
 const lblNetwork = document.getElementById("network-status");
 const lblAddress = document.getElementById("wallet-address");
@@ -67,9 +111,27 @@ async function initWeb3() {
 
   if(btnSwitch) btnSwitch.addEventListener("click", switchNetwork);
   if(btnCopyRef) btnCopyRef.addEventListener("click", copyRef);
+  if(btnDisconnect) btnDisconnect.addEventListener("click", handleDisconnect);
+  
+  if(btnProfileSettings) btnProfileSettings.addEventListener("click", () => {
+    initProfileModal();
+    document.getElementById('modal-backdrop').classList.remove('hidden');
+    document.getElementById('modal-profile').classList.remove('hidden');
+  });
+  if(btnSaveProfile) btnSaveProfile.addEventListener("click", () => {
+    let name = inputUsername.value.trim();
+    if(name.length > 0) {
+      currentUsername = name;
+      localStorage.setItem('bb_v1_username', currentUsername);
+    }
+    localStorage.setItem('bb_v1_avatar', selectedAvatar);
+    updateProfileUI();
+    window.closeModals();
+  });
   
   checkURLReferral();
   initDailyReward();
+  updateProfileUI();
 }
 
 function checkURLReferral() {
@@ -95,8 +157,7 @@ async function handleConnect(account) {
   viewDetails.classList.remove("hidden");
   
   lblAddress.innerText = shortAddr;
-  walletAddressTop.innerText = shortAddr;
-  userBadge.classList.remove("hidden");
+  if (userProfileArea) userProfileArea.style.display = 'flex';
   
   refInput.value = `${window.location.origin}${window.location.pathname}?ref=${userAddress}`;
   lblBest.innerText = localStorage.getItem('bb_v1_best') || "0";
@@ -107,9 +168,9 @@ async function handleConnect(account) {
 function handleDisconnect() {
   userAddress = null;
   window.userAddress = null; // GLOBAL EXPORT
-  viewConnect.classList.remove("hidden");
-  viewDetails.classList.add("hidden");
-  userBadge.classList.add("hidden");
+  if (viewConnect) viewConnect.classList.remove("hidden");
+  if (viewDetails) viewDetails.classList.add("hidden");
+  if (userProfileArea) userProfileArea.style.display = 'none';
 }
 
 async function checkNetwork() {
@@ -181,12 +242,15 @@ function initDailyReward() {
   const newBtn = btnClaim.cloneNode(true);
   btnClaim.parentNode.replaceChild(newBtn, btnClaim);
 
-  newBtn.addEventListener("click", () => {
+  newBtn.addEventListener("click", async () => {
     if (!window.userAddress) {
       showInfoModal('Wallet Required', 'You must connect your wallet to claim daily rewards!');
       return;
     }
     if(newBtn.disabled) return;
+    
+    const success = await window.claimBBTokensOnchain(50);
+    if (!success) return; // Wait for transaction to be approved
     
     let coins = parseInt(localStorage.getItem('bb_v1_coins') || '0');
     coins += 50; 
@@ -198,9 +262,39 @@ function initDailyReward() {
     newBtn.innerText = "CLAIMED ✓";
     newBtn.disabled = true;
     
-    showInfoModal("Reward Claimed!", "You received 50 BB Tokens. Come back tomorrow for more!");
+    showInfoModal("Reward Claimed!", "You received 50 BB Tokens onchain. Come back tomorrow for more!");
   });
 }
+
+window.claimBBTokensOnchain = async function(amount) {
+  if (!window.userAddress) return false;
+  const provider = window.ethereum;
+  if (!provider) return false;
+
+  try {
+    // Generate contract call data for: function claim(uint256 amount)
+    const tokenAbi = ["function claim(uint256 amount) public"];
+    const iface = new ethers.Interface(tokenAbi);
+    const parsedAmount = ethers.parseUnits(amount.toString(), 18);
+    const data = iface.encodeFunctionData("claim", [parsedAmount]);
+
+    const tx = {
+      from: window.userAddress,
+      to: BB_TOKEN_ADDRESS,
+      value: '0x0',
+      data: data
+    };
+    
+    await provider.request({
+      method: 'eth_sendTransaction',
+      params: [tx],
+    });
+    return true;
+  } catch (error) {
+    console.error("BB Claim failed:", error);
+    return false;
+  }
+};
 
 // SVG Achievement Icons
 const ACH_SVG = {
@@ -227,11 +321,16 @@ window.mintNFT = async function(nftName) {
   if (!provider) return;
 
   try {
+    // Generate contract call data for: function mint(string name)
+    const nftAbi = ["function mint(string memory name) public"];
+    const iface = new ethers.Interface(nftAbi);
+    const data = iface.encodeFunctionData("mint", [nftName]);
+
     const tx = {
       from: window.userAddress,
-      to: window.userAddress,
+      to: NFT_CONTRACT_ADDRESS,
       value: '0x0',
-      data: '0x'
+      data: data
     };
     
     await provider.request({
@@ -252,6 +351,8 @@ window.closeModals = function() {
   document.getElementById('modal-achievements').classList.add('hidden');
   document.getElementById('modal-shop').classList.add('hidden');
   document.getElementById('modal-equip-shop').classList.add('hidden');
+  const profileModal = document.getElementById('modal-profile');
+  if (profileModal) profileModal.classList.add('hidden');
 };
 
 window.showInfoModal = function(title, desc) {

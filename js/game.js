@@ -328,33 +328,43 @@ function renderAchievements(type) {
   const filtered = allTasks.filter(t => t.type === type);
   filtered.forEach(t => {
     const isDone = t.current >= t.target;
-    let progressText = isDone ? 'DONE ✓' : `${Math.min(t.current, t.target)}/${t.target}`;
     const isClaimed = localStorage.getItem('bb_v1_claimed_' + t.id) === 'true';
+    const progressPercent = Math.min(100, (t.current / t.target) * 100);
+    
     let rightSideHTML = '';
-
     if (t.type === 'general') {
       if (isDone) {
-        rightSideHTML = `<button class="btn btn-small" style="background: #b517ff; color: #fff; padding: 5px 10px; border-radius: 8px; font-weight: 800; font-size: 0.9rem;" onclick="if(!window.userAddress){showInfoModal('Wallet Required', 'You must connect your wallet to mint this NFT!');return;} window.mintNFT('${t.name}');">MINT NFT</button>`;
+        rightSideHTML = `<div class="btn-3d-lock" onclick="if(!window.userAddress){showInfoModal('Wallet Required', 'You must connect your wallet to mint this NFT!');return;} window.mintNFT('${t.name}');"><div class="check-icon-svg"></div></div>`;
       } else {
-        rightSideHTML = `<div class="ach-status" style="color: #8892b0; font-size: 0.9rem;">${progressText}</div>`;
+        rightSideHTML = `<div class="btn-3d-lock"><div class="lock-icon-svg"></div></div>`;
       }
     } else {
       if (isClaimed) {
-        rightSideHTML = `<div class="ach-status" style="color: #8892b0; font-size: 0.9rem; font-weight: bold;">CLAIMED ✓</div>`;
+        rightSideHTML = `<div class="btn-3d-lock claimed"><div class="check-icon-svg"></div></div>`;
       } else if (isDone) {
-        rightSideHTML = `<button class="btn btn-small" style="background: #10b981; color: #111; padding: 5px 10px; border-radius: 8px; font-weight: 800; font-size: 0.9rem;" onclick="claimAchievement('${t.id}', ${t.reward}, '${type}')">CLAIM ${t.reward} BB</button>`;
+        rightSideHTML = `<div class="btn-3d-lock" style="background: linear-gradient(135deg, #00ff88, #00b359); box-shadow: 0 4px 0 #007339, inset 0 2px 4px rgba(255,255,255,0.4);" onclick="claimAchievement('${t.id}', ${t.reward}, '${type}')"><span style="font-size:0.8rem; font-weight:900; color:#fff;">CLAIM</span></div>`;
       } else {
-        rightSideHTML = `<div class="ach-status" style="color: #8892b0; font-size: 0.9rem;">${progressText}</div>`;
+        rightSideHTML = `<div class="btn-3d-lock"><div class="lock-icon-svg"></div></div>`;
       }
     }
     
     list.innerHTML += `
       <div class="achieve-item">
-        <div class="ach-text">
-          <strong>${t.name}</strong><br>
-          ${t.desc}
+        <div class="ach-card-top">
+          <div class="ach-text">
+            <strong>${t.name} <span class="ach-reward-tag">${t.reward ? '+'+t.reward+' BB' : ''}</span></strong>
+            ${t.desc}
+          </div>
+          <div class="ach-action">
+            ${rightSideHTML}
+          </div>
         </div>
-        ${rightSideHTML}
+        <div class="ach-progress-wrapper">
+          <div class="ach-progress-container">
+            <div class="ach-progress-fill" style="width: ${progressPercent}%"></div>
+          </div>
+          <span class="ach-progress-text">${Math.min(t.current, t.target)}/${t.target}</span>
+        </div>
       </div>
     `;
   });

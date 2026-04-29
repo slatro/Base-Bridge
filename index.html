@@ -226,6 +226,7 @@
     
     <!-- Info Modal -->
     <div id="modal-info" class="modal-card hidden">
+      <div class="modal-close" onclick="closeModals()"></div>
       <h2 id="modal-info-title">Title</h2>
       <p id="modal-info-desc">Description</p>
       <button class="btn btn-aaa btn-blue" onclick="closeModals()">OK</button>
@@ -233,6 +234,7 @@
 
     <!-- Profile Settings Modal -->
     <div id="modal-profile" class="modal-card hidden">
+      <div class="modal-close" onclick="closeModals()"></div>
       <h2>PROFILE SETTINGS</h2>
       <div class="profile-input-group" style="margin-bottom: 10px;">
         <label for="username-input" style="color:var(--text-dim); display:block; margin-bottom:5px; text-align:left; font-weight:bold;">Username</label>
@@ -258,10 +260,10 @@
         <button class="ach-tab" data-tab="daily">DAILY</button>
         <button class="ach-tab" data-tab="weekly">WEEKLY</button>
       </div>
+      <div class="modal-close" onclick="closeModals()"></div>
       <div class="achievements-list" id="achievements-list">
         <!-- Populated dynamically via JS -->
       </div>
-      <button class="btn btn-aaa btn-pink mt-4" onclick="closeModals()">CLOSE</button>
     </div>
 
     <!-- Massive Equipment Shop Modal -->
@@ -271,10 +273,10 @@
         <button class="equip-tab active" data-tab="hat">HATS</button>
         <button class="equip-tab" data-tab="weapon">WEAPONS</button>
       </div>
+      <div class="modal-close" onclick="closeModals()"></div>
       <div class="equip-grid" id="equip-list">
         <!-- Populated dynamically via JS -->
       </div>
-      <button class="btn btn-aaa btn-pink mt-4" onclick="closeModals()">CLOSE</button>
     </div>
 
     <!-- Live Character Preview Panel -->

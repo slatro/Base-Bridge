@@ -34,3 +34,4 @@ The frontend is a purely static site built with HTML, CSS, and vanilla JS, meani
 - **Refer-to-Earn:** Users can copy their referral link (e.g., `?ref=0xYourWalletAddress`). When new users submit a score while holding that referral, the referrer earns onchain points and referral counts tracking on the smart contract.
 - **Gas-Efficient Leaderboard:** To save gas, scores are stored as `bestScore` per address, and `ScoreSubmitted` events are emitted on updates. The global leaderboard can be built efficiently offchain using indexers like The Graph or Goldsky.
 # Base-Bridge
+# Base-Bridge

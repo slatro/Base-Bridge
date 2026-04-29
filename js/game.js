@@ -320,7 +320,7 @@ function renderAchievements(type) {
 
     if (t.type === 'general') {
       if (isDone) {
-        rightSideHTML = `<button class="btn btn-small" style="background: #b517ff; color: #fff; padding: 5px 10px; border-radius: 8px; font-weight: 800; font-size: 0.9rem;" onclick="if(!window.userAddress){showInfoModal('Wallet Required', 'You must connect your wallet to mint this NFT!');return;} alert('Minting ${t.name} on Base Network... Please sign the transaction in your wallet.')">MINT NFT</button>`;
+        rightSideHTML = `<button class="btn btn-small" style="background: #b517ff; color: #fff; padding: 5px 10px; border-radius: 8px; font-weight: 800; font-size: 0.9rem;" onclick="if(!window.userAddress){showInfoModal('Wallet Required', 'You must connect your wallet to mint this NFT!');return;} window.mintNFT('${t.name}');">MINT NFT</button>`;
       } else {
         rightSideHTML = `<div class="ach-status" style="color: #8892b0; font-size: 0.9rem;">${progressText}</div>`;
       }

@@ -136,7 +136,7 @@ async function switchNetwork() {
   try {
     await provider.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: TARGET_CHAIN_HEX }] });
   } catch (e) {
-    if (e.code === 4902) {
+    try {
       await provider.request({
         method: 'wallet_addEthereumChain',
         params: [{
@@ -147,6 +147,8 @@ async function switchNetwork() {
           blockExplorerUrls: ['https://sepolia.basescan.org/']
         }]
       });
+    } catch (addError) {
+      console.error("Failed to switch/add network:", addError);
     }
   }
 }
@@ -213,6 +215,34 @@ const ACH_SVG = {
   gold: `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="45" fill="%23eab308"/><circle cx="50" cy="50" r="35" fill="%23fef08a"/></svg>`,
   space: `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="45" fill="%230f172a"/><circle cx="30" cy="30" r="5" fill="%23fff"/><circle cx="70" cy="60" r="3" fill="%23fff"/></svg>`,
   cal: `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect x="15" y="30" width="70" height="60" rx="5" fill="%23fff"/><rect x="15" y="20" width="70" height="20" rx="5" fill="%23ff2a7a"/></svg>`
+};
+
+window.mintNFT = async function(nftName) {
+  if (!window.userAddress) {
+    showInfoModal('Wallet Required', 'You must connect your wallet to mint this NFT!');
+    return;
+  }
+  
+  const provider = window.ethereum;
+  if (!provider) return;
+
+  try {
+    const tx = {
+      from: window.userAddress,
+      to: window.userAddress,
+      value: '0x0',
+      data: '0x'
+    };
+    
+    await provider.request({
+      method: 'eth_sendTransaction',
+      params: [tx],
+    });
+    
+    showInfoModal('Success!', `Successfully minted ${nftName} on Base Network!`);
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 // Ensure closeModals is truly global

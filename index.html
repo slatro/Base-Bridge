@@ -10,11 +10,11 @@
 <link rel="icon" type="image/png" href="/favicon.png">
 
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css?v=12">
+<link rel="stylesheet" href="css/styles.css?v=13">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
 <script defer src="js/firebase-config.js"></script>
-<script defer src="js/web3.js?v=12"></script>
-<script defer src="js/game.js?v=12"></script>
+<script defer src="js/web3.js?v=13"></script>
+<script defer src="js/game.js?v=13"></script>
 </head>
 <body>
   
@@ -109,7 +109,7 @@
           <p>Time your builds. Rescue characters.</p>
         </div>
       </div>
-      <div class="feature-card glass-panel" id="fc-daily" onclick="document.getElementById('modal-daily-calendar').classList.remove('hidden')">
+      <div class="feature-card glass-panel" id="fc-daily" onclick="window.showDailyModal(event)">
         <div class="fc-icon"><div class="svg-feat-daily"></div></div>
         <div class="fc-text">
           <h4>DAILY CHECK-IN</h4>
@@ -183,7 +183,7 @@
           <!-- 7 visual days injected via JS -->
         </div>
         <div class="dr-btn-wrapper" style="margin-top: 25px;">
-          <button class="btn btn-aaa btn-green" id="btn-open-daily-modal" onclick="document.getElementById('modal-daily-calendar').classList.remove('hidden')">CHECK IN</button>
+          <button class="btn btn-aaa btn-green" id="btn-open-daily-modal" onclick="window.showDailyModal(event)">CHECK IN</button>
         </div>
       </div>
 
@@ -302,7 +302,7 @@
     };
   </script>
     <!-- Neon Daily Check-in Modal -->
-    <div id="modal-daily-calendar" class="modal-backdrop hidden">
+    <div id="modal-daily-calendar" class="modal-backdrop hidden" style="z-index: 9999 !important;">
       <div class="neon-modal">
         <div class="neon-modal-header">
           <div class="neon-title-box">DAILY CHECKIN</div>

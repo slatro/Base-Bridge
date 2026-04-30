@@ -763,6 +763,9 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     targetCtx.shadowColor = colors.glow; targetCtx.shadowBlur = 10;
     targetCtx.strokeStyle = colors.glow; targetCtx.lineWidth = 2;
     targetCtx.beginPath(); targetCtx.moveTo(-s*0.1, s*0.4); targetCtx.lineTo(0, s*0.5); targetCtx.lineTo(-s*0.05, s*0.6); targetCtx.stroke();
+    // Glowing Cyber Eye (One)
+    targetCtx.fillStyle = colors.glow;
+    targetCtx.beginPath(); targetCtx.arc(s*0.15, s*0.2, s*0.06, 0, Math.PI*2); targetCtx.fill();
     targetCtx.shadowBlur = 0;
   }
   
@@ -792,20 +795,30 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
       targetCtx.beginPath(); targetCtx.arc(s*0.15, s*0.15, s*0.05, 0, Math.PI*2); targetCtx.fill();
     }
     // Hoodie has no eyes (face shadow only)
-  } else if (id === 'ninja') {
-    targetCtx.fillStyle = colors.face;
-    targetCtx.beginPath(); targetCtx.ellipse(s*0.1, s*0.2, s*0.15, s*0.1, 0, 0, Math.PI*2); targetCtx.fill();
-    targetCtx.fillStyle = colors.band;
-    targetCtx.fillRect(-s*0.3, 0, s*0.65, s*0.12);
-    // NINJA EYES (New)
+    // NINJA EYES (Side Profile - One Eye)
     targetCtx.fillStyle = '#111';
     targetCtx.beginPath(); 
-    targetCtx.arc(s*0.05, s*0.2, s*0.03, 0, Math.PI*2); 
-    targetCtx.arc(s*0.15, s*0.2, s*0.03, 0, Math.PI*2); 
+    targetCtx.arc(s*0.15, s*0.2, s*0.04, 0, Math.PI*2); 
+    targetCtx.fill();
+    
+    // Tied Bandana Tails
+    targetCtx.fillStyle = colors.band;
+    targetCtx.beginPath();
+    targetCtx.moveTo(-s*0.3, s*0.05);
+    targetCtx.lineTo(-s*0.5, -s*0.05);
+    targetCtx.lineTo(-s*0.45, s*0.15);
+    targetCtx.closePath();
+    targetCtx.fill();
+    targetCtx.beginPath();
+    targetCtx.moveTo(-s*0.3, s*0.08);
+    targetCtx.lineTo(-s*0.45, 0);
+    targetCtx.lineTo(-s*0.55, s*0.25);
+    targetCtx.closePath();
     targetCtx.fill();
   } else {
     targetCtx.fillStyle = colors.face || '#fff';
-    targetCtx.beginPath(); targetCtx.arc(s*0.15, s*0.2, s*0.05, 0, Math.PI*2); targetCtx.arc(s*0.3, s*0.2, s*0.05, 0, Math.PI*2); targetCtx.fill();
+    // Single Eye for Side Profile
+    targetCtx.beginPath(); targetCtx.arc(s*0.18, s*0.2, s*0.06, 0, Math.PI*2); targetCtx.fill();
   }
 
   // Draw Equipment

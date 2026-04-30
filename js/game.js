@@ -105,12 +105,18 @@ function renderDailyCheckinPanel() {
 
     // --- Modal Timeline Node ---
     const node = document.createElement('div');
-    node.className = `neon-node ${isActive ? 'active' : ''}`;
+    node.className = `neon-node ${isActive ? 'active' : ''} ${isClaimed ? 'claimed' : ''}`;
     if (isActive) {
       node.style.backgroundColor = '#fff';
       node.style.boxShadow = `0 0 15px #fff, 0 0 20px ${neonColors[i-1]}`;
     }
-    node.innerHTML = `<div class="neon-node-label">DAY ${i}</div>`;
+    if (isClaimed) {
+      node.style.backgroundColor = '#00ff88';
+      node.style.boxShadow = `0 0 15px #00ff88`;
+      node.innerHTML = `<div style="width:6px; height:6px; background:#fff; border-radius:50%; margin:4px auto 0;"></div><div class="neon-node-label">DAY ${i}</div>`;
+    } else {
+      node.innerHTML = `<div class="neon-node-label">DAY ${i}</div>`;
+    }
     nodesContainer.appendChild(node);
     
     // --- Dashboard Visual Grid Card ---

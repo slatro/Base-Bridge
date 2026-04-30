@@ -15,8 +15,13 @@ const levelNameEl = document.getElementById('ui-level-name');
 const levelFillEl = document.getElementById('ui-level-fill');
 const btnRevive = document.getElementById('btn-revive');
 
-
-
+// --- NEW GAMEPLAY STATE ---
+let reviveUsed = false;
+let sessionPerfectBonus = 0;
+let sessionComboBonus = 0;
+let slowMoTimer = 0;
+let missionProgress = { perfects: 0, score: 0, combo: 0 };
+let currentGapWidth = 0; // Track for risk/reward
 
 // Update UI top bar color
 function updateBiomeUI(currentBiome) {
@@ -33,7 +38,7 @@ let platformHeight = 250;
 
 const STATES = {
   MENU: 'MENU',
-  PLAYING: 'PLAYING', // Waiting for input
+  PLAYING: 'PLAYING', 
   BRIDGE_GROWING: 'BRIDGE_GROWING',
   BRIDGE_FALLING: 'BRIDGE_FALLING',
   CHARACTER_WALKING: 'CHARACTER_WALKING',
@@ -78,15 +83,11 @@ const todayString = now.getFullYear() + '-' + (now.getMonth()+1) + '-' + now.get
 let lastPlayedDay = localStorage.getItem('bb_v1_last_played_day');
 
 if (lastPlayedDay !== todayString) {
-  // Reset daily stats
   localStorage.setItem('bb_v1_daily_games', '0');
   localStorage.setItem('bb_v1_daily_score', '0');
   localStorage.setItem('bb_v1_daily_perfects', '0');
   localStorage.setItem('bb_v1_last_played_day', todayString);
-  // Reset claim status for daily tasks
-  for(let i=1; i<=10; i++) {
-    localStorage.removeItem('bb_v1_claimed_d' + i);
-  }
+  for(let i=1; i<=10; i++) localStorage.removeItem('bb_v1_claimed_d' + i);
 }
 
 // Metrics for Achievements
@@ -99,7 +100,34 @@ function incMetric(key, amt=1) {
     let dGames = parseInt(localStorage.getItem('bb_v1_daily_games') || '0');
     localStorage.setItem('bb_v1_daily_games', dGames + amt);
   }
-  if (key === 'bb_v1_total_perfects') {
+}
+
+function notifyMission(text) {
+  const missionPopup = document.createElement('div');
+  missionPopup.className = 'mission-popup';
+  missionPopup.innerText = text;
+  document.body.appendChild(missionPopup);
+  setTimeout(() => missionPopup.classList.add('show'), 100);
+  setTimeout(() => {
+    missionPopup.classList.remove('show');
+    setTimeout(() => missionPopup.remove(), 500);
+  }, 2500);
+}
+
+function trackMission(type, val) {
+  if (type === 'perfect') {
+    missionProgress.perfects += val;
+    if (missionProgress.perfects % 5 === 0) notifyMission("+1 Mission Progress (Perfects)");
+  }
+  if (type === 'score' && val > missionProgress.score) {
+    missionProgress.score = val;
+    if (val === 20) notifyMission("Mission Complete: Reach 20 Score! +50 BB");
+  }
+  if (type === 'combo' && val > missionProgress.combo) {
+    missionProgress.combo = val;
+    if (val === 3) notifyMission("Mission Complete: Get 3x Combo! +30 BB");
+  }
+}  if (key === 'bb_v1_total_perfects') {
     let dPerf = parseInt(localStorage.getItem('bb_v1_daily_perfects') || '0');
     localStorage.setItem('bb_v1_daily_perfects', dPerf + amt);
   }
@@ -887,15 +915,22 @@ function reviveGame() {
 }
 
 function generatePlatform() {
-  const last = platforms[platforms.length - 1];
-  // Starts scaling after 10 platforms, maxes out at score 30
-  let difficulty = Math.min(1, Math.max(0, score - 10) / 20); 
-  let minGap = 50 + difficulty * 100;
-  let maxGap = Math.min(W * 0.7, 200 + difficulty * 200);
-  let gap = minGap + Math.random() * (maxGap - minGap);
-  let w = Math.max(50, 150 - difficulty * 90);
+  // SYSTEM 8: DIFFICULTY PROGRESSION
+  let difficulty = Math.min(1.0, score / 60); 
   
-  platforms.push({ x: last.x + last.w + gap, w: w });
+  const minW = 40 - (difficulty * 15); 
+  const maxW = 120 - (difficulty * 50); 
+  const minGap = 60 + (difficulty * 40); 
+  const maxGap = Math.min(W * 0.5, 180 + (difficulty * 150)); 
+  
+  const lastP = platforms[platforms.length - 1];
+  const w = Math.floor(Math.random() * (maxW - minW + 1)) + minW;
+  const gap = Math.floor(Math.random() * (maxGap - minGap + 1)) + minGap;
+  const x = lastP.x + lastP.w + gap;
+  
+  platforms.push({ x, w, npcIndex: -1 });
+  currentGapWidth = gap;
+  if (platforms.length > 5) platforms.shift();
 }
 
 function resetBridge() {
@@ -933,61 +968,82 @@ function checkLanding() {
   incMetric('bb_v1_total_bridges', 1);
   const nextP = platforms[currentPlatformIndex + 1];
   const bridgeTip = bridge.x + bridge.length;
+  const tolerance = 5; // Pixels for near-miss
   
+  // 1. SUCCESS CHECK
   if (bridgeTip >= nextP.x && bridgeTip <= nextP.x + nextP.w) {
     success = true; platforms[currentPlatformIndex].bridgeL = bridge.length; 
     
-    // Dynamic Perfect Zone Width based on Level
+    // Perfect Zone Logic
     let basePerfectRatio = 0.20;
-    let shrinkFactor = Math.max(0.05, basePerfectRatio - (level * 0.015)); // Shrinks up to level 10
+    let shrinkFactor = Math.max(0.05, basePerfectRatio - (level * 0.015));
     const perfectW = Math.max(10, nextP.w * shrinkFactor);
     const perfectX = nextP.x + (nextP.w / 2) - (perfectW / 2);
     
     if (bridgeTip >= perfectX && bridgeTip <= perfectX + perfectW) {
+      // SYSTEM 1 & 2: PERFECT & COMBO
       perfectStreak++;
       sessionPerfects++;
       if (perfectStreak > sessionBestCombo) sessionBestCombo = perfectStreak;
       
-      let comboBonus = Math.floor(perfectStreak / 2); // 1 extra coin every 2 perfects
-      let totalCoins = 1 + comboBonus; // Base 1 + Combo
+      // Combo Rewards: 1->2, 2->4, 3->8, 4->16+
+      let comboBB = Math.min(16, Math.pow(2, perfectStreak));
+      sessionComboBonus += comboBB;
       
-      score += 2; addCoins(totalCoins); sessionCoins += totalCoins; scaleAmount = 1.05;
+      score += 2; addCoins(comboBB); sessionCoins += comboBB; 
+      shakeAmount = 15; scaleAmount = 1.05; // Feedback
       incMetric('bb_v1_total_perfects', 1);
+      trackMission('perfect', 1); trackMission('combo', perfectStreak);
       spawnSparks(bridgeTip, H - platformHeight); 
       
-      let msg = "PERFECT! +2";
-      if (perfectStreak > 1) msg += ` (COMBO x${perfectStreak})`;
+      let msg = `PERFECT x${perfectStreak}! +${comboBB} BB`;
       perfectEl.innerText = msg; 
       perfectEl.classList.add('show'); 
-      setTimeout(() => perfectEl.classList.remove('show'), 1000);
+      setTimeout(() => perfectEl.classList.remove('show'), 1200);
       playSound('perfect');
     } else {
-      perfectStreak = 0; // Reset streak on normal success
-      score += 1; addCoins(1); sessionCoins += 1; // Base 1 coin
+      // Normal Landing
+      perfectStreak = 0;
+      score += 1; addCoins(1); sessionCoins += 1;
     }
+
+    // SYSTEM 5: RISK / REWARD (Longer bridge = higher reward)
+    let gapRatio = bridge.length / (W * 0.5); // Normalized gap difficulty
+    if (gapRatio > 0.6) {
+      let riskBonus = Math.floor(gapRatio * 5);
+      if (riskBonus > 0) {
+        addCoins(riskBonus); sessionCoins += riskBonus;
+        console.log("Risk Bonus:", riskBonus);
+      }
+    }
+
     scoreEl.innerText = score;
+    trackMission('score', score);
     
     if (score > bestScore && bestScore > 0 && !window.newRecordReached) {
       window.newRecordReached = true;
       spawnConfetti(cameraX + W/2, H/2);
-      perfectEl.innerText = "NEW RECORD!"; perfectEl.style.color = '#facc15'; perfectEl.style.textShadow = '0 0 20px #facc15';
+      perfectEl.innerText = "NEW RECORD!"; perfectEl.style.color = '#facc15';
       perfectEl.classList.add('show'); 
-      setTimeout(() => { perfectEl.classList.remove('show'); perfectEl.style.color = ''; perfectEl.style.textShadow = ''; }, 2000);
+      setTimeout(() => { perfectEl.classList.remove('show'); perfectEl.style.color = ''; }, 2000);
       playSound('perfect');
     }
 
-    if (score >= level * 10) {
-      level++;
-      levelNameEl.classList.remove('level-flash');
-      void levelNameEl.offsetWidth; // trigger reflow
-      levelNameEl.classList.add('level-flash');
-      playSound('levelup');
-    }
     updateLevelUI();
-    character.squash = 0.6; // squash effect on land
-  } else { 
+    character.squash = 0.55; // Landing squash feedback
+  } 
+  else {
+    // 2. NEAR MISS CHECK (SYSTEM 4)
+    let distFromEdge = Math.min(Math.abs(bridgeTip - nextP.x), Math.abs(bridgeTip - (nextP.x + nextP.w)));
+    if (distFromEdge < 15) {
+      slowMoTimer = 0.35; // Trigger 0.35s slow-mo
+      perfectEl.innerText = "ALMOST!";
+      perfectEl.classList.add('show');
+      setTimeout(() => perfectEl.classList.remove('show'), 1000);
+    }
+
     success = false; 
-    perfectStreak = 0; // Reset streak on failure
+    perfectStreak = 0; 
   }
   gameState = STATES.CHARACTER_WALKING;
 }
@@ -995,36 +1051,71 @@ function checkLanding() {
 function triggerGameOver() {
   gameState = STATES.GAME_OVER; shakeAmount = 25; playSound('fail');
   let isNewBest = false;
-  if (score > bestScore) { bestScore = score; bestEl.innerText = bestScore; localStorage.setItem('bb_v1_best', bestScore); isNewBest = true; }
-  updateDailyBestScore(score);
+  if (score > bestScore) { 
+    bestScore = score; 
+    bestEl.innerText = bestScore; 
+    localStorage.setItem('bb_v1_best', bestScore); 
+    isNewBest = true; 
+  }
   
-  // Update the detailed stats
+  // SYSTEM 10: END SCREEN PSYCHOLOGY
+  let psychologyMsg = "";
+  if (!isNewBest) {
+    let diff = bestScore - score;
+    psychologyMsg = `You were just ${diff} points away from your best! Next run can beat it!`;
+  } else {
+    psychologyMsg = "UNBELIEVABLE! New Personal Record!";
+  }
+  
+  // SYSTEM 3: SCORE BREAKDOWN
   document.getElementById('go-score').innerText = score;
   document.getElementById('go-best').innerText = bestScore;
   document.getElementById('go-bb').innerText = sessionCoins;
-  document.getElementById('go-perfects').innerText = sessionPerfects;
-  document.getElementById('go-combo').innerText = sessionBestCombo;
-  document.getElementById('go-level').innerText = level;
-  updateLeaderboardUI();
+  
+  // Breakdown elements (Injecting into overlay)
+  const breakdownHTML = `
+    <div class="breakdown-box" style="margin-top:1rem; padding:1rem; background:rgba(255,255,255,0.05); border-radius:12px; font-size:0.9rem;">
+      <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;"><span>Perfects:</span> <span>${sessionPerfects}</span></div>
+      <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;"><span>Combo Bonus:</span> <span>${sessionComboBonus} BB</span></div>
+      <div style="display:flex; justify-content:space-between; color:#facc15;"><span>Total Earned:</span> <span>${sessionCoins} BB</span></div>
+      <p style="margin-top:1rem; font-style:italic; font-size:0.8rem; color:#94a3b8;">${psychologyMsg}</p>
+    </div>
+  `;
+  
+  const statsContainer = document.querySelector('.go-stats-grid');
+  if (statsContainer) {
+    let existingBreakdown = statsContainer.parentElement.querySelector('.breakdown-box');
+    if (existingBreakdown) existingBreakdown.remove();
+    let box = document.createElement('div');
+    box.className = 'breakdown-box';
+    box.innerHTML = breakdownHTML;
+    statsContainer.parentElement.insertBefore(box, statsContainer.nextSibling);
+  }
+
+  // SYSTEM 6: REVIVE SYSTEM (Once per run)
+  if (coins >= 50 && !reviveUsed) {
+    btnRevive.classList.remove('hidden');
+    btnRevive.onclick = () => {
+      addCoins(-50);
+      reviveUsed = true;
+      revivePlayer();
+    };
+  } else {
+    btnRevive.classList.add('hidden');
+  }
   
   document.querySelector('.gh-center').style.opacity = '0';
-  document.querySelector('.go-title').innerText = "GAME OVER"; document.querySelector('.go-title').style.color = '#fff';
-  if (coins >= 50) { btnRevive.classList.remove('hidden'); }
-  
-  const btnSubmitScore = document.getElementById('btn-submit-score');
-  if (btnSubmitScore) {
-      btnSubmitScore.classList.add('hidden');
-  }
+  setTimeout(() => gameOverOverlay.classList.remove('hidden'), 800);
+}
 
-  if (isNewBest && score > 0) {
-      setTimeout(async () => {
-          if (typeof window.submitScoreToFirebase === 'function') {
-              await window.submitScoreToFirebase(score);
-          }
-      }, 100);
-  }
-
-  setTimeout(() => gameOverOverlay.classList.remove('hidden'), 1000);
+function revivePlayer() {
+  gameOverOverlay.classList.add('hidden');
+  gameState = STATES.PLAYING;
+  character.y = H - platformHeight;
+  character.rotation = 0;
+  cameraX = platforms[currentPlatformIndex].x - W * 0.1;
+  resetBridge();
+  playSound('perfect');
 }
 
 function triggerGameWon() {
@@ -1129,30 +1220,33 @@ document.addEventListener('click', (e) => {
 });
 
 function update(dt) {
-  animTime += dt/1000;
+  // Apply Slow Motion (System 4)
+  let effectiveDt = dt;
+  if (slowMoTimer > 0) {
+    effectiveDt *= 0.3; // 30% speed
+    slowMoTimer -= dt/1000;
+  }
   
-  // Only process physics/movement if not in menus
+  animTime += effectiveDt/1000;
+  
   if ([STATES.MENU, STATES.SHOP, STATES.DAILY, STATES.LEADERBOARD, STATES.ACHIEVEMENTS, STATES.GAME_OVER, STATES.GAME_WON].includes(gameState)) return;
 
-  // Restore squash
-  character.squash += (1.0 - character.squash) * 15 * (dt/1000);
+  // SYSTEM 9: FEEDBACK - Smooth squash recovery
+  character.squash += (1.0 - character.squash) * 12 * (effectiveDt/1000);
 
   if (gameState === STATES.BRIDGE_GROWING) {
-    // Add slight acceleration to growth
-    bridge.length += (H * 0.8 + bridge.length * 0.5) * (dt / 1000); 
+    bridge.length += (H * 0.8 + bridge.length * 0.5) * (effectiveDt / 1000); 
     let maxL = (cameraX + W) - bridge.x; if (bridge.length > maxL) bridge.length = maxL;
   } 
   else if (gameState === STATES.BRIDGE_FALLING) {
-    bridge.fallTime += (dt / 1000);
-    // easeOutCubic: 1 - Math.pow(1 - t, 3)
-    let t = Math.min(bridge.fallTime / 0.5, 1.0); // 0.5s fall duration
+    bridge.fallTime += (effectiveDt / 1000);
+    let t = Math.min(bridge.fallTime / 0.4, 1.0); // Faster fall (0.4s)
     let easeOutCubic = 1 - Math.pow(1 - t, 3);
     bridge.angle = easeOutCubic * (Math.PI / 2);
-    
     if (t >= 1.0) { bridge.angle = Math.PI / 2; checkLanding(); }
   }
   else if (gameState === STATES.CHARACTER_WALKING) {
-    character.x += (W * 0.4) * (dt / 1000);
+    character.x += (W * 0.45) * (effectiveDt / 1000);
     let targetX;
     if (success) {
       const nextP = platforms[currentPlatformIndex + 1];
@@ -1160,6 +1254,9 @@ function update(dt) {
       if (character.x >= targetX) {
         character.x = targetX; gameState = STATES.SUCCESS_TRANSITION; currentPlatformIndex++;
         targetCameraX = platforms[currentPlatformIndex].x - W * 0.1; generatePlatform();
+        
+        // SYSTEM 8: Difficulty Scaling (Speed increase)
+        if (score > 10) level = Math.floor(score / 10) + 1;
       }
     } else {
       targetX = bridge.x + bridge.length;
@@ -1167,22 +1264,18 @@ function update(dt) {
     }
   }
   else if (gameState === STATES.SUCCESS_TRANSITION) {
-    let camSpeed = (targetCameraX - cameraX) * 8 * (dt / 1000); cameraX += camSpeed;
+    let camSpeed = (targetCameraX - cameraX) * 10 * (effectiveDt / 1000); cameraX += camSpeed;
     if (Math.abs(targetCameraX - cameraX) < 1) { 
       cameraX = targetCameraX; 
-      if (level > 10) {
-        triggerGameWon();
-      } else {
-        resetBridge(); gameState = STATES.PLAYING; 
-      }
+      resetBridge(); gameState = STATES.PLAYING; 
     }
   }
   else if (gameState === STATES.FALLING_DOWN) {
-    character.y += (H * 0.9) * (dt / 1000); character.rotation += (dt / 1000) * Math.PI * 2; bridge.angle += (dt / 1000) * Math.PI * 2; 
+    character.y += (H * 1.2) * (effectiveDt / 1000); character.rotation += (effectiveDt / 1000) * Math.PI * 3; bridge.angle += (effectiveDt / 1000) * Math.PI * 2; 
     if (character.y > H + character.size*2) { triggerGameOver(); }
   }
   
-  if (scaleAmount > 1.0) { scaleAmount -= dt / 1000; if (scaleAmount < 1.0) scaleAmount = 1.0; }
+  if (scaleAmount > 1.0) { scaleAmount -= effectiveDt / 1000; if (scaleAmount < 1.0) scaleAmount = 1.0; }
 }
 
 function drawBackground() {

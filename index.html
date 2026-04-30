@@ -10,14 +10,31 @@
 <link rel="icon" type="image/png" href="/favicon.png">
 
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css?v=15">
+<link rel="stylesheet" href="css/styles.css?v=16">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
 <script defer src="js/firebase-config.js"></script>
-<script defer src="js/web3.js?v=15"></script>
-<script defer src="js/game.js?v=15"></script>
+<script defer src="js/web3.js?v=16"></script>
+<script defer src="js/game.js?v=16"></script>
 </head>
 <body>
   
+  <div id="modal-daily-calendar" class="modal-backdrop hidden" style="z-index: 99999 !important;">
+    <div class="neon-modal">
+      <div class="neon-modal-header">
+        <div class="neon-title-box">DAILY CHECK-IN</div>
+        <button class="neon-close" onclick="document.getElementById('modal-daily-calendar').classList.add('hidden')">&times;</button>
+      </div>
+      <div class="neon-cards-container" id="neon-cards-container"></div>
+      <div class="neon-timeline-container" id="neon-timeline-container">
+        <div class="neon-timeline-line"></div>
+        <div class="neon-timeline-nodes" id="neon-timeline-nodes"></div>
+      </div>
+      <div class="neon-modal-footer" style="margin-top: 25px; text-align: center;">
+        <button class="btn neon-claim-btn" id="btn-claim-daily">CHECK IN TODAY</button>
+      </div>
+    </div>
+  </div>
+
   <div id="app">
     
     <!-- Top Row: Game & Menu -->
@@ -109,7 +126,7 @@
           <p>Time your builds. Rescue characters.</p>
         </div>
       </div>
-      <div class="feature-card glass-panel" id="fc-daily" onclick="window.showDailyModal(event)">
+      <div class="feature-card glass-panel" id="fc-daily" onclick="document.getElementById('modal-daily-calendar').classList.remove('hidden')">
         <div class="fc-icon"><div class="svg-feat-daily"></div></div>
         <div class="fc-text">
           <h4>DAILY CHECK-IN</h4>
@@ -183,7 +200,7 @@
           <!-- 7 visual days injected via JS -->
         </div>
         <div class="dr-btn-wrapper" style="margin-top: 25px;">
-          <button class="btn btn-aaa btn-green" id="btn-open-daily-modal" onclick="window.showDailyModal(event)">CHECK IN</button>
+          <button class="btn btn-aaa btn-green" id="btn-open-daily-modal" onclick="document.getElementById('modal-daily-calendar').classList.remove('hidden')">CHECK IN</button>
         </div>
       </div>
 
@@ -299,31 +316,6 @@
     // Simple helper to close all modals
     window.closeModals = window.closeModals || function() {
       document.querySelectorAll('.modal-card, .modal-backdrop').forEach(el => el.classList.add('hidden'));
-    };
   </script>
-    <!-- Neon Daily Check-in Modal -->
-    <div id="modal-daily-calendar" class="modal-backdrop hidden" style="z-index: 9999 !important;">
-      <div class="neon-modal">
-        <div class="neon-modal-header">
-          <div class="neon-title-box">DAILY CHECK-IN</div>
-          <button class="neon-close" onclick="document.getElementById('modal-daily-calendar').classList.add('hidden')">&times;</button>
-        </div>
-        
-        <div class="neon-cards-container" id="neon-cards-container">
-          <!-- 7 Cards Injected Here via JS -->
-        </div>
-        
-        <div class="neon-timeline-container" id="neon-timeline-container">
-          <div class="neon-timeline-line"></div>
-          <div class="neon-timeline-nodes" id="neon-timeline-nodes">
-            <!-- 7 Nodes Injected Here via JS -->
-          </div>
-        </div>
-
-        <div class="neon-modal-footer" style="margin-top: 25px; text-align: center;">
-          <button class="btn neon-claim-btn" id="btn-claim-daily">CHECK IN TODAY</button>
-        </div>
-      </div>
-    </div>
   </body>
 </html>

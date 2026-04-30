@@ -33,23 +33,6 @@ const levelNameEl = document.getElementById('ui-level-name');
 const levelFillEl = document.getElementById('ui-level-fill');
 const btnRevive = document.getElementById('btn-revive');
 
-// --- DAILY CHECK-IN SYSTEM (7-DAY PROGRESSION) ---
-// Daily Check-in Modal Opening Listener moved to the bottom for consolidation.
-
-window.showDailyModal = function(e) {
-  if (e) {
-    e.preventDefault();
-    e.stopPropagation();
-  }
-  console.log("showDailyModal triggered");
-  const modal = document.getElementById('modal-daily-calendar');
-  if (modal) {
-    modal.classList.remove('hidden');
-    // Force a repaint/reflow just in case
-    void modal.offsetWidth;
-  }
-};
-
 function renderDailyCheckinPanel() {
   const cardsContainer = document.getElementById('neon-cards-container');
   const nodesContainer = document.getElementById('neon-timeline-nodes');
@@ -1818,9 +1801,6 @@ document.getElementById('btn-start-overlay').addEventListener('click', startGame
 document.getElementById('btn-revive').addEventListener('click', reviveGame);
 
 // Consolidated Feature Card Listeners
-document.getElementById('fc-daily')?.addEventListener('click', (e) => {
-  window.showDailyModal(e);
-});
 document.getElementById('fc-skill')?.addEventListener('click', () => {
   console.log("Skill Missions Card Clicked");
   if (typeof showInfoModal === 'function') {

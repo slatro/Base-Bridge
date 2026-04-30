@@ -910,9 +910,11 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
   }
 
   // Translate up so feet touch 0, apply squash
-  targetCtx.translate(0, -s + bounceY);
-  targetCtx.scale(1.0 + (1.0 - character.squash) * 0.5, character.squash);
   const id = skinData.id;
+  let yOffset = -s;
+  if (id === 'pika') yOffset = -s * 0.72; // Lowered Pika to touch ground
+  targetCtx.translate(0, yOffset + bounceY);
+  targetCtx.scale(1.0 + (1.0 - character.squash) * 0.5, character.squash);
   const colors = skinData.colors;
 
   // Cape Rendering (Behind body)
@@ -1283,9 +1285,9 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     // Beard handled in head path
   }
   else if (id === 'pika') {
-    // Red cheek (right side)
+    // Red cheek (right side) - moved left to avoid mouth
     targetCtx.fillStyle = '#ef4444';
-    targetCtx.beginPath(); targetCtx.arc(s*0.25, s*0.25, s*0.08, 0, Math.PI*2); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.arc(s*0.12, s*0.25, s*0.08, 0, Math.PI*2); targetCtx.fill();
     // Eye (right side)
     targetCtx.fillStyle = '#111';
     targetCtx.beginPath(); targetCtx.arc(s*0.3, s*0.12, s*0.04, 0, Math.PI*2); targetCtx.fill();

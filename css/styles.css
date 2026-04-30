@@ -344,8 +344,8 @@ canvas { width: 100%; height: 100%; display: block; }
 
 /* Canvas Overlays */
 .game-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10; }
-.game-overlay h2 { font-size: 3rem; color: #fff; text-shadow: 0 4px 15px rgba(0,0,0,0.8); margin-bottom: 20px; }
-.go-stats-container { display: flex; gap: 20px; justify-content: center; align-items: stretch; width: 100%; max-width: 650px; margin-bottom: 20px; }
+.game-overlay h2 { font-size: 3rem; color: #fff; text-shadow: 0 4px 15px rgba(0,0,0,0.8); margin-bottom: 20px; margin-top: 40px; }
+.go-stats-container { display: flex; gap: 20px; justify-content: center; align-items: stretch; width: 100%; max-width: 650px; margin-bottom: 10px; }
 .game-over-stats { background: rgba(0,0,0,0.7); padding: 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 15px 35px rgba(0,0,0,0.5); display: flex; flex-direction: column; gap: 8px; flex: 1; text-align: left; position: relative; }
 .breakdown-box { 
   background: rgba(255,255,255,0.07); backdrop-filter: blur(20px); 

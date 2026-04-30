@@ -148,7 +148,9 @@ const SVG_ICONS = {
   face_glasses: `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect x="20" y="40" width="25" height="15" fill="%23111"/><rect x="55" y="40" width="25" height="15" fill="%23111"/><path d="M45 45 L55 45" stroke="%23111" stroke-width="3"/></svg>`,
   face_beard: `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M10 20 Q50 100 90 20 Q50 50 10 20 Z" fill="%23451a03"/></svg>`,
   wpn_sword: `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect x="45" y="10" width="10" height="60" fill="%23e2e8f0"/><polygon points="45,10 50,0 55,10" fill="%23e2e8f0"/><rect x="35" y="65" width="30" height="8" fill="%23ca8a04"/><rect x="45" y="73" width="10" height="20" fill="%23451a03"/><circle cx="50" cy="95" r="6" fill="%23ca8a04"/></svg>`,
-  wpn_saber: `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect x="45" y="10" width="10" height="60" rx="5" fill="%23ef4444" filter="drop-shadow(0 0 10px %23ef4444)"/><rect x="42" y="70" width="16" height="25" fill="%2394a3b8"/><rect x="40" y="72" width="20" height="4" fill="%23334155"/><rect x="40" y="78" width="20" height="4" fill="%23334155"/></svg>`
+  wpn_saber: `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect x="45" y="10" width="10" height="60" rx="5" fill="%23ef4444" filter="drop-shadow(0 0 10px %23ef4444)"/><rect x="42" y="70" width="16" height="25" fill="%2394a3b8"/><rect x="40" y="72" width="20" height="4" fill="%23334155"/><rect x="40" y="78" width="20" height="4" fill="%23334155"/></svg>`,
+  wpn_axe: `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect x="45" y="40" width="10" height="50" fill="%23451a03"/><path d="M30 10 Q60 10 75 45 L50 45 Q45 20 30 10 Z" fill="%2394a3b8" stroke="%23475569" stroke-width="2"/></svg>`,
+  wpn_gun: `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect x="25" y="40" width="50" height="15" rx="4" fill="%231e293b"/><rect x="30" y="50" width="12" height="25" fill="%230f172a"/><circle cx="70" cy="47" r="4" fill="%23ef4444" filter="drop-shadow(0 0 5px %23ef4444)"/></svg>`
 };
 let loadedIcons = {};
 for(let k in SVG_ICONS) { const img = new Image(); img.src = SVG_ICONS[k]; loadedIcons[k] = img; }
@@ -174,7 +176,9 @@ const SHOP_DB = [
   { id: 'halo', type: 'hat', name: 'Halo', rarity: 'Mythic', cost: 400, iconId: 'hat_halo', desc: 'Divine protection.' },
   // WEAPONS
   { id: 'iron_sword', type: 'weapon', name: 'Iron Sword', rarity: 'Rare', cost: 150, iconId: 'wpn_sword', desc: 'A trusty blade.' },
-  { id: 'plasma_saber', type: 'weapon', name: 'Plasma Sword', rarity: 'Legendary', cost: 350, iconId: 'wpn_saber', desc: 'Cuts through anything.' }
+  { id: 'battle_axe', type: 'weapon', name: 'Battle Axe', rarity: 'Epic', cost: 250, iconId: 'wpn_axe', desc: 'Heavy hitter.' },
+  { id: 'plasma_saber', type: 'weapon', name: 'Plasma Sword', rarity: 'Legendary', cost: 350, iconId: 'wpn_saber', desc: 'Cuts through anything.' },
+  { id: 'laser_gun', type: 'weapon', name: 'Laser Gun', rarity: 'Mythic', cost: 500, iconId: 'wpn_gun', desc: 'Pew pew!' }
 ];
 let ownedItems = JSON.parse(localStorage.getItem('bb_v1_owned') || '["classic"]');
 
@@ -823,7 +827,11 @@ function drawLimbPath(targetCtx, x, y, w, h, angle, color, isBack, wpnId) {
   targetCtx.fill();
   
   if (!isBack && wpnId) {
-    const iconId = wpnId === 'plasma_saber' ? 'wpn_saber' : 'wpn_sword';
+    let iconId = 'wpn_sword';
+    if (wpnId === 'plasma_saber') iconId = 'wpn_saber';
+    else if (wpnId === 'battle_axe') iconId = 'wpn_axe';
+    else if (wpnId === 'laser_gun') iconId = 'wpn_gun';
+
     if (loadedIcons[iconId]) {
       targetCtx.translate(0, h);
       targetCtx.drawImage(loadedIcons[iconId], -w, -h*1.2, w*3, h*1.8);

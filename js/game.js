@@ -372,7 +372,7 @@ const SHOP_DB = [
   { id: 'wizard', type: 'skin', name: 'Wizard', rarity: 'Epic', cost: 450, icon: 'wizard', desc: 'A wise sorcerer with a star-patterned robe.', colors: { body: '#1d4ed8', head: '#ffffff', hat: '#1d4ed8', stars: '#facc15' } },
   { id: 'troop', type: 'skin', name: 'Troop', rarity: 'Legendary', cost: 550, icon: 'troop', desc: 'Shadowed face hidden beneath a red hood.', colors: { body: '#e11d48', head: '#be123c', faceShadow: '#111111' } },
   { id: 'galaxy', type: 'skin', name: 'Titan', rarity: 'Mythic', cost: 750, icon: 'galaxy', desc: 'Inspired by a cosmic powerhouse.', colors: { body: '#1e3a8a', head: '#a855f7', gauntlet: '#eab308' } },
-  { id: 'sparky', type: 'skin', name: 'Sparky', rarity: 'Mythic', cost: 750, icon: 'sparky', desc: 'An electric mouse with a shocking attitude.', colors: { body: '#facc15', head: '#facc15', cheeks: '#ef4444', ears: '#111111' } },
+  { id: 'pika', type: 'skin', name: 'Pika', rarity: 'Mythic', cost: 750, icon: 'pika', desc: 'An electric mouse with a shocking attitude.', colors: { body: '#facc15', head: '#facc15', cheeks: '#ef4444', ears: '#111111' } },
   // HATS
   { id: 'cap', type: 'hat', name: 'Baseball Cap', rarity: 'Common', cost: 50, iconId: 'hat_cap', desc: 'Keep the sun out.' },
   { id: 'cape', type: 'hat', name: 'Hero Cape', rarity: 'Epic', cost: 250, iconId: 'hat_cape', desc: 'Flows in the wind.' },
@@ -934,11 +934,45 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
   }
 
   // Body Path Details
-  targetCtx.beginPath();
-  targetCtx.moveTo(-s * 0.2, s * 0.3);
-  targetCtx.quadraticCurveTo(-s * 0.25, s * 0.5, -s * 0.15, s * 0.7);
-  targetCtx.lineTo(s * 0.15, s * 0.7);
-  targetCtx.quadraticCurveTo(s * 0.25, s * 0.5, s * 0.2, s * 0.3);
+  if (id === 'pika') {
+    // Pika Custom Fat Body and Limbs
+    // Back Arm
+    targetCtx.save(); targetCtx.translate(-s*0.05, s*0.4); targetCtx.rotate(armAngle2);
+    targetCtx.fillStyle = '#ca8a04'; targetCtx.beginPath(); targetCtx.ellipse(0, s*0.1, s*0.06, s*0.15, 0, 0, Math.PI*2); targetCtx.fill(); targetCtx.restore();
+    // Back Leg
+    targetCtx.save(); targetCtx.translate(-s*0.15, s*0.65); targetCtx.rotate(legAngle2);
+    targetCtx.fillStyle = '#ca8a04'; targetCtx.beginPath(); targetCtx.ellipse(s*0.05, s*0.05, s*0.12, s*0.08, 0, 0, Math.PI*2); targetCtx.fill(); targetCtx.restore();
+    
+    // Zigzag tail
+    targetCtx.beginPath(); targetCtx.moveTo(-s*0.35, s*0.45); targetCtx.lineTo(-s*0.55, s*0.5); targetCtx.lineTo(-s*0.45, s*0.35); targetCtx.lineTo(-s*0.65, s*0.25); targetCtx.lineTo(-s*0.55, s*0.1); targetCtx.lineTo(-s*0.8, -s*0.1); targetCtx.lineTo(-s*0.65, -s*0.2); targetCtx.lineWidth = Math.max(3, s*0.12); targetCtx.strokeStyle = '#facc15'; targetCtx.lineJoin = 'miter'; targetCtx.stroke();
+    targetCtx.beginPath(); targetCtx.moveTo(-s*0.35, s*0.45); targetCtx.lineTo(-s*0.41, s*0.46); targetCtx.strokeStyle = '#854d0e'; targetCtx.stroke();
+    
+    // Fat Body
+    targetCtx.fillStyle = '#facc15';
+    targetCtx.beginPath();
+    targetCtx.moveTo(-s * 0.3, s * 0.1);
+    targetCtx.quadraticCurveTo(-s * 0.5, s * 0.5, -s * 0.25, s * 0.7);
+    targetCtx.lineTo(s * 0.15, s * 0.7);
+    targetCtx.quadraticCurveTo(s * 0.35, s * 0.5, s * 0.2, s * 0.1);
+    targetCtx.fill();
+    
+    // Brown stripes
+    targetCtx.strokeStyle = '#854d0e'; targetCtx.lineWidth = Math.max(2, s*0.06); targetCtx.lineCap = 'round';
+    targetCtx.beginPath(); targetCtx.moveTo(-s*0.4, s*0.35); targetCtx.lineTo(-s*0.2, s*0.38); targetCtx.stroke();
+    targetCtx.beginPath(); targetCtx.moveTo(-s*0.42, s*0.5); targetCtx.lineTo(-s*0.22, s*0.53); targetCtx.stroke();
+
+    // Front Arm
+    targetCtx.save(); targetCtx.translate(s*0.15, s*0.4); targetCtx.rotate(armAngle1);
+    targetCtx.fillStyle = '#facc15'; targetCtx.beginPath(); targetCtx.ellipse(0, s*0.1, s*0.06, s*0.15, -Math.PI/6, 0, Math.PI*2); targetCtx.fill(); targetCtx.restore();
+    // Front Leg
+    targetCtx.save(); targetCtx.translate(0, s*0.65); targetCtx.rotate(legAngle1);
+    targetCtx.fillStyle = '#facc15'; targetCtx.beginPath(); targetCtx.ellipse(s*0.05, s*0.05, s*0.12, s*0.08, 0, 0, Math.PI*2); targetCtx.fill(); targetCtx.restore();
+  } else {
+    targetCtx.beginPath();
+    targetCtx.moveTo(-s * 0.2, s * 0.3);
+    targetCtx.quadraticCurveTo(-s * 0.25, s * 0.5, -s * 0.15, s * 0.7);
+    targetCtx.lineTo(s * 0.15, s * 0.7);
+    targetCtx.quadraticCurveTo(s * 0.25, s * 0.5, s * 0.2, s * 0.3);
 
   if (id === 'ninja') {
     // Cross straps
@@ -974,32 +1008,7 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
         targetCtx.arc((i%2?0.1:-0.1)*s, s*(0.45 + i*0.08), s*0.02, 0, Math.PI*2);
         targetCtx.fill();
     }
-  } else if (id === 'galaxy') {
-    targetCtx.fillStyle = '#a855f7';
-    targetCtx.shadowColor = '#a855f7'; targetCtx.shadowBlur = 5;
-    targetCtx.fill();
-  } else if (id === 'sparky') {
-    // Zigzag tail
-    targetCtx.beginPath();
-    targetCtx.moveTo(-s*0.15, s*0.6);
-    targetCtx.lineTo(-s*0.3, s*0.65);
-    targetCtx.lineTo(-s*0.25, s*0.5);
-    targetCtx.lineTo(-s*0.4, s*0.4);
-    targetCtx.lineTo(-s*0.35, s*0.25);
-    targetCtx.lineTo(-s*0.5, s*0.1);
-    targetCtx.lineTo(-s*0.4, -s*0.05);
-    targetCtx.lineWidth = Math.max(3, s*0.1); targetCtx.strokeStyle = '#facc15'; targetCtx.lineJoin = 'miter'; targetCtx.stroke();
-    targetCtx.beginPath(); targetCtx.moveTo(-s*0.15, s*0.6); targetCtx.lineTo(-s*0.25, s*0.62); targetCtx.strokeStyle = '#854d0e'; targetCtx.stroke();
-    
-    // Body
-    targetCtx.fillStyle = '#facc15';
-    targetCtx.fill();
-    
-    // Brown stripes
-    targetCtx.strokeStyle = '#854d0e'; targetCtx.lineWidth = Math.max(2, s*0.06); targetCtx.lineJoin = 'round';
-    targetCtx.beginPath(); targetCtx.moveTo(-s*0.15, s*0.45); targetCtx.lineTo(-s*0.02, s*0.48); targetCtx.stroke();
-    targetCtx.beginPath(); targetCtx.moveTo(-s*0.18, s*0.58); targetCtx.lineTo(-s*0.02, s*0.61); targetCtx.stroke();
-  } else if (id === 'troop') {
+  if (id === 'troop') {
     targetCtx.fillStyle = '#e11d48';
     targetCtx.fill();
   } else if (id === 'classic') {
@@ -1014,7 +1023,7 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     targetCtx.lineTo(s * 0.05, s * 0.55);
     targetCtx.lineTo(s * 0.1, s * 0.65);
     targetCtx.stroke();
-  } else if (id !== 'ninja') {
+  } else if (id !== 'ninja' && id !== 'pika') {
     targetCtx.fillStyle = colors.body || '#111';
     targetCtx.fill();
   }
@@ -1182,16 +1191,19 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     targetCtx.beginPath();
     targetCtx.roundRect(-s*0.3, -s*0.1, s*0.6, s*0.6, s*0.08);
     targetCtx.fill();
-  } else if (id === 'sparky') {
+  } else if (id === 'pika') {
     targetCtx.fillStyle = '#facc15';
-    targetCtx.beginPath(); targetCtx.arc(0, s * 0.2, s * 0.35, 0, Math.PI * 2); targetCtx.fill();
+    // Head shape - looking right
+    targetCtx.beginPath(); targetCtx.arc(s*0.05, s * 0.15, s * 0.32, 0, Math.PI * 2); targetCtx.fill();
     // Ears
-    targetCtx.beginPath(); targetCtx.moveTo(-s*0.2, s*0.05); targetCtx.lineTo(-s*0.4, -s*0.3); targetCtx.lineTo(-s*0.05, s*0.1); targetCtx.fill();
-    targetCtx.beginPath(); targetCtx.moveTo(s*0.2, s*0.05); targetCtx.lineTo(s*0.4, -s*0.3); targetCtx.lineTo(s*0.05, s*0.1); targetCtx.fill();
-    // Black tips
+    targetCtx.fillStyle = '#eab308';
+    targetCtx.beginPath(); targetCtx.moveTo(-s*0.1, s*0.05); targetCtx.lineTo(-s*0.4, -s*0.2); targetCtx.lineTo(s*0.05, 0); targetCtx.fill();
     targetCtx.fillStyle = '#111';
-    targetCtx.beginPath(); targetCtx.moveTo(-s*0.27, -s*0.1); targetCtx.lineTo(-s*0.4, -s*0.3); targetCtx.lineTo(-s*0.2, -s*0.15); targetCtx.fill();
-    targetCtx.beginPath(); targetCtx.moveTo(s*0.27, -s*0.1); targetCtx.lineTo(s*0.4, -s*0.3); targetCtx.lineTo(s*0.2, -s*0.15); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.moveTo(-s*0.25, -s*0.08); targetCtx.lineTo(-s*0.4, -s*0.2); targetCtx.lineTo(-s*0.15, -s*0.15); targetCtx.fill();
+    targetCtx.fillStyle = '#facc15';
+    targetCtx.beginPath(); targetCtx.moveTo(s*0.05, 0); targetCtx.lineTo(-s*0.1, -s*0.35); targetCtx.lineTo(s*0.2, -s*0.05); targetCtx.fill();
+    targetCtx.fillStyle = '#111';
+    targetCtx.beginPath(); targetCtx.moveTo(-s*0.02, -s*0.15); targetCtx.lineTo(-s*0.1, -s*0.35); targetCtx.lineTo(0.05, -s*0.2); targetCtx.fill();
   } else if (id === 'wizard') {
     // Face Skin area
     targetCtx.fillStyle = '#ffedd5';
@@ -1267,22 +1279,22 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
   else if (id === 'wizard') {
     // Beard handled in head path
   }
-  else if (id === 'sparky') {
-    // Red cheeks
+  else if (id === 'pika') {
+    // Red cheek (right side)
     targetCtx.fillStyle = '#ef4444';
-    targetCtx.beginPath(); targetCtx.arc(-s*0.2, s*0.28, s*0.1, 0, Math.PI*2); targetCtx.fill();
-    targetCtx.beginPath(); targetCtx.arc(s*0.2, s*0.28, s*0.1, 0, Math.PI*2); targetCtx.fill();
-    // Eyes
+    targetCtx.beginPath(); targetCtx.arc(s*0.25, s*0.25, s*0.08, 0, Math.PI*2); targetCtx.fill();
+    // Eye (right side)
     targetCtx.fillStyle = '#111';
-    targetCtx.beginPath(); targetCtx.arc(-s*0.1, s*0.18, s*0.05, 0, Math.PI*2); targetCtx.fill();
-    targetCtx.beginPath(); targetCtx.arc(s*0.1, s*0.18, s*0.05, 0, Math.PI*2); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.arc(s*0.3, s*0.12, s*0.04, 0, Math.PI*2); targetCtx.fill();
     // White eye reflection
     targetCtx.fillStyle = '#fff';
-    targetCtx.beginPath(); targetCtx.arc(-s*0.11, s*0.17, s*0.02, 0, Math.PI*2); targetCtx.fill();
-    targetCtx.beginPath(); targetCtx.arc(s*0.09, s*0.17, s*0.02, 0, Math.PI*2); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.arc(s*0.28, s*0.10, s*0.015, 0, Math.PI*2); targetCtx.fill();
+    // Nose
+    targetCtx.fillStyle = '#111';
+    targetCtx.beginPath(); targetCtx.arc(s*0.38, s*0.16, s*0.01, 0, Math.PI*2); targetCtx.fill();
     // Mouth
-    targetCtx.strokeStyle = '#111'; targetCtx.lineWidth = Math.max(1, s*0.03); targetCtx.lineCap = 'round';
-    targetCtx.beginPath(); targetCtx.moveTo(-s*0.05, s*0.22); targetCtx.quadraticCurveTo(0, s*0.25, s*0.05, s*0.22); targetCtx.stroke();
+    targetCtx.strokeStyle = '#111'; targetCtx.lineWidth = Math.max(1, s*0.015); targetCtx.lineCap = 'round';
+    targetCtx.beginPath(); targetCtx.moveTo(s*0.35, s*0.2); targetCtx.quadraticCurveTo(s*0.3, s*0.23, s*0.25, s*0.2); targetCtx.stroke();
   }
   else if (id === 'galaxy') {
     // Thanos Chin Ridges
@@ -1413,6 +1425,7 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
 }
 
 function drawLimbPath(targetCtx, x, y, w, h, angle, color, isBack, wpnId, skinId) {
+  if (skinId === 'pika') return; // Handled within custom body logic
   targetCtx.save();
   targetCtx.translate(x, y); targetCtx.rotate(angle);
   

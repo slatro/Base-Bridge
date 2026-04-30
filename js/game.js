@@ -172,7 +172,7 @@ const SHOP_DB = [
   { id: 'ninja', type: 'skin', name: 'Ninja', rarity: 'Uncommon', cost: 250, icon: 'ninja', desc: 'Stealthy assassin with a red headband.', colors: { body: '#1a1a1a', head: '#1a1a1a', face: '#eebb99', band: '#ef4444' } },
   { id: 'cyber', type: 'skin', name: 'Cyber', rarity: 'Rare', cost: 350, icon: 'cyber', desc: 'Friendly AI robot from the future.', colors: { body: '#f8fafc', head: '#f8fafc', glow: '#00e5ff' } },
   { id: 'wizard', type: 'skin', name: 'Wizard', rarity: 'Epic', cost: 450, icon: 'wizard', desc: 'A wise sorcerer with a star-patterned robe.', colors: { body: '#1d4ed8', head: '#ffffff', hat: '#1d4ed8', stars: '#facc15' } },
-  { id: 'troop', type: 'skin', name: 'Troop', rarity: 'Legendary', cost: 550, icon: 'troop', desc: 'Elite crimson trooper armor.', colors: { body: '#991b1b', head: '#dc2626' } },
+  { id: 'troop', type: 'skin', name: 'Troop', rarity: 'Legendary', cost: 550, icon: 'troop', desc: 'Shadowed face hidden beneath a red hood.', colors: { body: '#e11d48', head: '#be123c', faceShadow: '#111111' } },
   { id: 'galaxy', type: 'skin', name: 'Titan', rarity: 'Mythic', cost: 750, icon: 'galaxy', desc: 'Inspired by a cosmic powerhouse.', colors: { body: '#1e3a8a', head: '#a855f7', gauntlet: '#eab308' } },
   // HATS
   { id: 'cap', type: 'hat', name: 'Baseball Cap', rarity: 'Common', cost: 50, iconId: 'hat_cap', desc: 'Keep the sun out.' },
@@ -883,11 +883,11 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
   // Head Path
   targetCtx.save();
   if (id === 'troop') {
-    targetCtx.fillStyle = colors.head || '#dc2626';
-    targetCtx.beginPath(); targetCtx.arc(0, s * 0.2, s * 0.35, 0, Math.PI * 2); targetCtx.fill();
-    // Troop Jaw/Cheeks
-    targetCtx.fillStyle = '#991b1b';
-    targetCtx.beginPath(); targetCtx.moveTo(-s*0.25, s*0.35); targetCtx.lineTo(s*0.25, s*0.35); targetCtx.lineTo(s*0.1, s*0.55); targetCtx.lineTo(-s*0.1, s*0.55); targetCtx.closePath(); targetCtx.fill();
+    targetCtx.fillStyle = colors.head;
+    targetCtx.beginPath(); targetCtx.arc(0, s * 0.2, s * 0.35, Math.PI, 0); targetCtx.fill();
+    targetCtx.fillRect(-s * 0.35, s * 0.2, s * 0.7, s * 0.2);
+    targetCtx.fillStyle = colors.faceShadow || '#111111';
+    targetCtx.beginPath(); targetCtx.arc(s * 0.1, s * 0.3, s * 0.2, 0, Math.PI * 2); targetCtx.fill();
   } else if (id === 'galaxy') {
     // Square Head for Titan
     targetCtx.fillStyle = '#a855f7';
@@ -984,15 +984,7 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     targetCtx.beginPath(); targetCtx.arc(s * 0.15, s * 0.2, s * 0.05, 0, Math.PI * 2); targetCtx.fill();
   }
   else if (id === 'troop') {
-    // Troop Visor (Black band)
-    targetCtx.fillStyle = '#111';
-    targetCtx.beginPath(); targetCtx.moveTo(-s*0.35, s*0.15); targetCtx.quadraticCurveTo(0, s*0.05, s*0.35, s*0.15); targetCtx.lineTo(s*0.3, s*0.25); targetCtx.quadraticCurveTo(0, s*0.15, -s*0.3, s*0.25); targetCtx.closePath(); targetCtx.fill();
-    // Troop Lower Cheek Accents
-    targetCtx.fillStyle = '#111';
-    targetCtx.beginPath(); targetCtx.moveTo(-s*0.2, s*0.25); targetCtx.lineTo(s*0.2, s*0.25); targetCtx.lineTo(s*0.15, s*0.45); targetCtx.lineTo(-s*0.15, s*0.45); targetCtx.closePath(); targetCtx.fill();
-    // Red Center Nose Block
-    targetCtx.fillStyle = '#dc2626';
-    targetCtx.beginPath(); targetCtx.moveTo(-s*0.1, s*0.2); targetCtx.lineTo(s*0.1, s*0.2); targetCtx.lineTo(s*0.12, s*0.4); targetCtx.lineTo(0, s*0.5); targetCtx.lineTo(-s*0.12, s*0.4); targetCtx.closePath(); targetCtx.fill();
+    // No eyes for troop, just shadow
   }
   else {
     targetCtx.fillStyle = colors.face || '#fff';
@@ -1076,7 +1068,7 @@ function drawLimbPath(targetCtx, x, y, w, h, angle, color, isBack, wpnId) {
   
   // Thin black outline for Troop arms
   let drawStroke = false;
-  if (color === '#991b1b') drawStroke = true;
+  if (color === '#e11d48') drawStroke = true;
 
   const baseColor = isBack ? shadeColor(color, -20) : color;
   targetCtx.fillStyle = baseColor;

@@ -230,6 +230,7 @@ async function initWeb3() {
     }
     
     localStorage.setItem('bb_v1_avatar', selectedAvatar);
+    if (typeof window.syncDataToCloud === 'function') window.syncDataToCloud();
     updateProfileUI();
     window.closeModals();
   });
@@ -263,6 +264,12 @@ async function handleConnect(account) {
   lblAddress.innerText = shortAddr;
   
   refInput.value = `${window.location.origin}${window.location.pathname}?ref=${userAddress}`;
+  
+  if (typeof window.loadDataFromCloud === 'function') {
+      await window.loadDataFromCloud(userAddress);
+      if (typeof window.reloadGameData === 'function') window.reloadGameData();
+  }
+
   lblBest.innerText = localStorage.getItem('bb_v1_best') || "0";
   
   if (typeof updateLeaderboardUI === 'function') updateLeaderboardUI();

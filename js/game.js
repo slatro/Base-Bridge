@@ -175,6 +175,9 @@ async function doDailyCheckin() {
     // Auto hide the daily modal so the success modal is clearly visible
     document.getElementById('modal-daily-calendar')?.classList.add('hidden');
     if (typeof window.showInfoModal === 'function') window.showInfoModal("Check-in Successful!", `You checked in and earned ${reward} BB Tokens!`);
+    
+    // Sync to cloud
+    if (typeof window.syncDataToCloud === 'function') window.syncDataToCloud();
   } else {
     claimBtn.innerText = "CHECK IN";
     claimBtn.disabled = false;
@@ -238,6 +241,22 @@ let bestScore = parseInt(localStorage.getItem('bb_v1_best') || '0');
 let coins = parseInt(localStorage.getItem('bb_v1_coins') || '0');
 bestEl.innerText = bestScore;
 uiCoinsEl.innerText = coins;
+
+window.reloadGameData = function() {
+  bestScore = parseInt(localStorage.getItem('bb_v1_best') || '0');
+  coins = parseInt(localStorage.getItem('bb_v1_coins') || '0');
+  ownedItems = JSON.parse(localStorage.getItem('bb_v1_owned') || '["classic"]');
+  currentSkin = localStorage.getItem('bb_v1_skin') || 'classic';
+  equippedHat = localStorage.getItem('bb_v1_hat') || null;
+  equippedWeapon = localStorage.getItem('bb_v1_weapon') || null;
+  equippedFace = localStorage.getItem('bb_v1_face') || null;
+  
+  bestEl.innerText = bestScore;
+  uiCoinsEl.innerText = coins;
+  renderDailyCheckinPanel();
+  renderSkinsShop();
+  updateLeaderboardUI();
+};
 
 let cameraX = 0;
 let targetCameraX = 0;
@@ -332,10 +351,18 @@ for (let k in SVG_ICONS) { const img = new Image(); img.src = SVG_ICONS[k]; load
 
 
 // --- EQUIPMENT & SKINS SYSTEM ---
-let currentSkin = 'classic';
-let equippedHat = null;
-let equippedWeapon = null;
-let equippedFace = null;
+let currentSkin = localStorage.getItem('bb_v1_skin') || 'classic';
+let equippedHat = localStorage.getItem('bb_v1_hat') || null;
+let equippedWeapon = localStorage.getItem('bb_v1_weapon') || null;
+let equippedFace = localStorage.getItem('bb_v1_face') || null;
+
+function saveEquipmentsToStorage() {
+  localStorage.setItem('bb_v1_skin', currentSkin);
+  if (equippedHat) localStorage.setItem('bb_v1_hat', equippedHat); else localStorage.removeItem('bb_v1_hat');
+  if (equippedWeapon) localStorage.setItem('bb_v1_weapon', equippedWeapon); else localStorage.removeItem('bb_v1_weapon');
+  if (equippedFace) localStorage.setItem('bb_v1_face', equippedFace); else localStorage.removeItem('bb_v1_face');
+  if (typeof window.syncDataToCloud === 'function') window.syncDataToCloud();
+}
 
 const SHOP_DB = [
   // SKINS
@@ -788,6 +815,7 @@ function openShopPreview(id) {
         if (item.type === 'hat') equippedHat = null;
         if (item.type === 'weapon') equippedWeapon = null;
         if (item.type === 'face') equippedFace = null;
+        saveEquipmentsToStorage();
         renderSkinsShop();
         if (item.type === 'skin') closeModals(); else backToShop();
       };
@@ -804,6 +832,7 @@ function openShopPreview(id) {
         if (item.type === 'hat') equippedHat = id;
         if (item.type === 'weapon') equippedWeapon = id;
         if (item.type === 'face') equippedFace = id;
+        saveEquipmentsToStorage();
         renderSkinsShop();
         if (item.type === 'skin') closeModals(); else backToShop();
       };
@@ -826,6 +855,8 @@ function openShopPreview(id) {
           if (item.type === 'hat') equippedHat = id;
           if (item.type === 'weapon') equippedWeapon = id;
           if (item.type === 'face') equippedFace = id;
+          saveEquipmentsToStorage();
+          if (typeof window.syncDataToCloud === 'function') window.syncDataToCloud(); // Sync purchase
           renderSkinsShop();
           if (item.type === 'skin') closeModals(); else backToShop();
         } else {
@@ -1620,7 +1651,7 @@ function checkLanding() {
       let comboBB = Math.min(32, Math.pow(2, perfectStreak));
       sessionComboBonus += comboBB;
 
-      score += 2; addCoins(comboBB, bridgeTip, H - platformHeight - 50);
+      score += 2; addCoins(comboBB, bridgeTip, H - platformHeight - 50); sessionCoins += comboBB;
       shakeAmount = 15; scaleAmount = 1.05;
       incMetric('bb_v1_total_perfects', 1);
       trackMission('perfect', 1); trackMission('combo', perfectStreak);
@@ -1721,6 +1752,9 @@ function triggerGameOver() {
   } else {
     btnRevive.classList.add('hidden');
   }
+
+  // Trigger cloud sync to save coins and new best score
+  if (typeof window.syncDataToCloud === 'function') window.syncDataToCloud();
 
   document.querySelector('.gh-center').style.opacity = '0';
   setTimeout(() => gameOverOverlay.classList.remove('hidden'), 800);

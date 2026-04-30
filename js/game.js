@@ -712,25 +712,32 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
   drawLimbPath(targetCtx, 0, s*0.3, s*0.12, s*0.35, armAngle2, colors.body || '#222', true, null);
 
   // Body Path Details
+  targetCtx.beginPath();
+  targetCtx.moveTo(-s*0.2, s*0.3);
+  targetCtx.quadraticCurveTo(-s*0.25, s*0.5, -s*0.15, s*0.7);
+  targetCtx.lineTo(s*0.15, s*0.7);
+  targetCtx.quadraticCurveTo(s*0.25, s*0.5, s*0.2, s*0.3);
+
   if (id === 'gold') {
     let g = targetCtx.createLinearGradient(0, s*0.2, 0, s*0.7); 
     g.addColorStop(0, '#fef08a'); g.addColorStop(0.3, '#eab308'); 
     g.addColorStop(0.7, '#a16207'); g.addColorStop(1, '#422006');
     targetCtx.fillStyle = g;
     targetCtx.shadowColor = '#eab308'; targetCtx.shadowBlur = 15;
+    targetCtx.fill();
   } else if (id === 'galaxy') {
-    // Thanos Purple Skin for Body / Base
     targetCtx.fillStyle = '#a855f7'; 
     targetCtx.shadowColor = '#a855f7'; targetCtx.shadowBlur = 5;
+    targetCtx.fill();
   } else if (id === 'hoodie') {
     targetCtx.fillStyle = '#e11d48';
+    targetCtx.fill();
   } else if (id === 'cyber') {
-    targetCtx.fillStyle = '#f1f5f9'; // Sleek White/Silver
-  } else {
+    // Cyber has custom pod body below, skip this shared fill
+  } else if (id !== 'ninja') {
     targetCtx.fillStyle = colors.body || '#111';
+    targetCtx.fill();
   }
-  
-  targetCtx.fill();
   
   if (id === 'ninja') {
     // Solid Black Ninja Body Shape

@@ -33,6 +33,111 @@ const levelNameEl = document.getElementById('ui-level-name');
 const levelFillEl = document.getElementById('ui-level-fill');
 const btnRevive = document.getElementById('btn-revive');
 
+// --- DAILY CHECK-IN SYSTEM ---
+document.getElementById('fc-daily')?.addEventListener('click', () => {
+  renderDailyCalendar();
+  document.getElementById('modal-daily-calendar').classList.remove('hidden');
+});
+
+function renderDailyCalendar() {
+  const grid = document.getElementById('calendar-grid');
+  const monthTitle = document.getElementById('calendar-month-title');
+  const streakEl = document.getElementById('calendar-streak');
+  const totalEl = document.getElementById('calendar-total');
+  if (!grid) return;
+
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  const today = now.getDate();
+
+  const monthNames = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
+  monthTitle.innerText = `CHECK-IN: ${monthNames[month]} ${year}`;
+
+  const totalCheckins = parseInt(localStorage.getItem('bb_v1_total_checkins') || '0');
+  const streak = parseInt(localStorage.getItem('bb_v1_checkin_streak') || '0');
+  streakEl.innerText = `STREAK: ${streak} DAYS`;
+  totalEl.innerText = `TOTAL: ${totalCheckins}`;
+
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  grid.innerHTML = '';
+  
+  // Empty spaces for previous month
+  for (let i = 0; i < (firstDay === 0 ? 6 : firstDay - 1); i++) {
+    const empty = document.createElement('div');
+    empty.className = 'calendar-day locked';
+    grid.appendChild(empty);
+  }
+
+  const claimedDays = JSON.parse(localStorage.getItem(`bb_v1_checkins_${month}_${year}`) || '[]');
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dayDiv = document.createElement('div');
+    dayDiv.className = 'calendar-day';
+    dayDiv.innerHTML = `<span class="day-num">${d}</span>`;
+    
+    if (claimedDays.includes(d)) {
+      dayDiv.classList.add('claimed');
+    } else if (d === today) {
+      dayDiv.classList.add('current');
+    } else if (d < today) {
+      dayDiv.classList.add('locked');
+    }
+    
+    grid.appendChild(dayDiv);
+  }
+
+  const btn = document.getElementById('btn-do-checkin');
+  if (claimedDays.includes(today)) {
+    btn.innerText = "ALREADY CHECKED-IN";
+    btn.disabled = true;
+    btn.style.opacity = '0.5';
+  } else {
+    btn.innerText = "CHECK-IN TODAY (0.10$)";
+    btn.disabled = false;
+    btn.style.opacity = '1';
+    btn.onclick = () => doCheckIn(today, month, year);
+  }
+}
+
+async function doCheckIn(day, month, year) {
+  const btn = document.getElementById('btn-do-checkin');
+  btn.innerText = "PROCESSING...";
+  btn.disabled = true;
+
+  const success = await window.purchaseItemOnChain({ id: 'daily_checkin', name: 'Daily Check-in' });
+  if (success) {
+    let claimedDays = JSON.parse(localStorage.getItem(`bb_v1_checkins_${month}_${year}`) || '[]');
+    claimedDays.push(day);
+    localStorage.setItem(`bb_v1_checkins_${month}_${year}`, JSON.stringify(claimedDays));
+
+    let total = parseInt(localStorage.getItem('bb_v1_total_checkins') || '0');
+    total++;
+    localStorage.setItem('bb_v1_total_checkins', total);
+
+    let streak = parseInt(localStorage.getItem('bb_v1_checkin_streak') || '0');
+    // Simple streak logic: if yesterday was claimed, streak++, else reset to 1
+    // (For now, we'll just increment it for demo)
+    streak++;
+    localStorage.setItem('bb_v1_checkin_streak', streak);
+
+    // Reward BB
+    let coins = parseInt(localStorage.getItem('bb_v1_coins') || '0');
+    coins += 50; // Daily reward
+    localStorage.setItem('bb_v1_coins', coins);
+    const uiCoins = document.getElementById('ui-coins');
+    if (uiCoins) uiCoins.innerText = coins;
+
+    renderDailyCalendar();
+    if (typeof window.showInfoModal === 'function') window.showInfoModal("Check-in Successful!", "You earned 50 BB Tokens on-chain!");
+  } else {
+    btn.innerText = "CHECK-IN TODAY (0.10$)";
+    btn.disabled = false;
+  }
+}
+
 // --- NEW GAMEPLAY STATE ---
 let reviveUsed = false;
 let sessionPerfectBonus = 0;
@@ -447,7 +552,17 @@ function renderAchievements(type) {
     { id: 'd9', type: 'daily', name: 'Marathoner', desc: 'Play 25 games today.', target: 25, current: dGames, reward: 25 },
     { id: 'd10', type: 'daily', name: 'Unstoppable', desc: 'Score 30 points in a game today.', target: 30, current: dScore, reward: 5 },
 
-    // Weekly (10 Tasks)
+    // Check-in Milestones (New Category)
+    { id: 'c1', type: 'checkin', name: '1 Week Loyal', desc: 'Check-in for 7 total days. Mints a Base NFT.', target: 7, current: parseInt(localStorage.getItem('bb_v1_total_checkins') || '0') },
+    { id: 'c2', type: 'checkin', name: '2 Weeks Dedicated', desc: 'Check-in for 14 total days. Mints a Base NFT.', target: 14, current: parseInt(localStorage.getItem('bb_v1_total_checkins') || '0') },
+    { id: 'c3', type: 'checkin', name: '3 Weeks Pro', desc: 'Check-in for 21 total days. Mints a Base NFT.', target: 21, current: parseInt(localStorage.getItem('bb_v1_total_checkins') || '0') },
+    { id: 'c4', type: 'checkin', name: '1 Month Veteran', desc: 'Check-in for 30 total days. Mints a Base NFT.', target: 30, current: parseInt(localStorage.getItem('bb_v1_total_checkins') || '0') },
+    { id: 'c5', type: 'checkin', name: '2 Months Legend', desc: 'Check-in for 60 total days. Mints a Base NFT.', target: 60, current: parseInt(localStorage.getItem('bb_v1_total_checkins') || '0') },
+    { id: 'c6', type: 'checkin', name: '3 Months Master', desc: 'Check-in for 90 total days. Mints a Base NFT.', target: 90, current: parseInt(localStorage.getItem('bb_v1_total_checkins') || '0') },
+    { id: 'c7', type: 'checkin', name: '6 Months Godlike', desc: 'Check-in for 180 total days. Mints a Base NFT.', target: 180, current: parseInt(localStorage.getItem('bb_v1_total_checkins') || '0') },
+    { id: 'c8', type: 'checkin', name: '9 Months Divine', desc: 'Check-in for 270 total days. Mints a Base NFT.', target: 270, current: parseInt(localStorage.getItem('bb_v1_total_checkins') || '0') },
+    { id: 'c9', type: 'checkin', name: '1 Year Eternal', desc: 'Check-in for 365 total days. Mints a Base NFT.', target: 365, current: parseInt(localStorage.getItem('bb_v1_total_checkins') || '0') },
+
     { id: 'w1', type: 'weekly', name: 'Veteran', desc: 'Play 50 games.', target: 50, current: mGames, reward: 50 },
     { id: 'w3', type: 'weekly', name: 'Precision', desc: 'Get 25 perfects.', target: 25, current: mPerfects, reward: 50 },
     { id: 'w5', type: 'weekly', name: 'Century Club', desc: 'Play 100 games.', target: 100, current: mGames, reward: 100 },

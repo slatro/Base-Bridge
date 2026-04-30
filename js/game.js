@@ -333,7 +333,7 @@ function updateDailyBestScore(s) {
 }
 
 const SVG_ICONS = {
-  hat_cap: `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M 5 70 Q 15 55 65 65 L 65 75 Q 15 65 5 75 Z" fill="%23000"/><path d="M 5 70 C 5 20, 60 20, 65 60 L 65 65 Q 30 55 5 70" fill="%23d90000" stroke="%23000" stroke-width="4"/><path d="M 30 28 C 30 24, 40 24, 40 28" fill="%23d90000" stroke="%23000" stroke-width="4" stroke-linecap="round"/><path d="M 35 28 C 32 40, 30 50, 30 63" fill="none" stroke="%23000" stroke-width="2"/><path d="M 20 66 C 50 50, 95 65, 95 72 C 70 75, 40 70, 20 72 Z" fill="%23000" stroke="%23000" stroke-width="3" stroke-linejoin="round"/><path d="M 25 65 C 50 53, 90 66, 90 69 C 70 70, 40 66, 25 69 Z" fill="%23d90000"/></svg>`,
+  hat_cap: `data:image/svg+xml;utf8,<svg viewBox="-20 0 120 100" xmlns="http://www.w3.org/2000/svg"><path d="M -15 70 Q 5 55 65 65 L 65 75 Q 5 65 -15 75 Z" fill="%23000"/><path d="M -15 70 C -15 20, 60 20, 65 60 L 65 65 Q 25 55 -15 70" fill="%23d90000" stroke="%23000" stroke-width="4"/><path d="M 20 28 C 20 24, 30 24, 30 28" fill="%23d90000" stroke="%23000" stroke-width="4" stroke-linecap="round"/><path d="M 25 28 C 22 40, 20 50, 20 63" fill="none" stroke="%23000" stroke-width="2"/><path d="M 20 66 C 50 50, 95 65, 95 72 C 70 75, 40 70, 20 72 Z" fill="%23000" stroke="%23000" stroke-width="3" stroke-linejoin="round"/><path d="M 25 65 C 50 53, 90 66, 90 69 C 70 70, 40 66, 25 69 Z" fill="%23d90000"/></svg>`,
   hat_cape: `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M20 20 L80 20 L95 100 L5 100 Z" fill="%23ef4444" stroke="%23b91c1c" stroke-width="2"/><path d="M20 20 L50 40 L80 20" fill="none" stroke="%23b91c1c" stroke-width="3"/></svg>`,
   hat_halo: `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><ellipse cx="50" cy="50" rx="40" ry="15" fill="none" stroke="%23fef08a" stroke-width="6" filter="drop-shadow(0 0 8px %23facc15)"/></svg>`,
   face_visor: `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M10 40 L90 40 L75 60 L25 60 Z" fill="%230a192f" stroke="%2300e5ff" stroke-width="6"/><path d="M20 50 L80 50" stroke="%2300e5ff" stroke-width="6" opacity="0.8"/></svg>`,
@@ -1523,7 +1523,7 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
   }
 
   // Draw Equipment
-  if (hatId === 'cap' && loadedIcons['hat_cap']) targetCtx.drawImage(loadedIcons['hat_cap'], -s * 0.25, -s * 0.42, s * 0.7, s * 0.45);
+  if (hatId === 'cap' && loadedIcons['hat_cap']) targetCtx.drawImage(loadedIcons['hat_cap'], -s * 0.3, -s * 0.38, s * 0.8, s * 0.45);
   if (hatId === 'halo' && loadedIcons['hat_halo']) targetCtx.drawImage(loadedIcons['hat_halo'], -s * 0.5, -s * 0.4, s * 1.0, s * 0.4);
 
   if (faceId === 'glasses' && loadedIcons['face_glasses']) targetCtx.drawImage(loadedIcons['face_glasses'], -s * 0.15, s * 0.1, s * 0.6, s * 0.25);

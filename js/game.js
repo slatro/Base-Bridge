@@ -1008,16 +1008,18 @@ function addCoins(amount, x, y) {
 }
 
 function spawnFloatingText(text, x, y, isSpecial = false) {
+  const container = document.getElementById('canvas-wrapper') || document.body;
   const el = document.createElement('div');
   el.className = 'floating-text';
   if (isSpecial) el.classList.add('hot-streak');
   el.innerText = text;
   // Convert world x to screen x
+  const rect = canvas.getBoundingClientRect();
   const screenX = (x - cameraX) * (canvas.offsetWidth / W);
   const screenY = y * (canvas.offsetHeight / H);
   el.style.left = `${screenX}px`;
   el.style.top = `${screenY}px`;
-  document.getElementById('game-container').appendChild(el);
+  container.appendChild(el);
   setTimeout(() => el.remove(), 1000);
 }
 
@@ -1301,16 +1303,22 @@ function update(dt) {
   else if (gameState === STATES.CHARACTER_WALKING) {
     character.x += (W * 0.45) * (effectiveDt / 1000);
     let targetX;
-        if (success) {
-          const nextP = platforms[currentPlatformIndex + 1];
-          targetX = nextP.x + nextP.w - character.size*1.5;
-          if (character.x >= targetX) {
-            character.x = targetX; gameState = STATES.SUCCESS_TRANSITION; currentPlatformIndex++;
-            targetCameraX = platforms[currentPlatformIndex].x - W * 0.1; generatePlatform();
-          }
-        } else {
+    if (success) {
+      const nextP = platforms[currentPlatformIndex + 1];
+      targetX = nextP.x + nextP.w - character.size * 1.5;
+      if (character.x >= targetX) {
+        character.x = targetX; 
+        gameState = STATES.SUCCESS_TRANSITION; 
+        currentPlatformIndex++;
+        targetCameraX = platforms[currentPlatformIndex].x - W * 0.1; 
+        generatePlatform();
+      }
+    } else {
       targetX = bridge.x + bridge.length;
-      if (character.x >= targetX) { character.x = targetX; gameState = STATES.FALLING_DOWN; }
+      if (character.x >= targetX) { 
+        character.x = targetX; 
+        gameState = STATES.FALLING_DOWN; 
+      }
     }
   }
   else if (gameState === STATES.SUCCESS_TRANSITION) {

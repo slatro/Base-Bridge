@@ -140,7 +140,7 @@ function updateDailyBestScore(s) {
 
 const SVG_ICONS = {
   hat_cap: `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M10 65 Q50 65 90 65 L85 55 L75 40 Q50 30 25 40 Z" fill="%23e11d48"/><path d="M10 65 Q50 75 90 65" fill="none" stroke="%23be123c" stroke-width="5"/><circle cx="50" cy="35" r="5" fill="%23fff"/></svg>`,
-  hat_crown: `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M15 80 L25 30 L35 50 L50 20 L65 50 L75 30 L85 80 Z" fill="%23facc15"/><rect x="15" y="70" width="70" height="10" fill="%23ca8a04"/><circle cx="50" cy="35" r="5" fill="%23ef4444"/><circle cx="30" cy="45" r="4" fill="%233b82f6"/><circle cx="70" cy="45" r="4" fill="%2322c55e"/></svg>`,
+  hat_cape: `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M20 20 L80 20 L95 100 L5 100 Z" fill="%23ef4444" stroke="%23b91c1c" stroke-width="2"/><path d="M20 20 L50 40 L80 20" fill="none" stroke="%23b91c1c" stroke-width="3"/></svg>`,
   hat_halo: `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><ellipse cx="50" cy="50" rx="40" ry="15" fill="none" stroke="%23fef08a" stroke-width="6" filter="drop-shadow(0 0 8px %23facc15)"/></svg>`,
   face_visor: `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M10 40 L90 40 L75 60 L25 60 Z" fill="%230a192f" stroke="%2300e5ff" stroke-width="6"/><path d="M20 50 L80 50" stroke="%2300e5ff" stroke-width="6" opacity="0.8"/></svg>`,
   face_mask: `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M10 40 L90 40 L80 100 Q50 110 20 100 Z" fill="%23111"/><path d="M10 40 L90 40" stroke="%23333" stroke-width="4"/><path d="M30 40 L30 100 M50 40 L50 100 M70 40 L70 100" stroke="%23222" stroke-width="2"/></svg>`,
@@ -170,11 +170,11 @@ const SHOP_DB = [
   { id: 'galaxy', type: 'skin', name: 'Galaxy', rarity: 'Mythic', cost: 750, icon: 'galaxy', desc: 'Contains the cosmos.', colors: { body: '#111111', head: '#000000', grad1: '#b517ff', grad2: '#00e5ff' } },
   // HATS
   { id: 'cap', type: 'hat', name: 'Baseball Cap', rarity: 'Common', cost: 50, iconId: 'hat_cap', desc: 'Keep the sun out.' },
-  { id: 'crown', type: 'hat', name: 'King Crown', rarity: 'Epic', cost: 250, iconId: 'hat_crown', desc: 'Rule the bridge.' },
+  { id: 'cape', type: 'hat', name: 'Hero Cape', rarity: 'Epic', cost: 250, iconId: 'hat_cape', desc: 'Flows in the wind.' },
   { id: 'halo', type: 'hat', name: 'Halo', rarity: 'Mythic', cost: 400, iconId: 'hat_halo', desc: 'Divine protection.' },
   // WEAPONS
-  { id: 'sword', type: 'weapon', name: 'Iron Sword', rarity: 'Rare', cost: 150, iconId: 'wpn_sword', desc: 'A trusty blade.' },
-  { id: 'lightsaber', type: 'weapon', name: 'Plasma Sword', rarity: 'Legendary', cost: 350, iconId: 'wpn_saber', desc: 'Cuts through anything.' }
+  { id: 'iron_sword', type: 'weapon', name: 'Iron Sword', rarity: 'Rare', cost: 150, iconId: 'wpn_sword', desc: 'A trusty blade.' },
+  { id: 'plasma_saber', type: 'weapon', name: 'Plasma Sword', rarity: 'Legendary', cost: 350, iconId: 'wpn_saber', desc: 'Cuts through anything.' }
 ];
 let ownedItems = JSON.parse(localStorage.getItem('bb_v1_owned') || '["classic"]');
 
@@ -690,6 +690,15 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
   const id = skinData.id;
   const colors = skinData.colors;
 
+  // Cape Rendering (Behind body)
+  if (hatId === 'cape' && loadedIcons['hat_cape']) {
+    targetCtx.save();
+    targetCtx.translate(-s*0.1, s*0.3);
+    targetCtx.rotate(state === 'WALK' ? Math.sin(time*15)*0.2 : Math.sin(time*3)*0.05);
+    targetCtx.drawImage(loadedIcons['hat_cape'], -s*0.2, 0, s*0.5, s*0.6);
+    targetCtx.restore();
+  }
+
   // Back Arm & Leg
   drawLimbPath(targetCtx, -s*0.1, s*0.6, s*0.15, s*0.4, legAngle2, colors.body || '#222', true);
   drawLimbPath(targetCtx, 0, s*0.3, s*0.12, s*0.35, armAngle2, colors.body || '#222', true, null);
@@ -793,7 +802,6 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
 
   // Draw Equipment
   if (hatId === 'cap' && loadedIcons['hat_cap']) targetCtx.drawImage(loadedIcons['hat_cap'], -s*0.4, -s*0.3, s*0.8, s*0.5);
-  if (hatId === 'crown' && loadedIcons['hat_crown']) targetCtx.drawImage(loadedIcons['hat_crown'], -s*0.45, -s*0.45, s*0.9, s*0.7);
   if (hatId === 'halo' && loadedIcons['hat_halo']) targetCtx.drawImage(loadedIcons['hat_halo'], -s*0.5, -s*0.4, s*1.0, s*0.4);
   
   if (faceId === 'glasses' && loadedIcons['face_glasses']) targetCtx.drawImage(loadedIcons['face_glasses'], -s*0.15, s*0.1, s*0.6, s*0.25);
@@ -815,7 +823,7 @@ function drawLimbPath(targetCtx, x, y, w, h, angle, color, isBack, wpnId) {
   targetCtx.fill();
   
   if (!isBack && wpnId) {
-    const iconId = wpnId === 'lightsaber' ? 'wpn_saber' : 'wpn_sword';
+    const iconId = wpnId === 'plasma_saber' ? 'wpn_saber' : 'wpn_sword';
     if (loadedIcons[iconId]) {
       targetCtx.translate(0, h);
       targetCtx.drawImage(loadedIcons[iconId], -w, -h*1.2, w*3, h*1.8);

@@ -730,18 +730,35 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     targetCtx.fillStyle = colors.body || '#111';
   }
   
-  targetCtx.beginPath();
-  targetCtx.moveTo(-s*0.2, s*0.3);
-  targetCtx.quadraticCurveTo(-s*0.25, s*0.5, -s*0.15, s*0.7);
-  targetCtx.lineTo(s*0.15, s*0.7);
-  targetCtx.quadraticCurveTo(s*0.25, s*0.5, s*0.2, s*0.3);
   targetCtx.fill();
+  
+  if (id === 'ninja') {
+    // V-neck Detail
+    targetCtx.strokeStyle = 'rgba(255,255,255,0.2)';
+    targetCtx.lineWidth = 1.5;
+    targetCtx.beginPath();
+    targetCtx.moveTo(-s*0.1, s*0.3); targetCtx.lineTo(0, s*0.45); targetCtx.lineTo(s*0.1, s*0.3);
+    targetCtx.stroke();
+    // Red Belt
+    targetCtx.fillStyle = '#ef4444';
+    targetCtx.fillRect(-s*0.18, s*0.55, s*0.36, s*0.06);
+    // Belt Tail
+    targetCtx.beginPath();
+    targetCtx.moveTo(0, s*0.6); targetCtx.lineTo(-s*0.05, s*0.75); targetCtx.lineTo(-s*0.12, s*0.68);
+    targetCtx.fill();
+  }
   
   // Character Outline for Hoodie
   if (id === 'hoodie') {
     targetCtx.strokeStyle = '#000';
     targetCtx.lineWidth = 0.5;
     targetCtx.stroke();
+  }
+
+  // Red Boots for Ninja
+  if (id === 'ninja') {
+    targetCtx.fillStyle = '#ef4444'; // Red boots
+    // Draw on top of legs later or just set here
   }
 
   // Subtle body details
@@ -816,37 +833,41 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
 
   // Eyes & Details
   if (id === 'ninja') {
-    // Ninja Mask
+    // Face Skin area (beige)
+    targetCtx.fillStyle = '#ffedd5';
+    targetCtx.beginPath(); targetCtx.ellipse(s*0.1, s*0.2, s*0.18, s*0.12, 0, 0, Math.PI*2); targetCtx.fill();
+
+    // Ninja Mask (Black)
     targetCtx.fillStyle = '#111';
     targetCtx.beginPath();
-    targetCtx.moveTo(-s*0.3, s*0.2);
-    targetCtx.lineTo(s*0.3, s*0.2);
-    targetCtx.lineTo(s*0.2, s*0.5);
-    targetCtx.lineTo(-s*0.2, s*0.5);
+    targetCtx.moveTo(-s*0.1, s*0.25);
+    targetCtx.lineTo(s*0.3, s*0.25);
+    targetCtx.lineTo(s*0.2, s*0.45);
+    targetCtx.lineTo(-s*0.1, s*0.45);
     targetCtx.closePath();
     targetCtx.fill();
     
-    // Bandana
-    targetCtx.fillStyle = colors.band || '#e11d48';
-    targetCtx.fillRect(-s*0.3, s*0.05, s*0.65, s*0.12);
+    // Bandana (Red)
+    targetCtx.fillStyle = '#ef4444';
+    targetCtx.fillRect(-s*0.32, s*0.08, s*0.65, s*0.1);
     
     // Bandana Tails (Back)
+    targetCtx.save();
+    targetCtx.translate(-s*0.3, s*0.13);
+    targetCtx.rotate(Math.sin(time*5)*0.1);
     targetCtx.beginPath();
-    targetCtx.moveTo(-s*0.3, s*0.1);
-    targetCtx.lineTo(-s*0.5, 0);
-    targetCtx.lineTo(-s*0.45, s*0.2);
-    targetCtx.closePath();
-    targetCtx.fill();
+    targetCtx.moveTo(0, 0); targetCtx.lineTo(-s*0.2, -s*0.1); targetCtx.lineTo(-s*0.15, s*0.1); targetCtx.closePath(); targetCtx.fill();
     targetCtx.beginPath();
-    targetCtx.moveTo(-s*0.3, s*0.13);
-    targetCtx.lineTo(-s*0.5, s*0.05);
-    targetCtx.lineTo(-s*0.55, s*0.3);
-    targetCtx.closePath();
-    targetCtx.fill();
+    targetCtx.moveTo(0, 0.05); targetCtx.lineTo(-s*0.15, 0.05); targetCtx.lineTo(-s*0.25, s*0.2); targetCtx.closePath(); targetCtx.fill();
+    targetCtx.restore();
 
-    // Eye
+    // Eye (Large Blue)
     targetCtx.fillStyle = '#fff';
-    targetCtx.beginPath(); targetCtx.arc(s*0.15, s*0.2, s*0.04, 0, Math.PI*2); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.arc(s*0.12, s*0.2, s*0.07, 0, Math.PI*2); targetCtx.fill();
+    targetCtx.fillStyle = '#0ea5e9'; // Blue pupil
+    targetCtx.beginPath(); targetCtx.arc(s*0.14, s*0.2, s*0.04, 0, Math.PI*2); targetCtx.fill();
+    targetCtx.fillStyle = '#000';
+    targetCtx.beginPath(); targetCtx.arc(s*0.15, s*0.2, s*0.02, 0, Math.PI*2); targetCtx.fill();
   } 
   else if (id === 'galaxy') {
     // Thanos Chin Ridges
@@ -922,6 +943,14 @@ function drawLimbPath(targetCtx, x, y, w, h, angle, color, isBack, wpnId) {
   targetCtx.fillStyle = isBack ? shadeColor(color, -20) : color;
   targetCtx.beginPath(); targetCtx.roundRect(-w/2, 0, w, h, w/2); 
   targetCtx.fill();
+  
+  // Ninja Red Boots (Logic for Ninja skin legs)
+  if (color === '#111' && h > w * 1.5 && !wpnId) {
+    targetCtx.fillStyle = '#ef4444';
+    targetCtx.beginPath();
+    targetCtx.roundRect(-w/2, h*0.7, w, h*0.3, w/4);
+    targetCtx.fill();
+  }
   
   if (!isBack && wpnId) {
     let iconId = 'wpn_sword';

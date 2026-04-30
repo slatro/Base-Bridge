@@ -1176,28 +1176,45 @@ function renderSkeleton(targetCtx, skinId, hatId, capeId, wpnId, faceId, s, stat
     targetCtx.lineWidth = Math.max(3, s*0.06);
     targetCtx.stroke();
     
-    // Tail Flame (Animated)
+    // Tail Flame (Animated - Realistic Fire Style)
     targetCtx.translate(-s*0.6, -s*0.3);
-    let flameScale = 1.0 + Math.sin(time * 20) * 0.15; // Flickering
-    targetCtx.scale(flameScale, flameScale);
-    
-    // Outer Flame (Red)
-    targetCtx.fillStyle = '#ff3300'; 
-    targetCtx.beginPath(); 
-    targetCtx.moveTo(0, -s*0.25); 
-    targetCtx.quadraticCurveTo(-s*0.15, -s*0.1, -s*0.1, s*0.05); 
-    targetCtx.quadraticCurveTo(0, s*0.15, s*0.1, s*0.05); 
-    targetCtx.quadraticCurveTo(s*0.15, -s*0.1, 0, -s*0.25); 
+    let thrustLength = s * 0.25 + Math.abs(Math.sin(time * 25)) * (s * 0.2);
+    let thrustWidth = s * 0.15 + Math.abs(Math.cos(time * 15)) * (s * 0.05);
+
+    // 1. Outer Glow/Flame (Red/Deep Orange)
+    targetCtx.shadowColor = '#ff4400';
+    targetCtx.shadowBlur = 15;
+    targetCtx.fillStyle = '#ff4400';
+    targetCtx.beginPath();
+    targetCtx.moveTo(-thrustWidth * 0.8, 0);
+    targetCtx.quadraticCurveTo(0, thrustWidth * 0.4, thrustWidth * 0.8, 0);
+    targetCtx.lineTo(0, -thrustLength);
+    targetCtx.closePath();
+    targetCtx.fill();
+
+    // 2. Mid Flame (Orange/Yellow)
+    targetCtx.shadowBlur = 8;
+    targetCtx.shadowColor = '#ffaa00';
+    targetCtx.fillStyle = '#ffaa00';
+    targetCtx.beginPath();
+    targetCtx.moveTo(-thrustWidth * 0.5, 0);
+    targetCtx.quadraticCurveTo(0, thrustWidth * 0.2, thrustWidth * 0.5, 0);
+    targetCtx.lineTo(0, -thrustLength * 0.7);
+    targetCtx.closePath();
+    targetCtx.fill();
+
+    // 3. Hot Core (Yellow/White)
+    targetCtx.shadowBlur = 5;
+    targetCtx.shadowColor = '#ffff00';
+    targetCtx.fillStyle = '#ffffff';
+    targetCtx.beginPath();
+    targetCtx.moveTo(-thrustWidth * 0.2, 0);
+    targetCtx.lineTo(thrustWidth * 0.2, 0);
+    targetCtx.lineTo(0, -thrustLength * 0.4);
+    targetCtx.closePath();
     targetCtx.fill();
     
-    // Inner Flame (Yellow)
-    targetCtx.fillStyle = '#facc15'; 
-    targetCtx.beginPath(); 
-    targetCtx.moveTo(0, -s*0.12); 
-    targetCtx.quadraticCurveTo(-s*0.08, -s*0.03, -s*0.05, s*0.03); 
-    targetCtx.quadraticCurveTo(0, s*0.08, s*0.05, s*0.03); 
-    targetCtx.quadraticCurveTo(s*0.08, -s*0.03, 0, -s*0.12); 
-    targetCtx.fill();
+    targetCtx.shadowBlur = 0;
 
     targetCtx.restore();
   } else {
@@ -1483,7 +1500,7 @@ function renderSkeleton(targetCtx, skinId, hatId, capeId, wpnId, faceId, s, stat
     targetCtx.strokeStyle = '#64748b'; targetCtx.lineWidth = 1; targetCtx.stroke();
   } else if (id === 'demon') {
     targetCtx.save();
-    targetCtx.translate(0, -s*0.18); // shifted up higher and right
+    targetCtx.translate(s*0.05, -s*0.22); // Shifted further right and up
 
     let hg = targetCtx.createLinearGradient(0, -s*0.1, 0, s*0.4);
     hg.addColorStop(0, '#ff3300'); hg.addColorStop(1, '#990000');
@@ -1503,27 +1520,27 @@ function renderSkeleton(targetCtx, skinId, hatId, capeId, wpnId, faceId, s, stat
     targetCtx.beginPath(); targetCtx.moveTo(-s*0.05, s*0.1); targetCtx.lineTo(-s*0.3, -s*0.05); targetCtx.lineTo(-s*0.1, s*0.2); targetCtx.fill();
     targetCtx.beginPath(); targetCtx.moveTo(-s*0.05, s*0.1); targetCtx.lineTo(-s*0.3, -s*0.05); targetCtx.lineTo(-s*0.1, s*0.2); targetCtx.stroke();
 
-    // Angry Blank White Eye (Facing Right)
+    // Angry Blank White Eye (Facing Right) - Smaller and shifted left
     targetCtx.fillStyle = '#ffffff';
     targetCtx.beginPath();
-    targetCtx.moveTo(s*0.02, s*0.2); 
-    targetCtx.lineTo(s*0.18, s*0.16); 
-    targetCtx.lineTo(s*0.18, s*0.21); 
-    targetCtx.lineTo(s*0.10, s*0.23); 
+    targetCtx.moveTo(-s*0.05, s*0.2); 
+    targetCtx.lineTo(s*0.1, s*0.17); 
+    targetCtx.lineTo(s*0.1, s*0.21); 
+    targetCtx.lineTo(0, s*0.23); 
     targetCtx.fill();
 
-    // Fang Mouth (Facing Right)
+    // Fang Mouth (Facing Right) - Shifted left and up, aligned right edge
     targetCtx.fillStyle = '#111';
     targetCtx.beginPath(); 
-    targetCtx.moveTo(-s*0.05, s*0.30); 
-    targetCtx.quadraticCurveTo(s*0.05, s*0.40, s*0.18, s*0.30); 
-    targetCtx.quadraticCurveTo(s*0.05, s*0.35, -s*0.05, s*0.30); 
+    targetCtx.moveTo(-s*0.1, s*0.28); 
+    targetCtx.quadraticCurveTo(s*0.05, s*0.38, s*0.2, s*0.28); 
+    targetCtx.quadraticCurveTo(s*0.05, s*0.33, -s*0.1, s*0.28); 
     targetCtx.fill();
     
     // Fangs
     targetCtx.fillStyle = '#fff';
-    targetCtx.beginPath(); targetCtx.moveTo(0, s*0.32); targetCtx.lineTo(s*0.03, s*0.37); targetCtx.lineTo(s*0.05, s*0.33); targetCtx.fill();
-    targetCtx.beginPath(); targetCtx.moveTo(s*0.10, s*0.32); targetCtx.lineTo(s*0.13, s*0.37); targetCtx.lineTo(s*0.15, s*0.33); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.moveTo(-s*0.05, s*0.3); targetCtx.lineTo(-s*0.02, s*0.35); targetCtx.lineTo(0, s*0.31); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.moveTo(s*0.08, s*0.3); targetCtx.lineTo(s*0.11, s*0.35); targetCtx.lineTo(s*0.13, s*0.31); targetCtx.fill();
     targetCtx.restore();
 
   } else if (id === 'wizard') {

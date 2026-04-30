@@ -118,14 +118,20 @@ function renderDailyCheckinPanel() {
     // --- Modal Neon Card ---
     const card = document.createElement('div');
     card.className = `neon-card ${isActive ? 'active' : ''} ${isClaimed ? 'claimed' : ''}`;
-    // Apply dynamic neon border/shadow if active or claimed
-    if (isActive || isClaimed) {
-      const color = isActive ? neonColors[i-1] : '#00ff88';
+    // Apply dynamic neon border/shadow if active
+    if (isActive) {
+      const color = neonColors[i-1];
       card.style.borderColor = color;
       card.style.boxShadow = `0 0 20px ${color}, inset 0 0 15px ${color}`;
       card.style.filter = `drop-shadow(0 0 5px ${color})`;
+    } else if (isClaimed) {
+      card.style.borderColor = '#333';
+      card.style.background = 'rgba(0,0,0,0.4)';
+      card.style.filter = 'grayscale(1) brightness(0.7)';
     }
-    card.innerHTML = `<div class="neon-card-icon" style="filter: drop-shadow(0 0 12px ${neonColors[i-1]});">${ninjaSVG}</div>`;
+    
+    let iconStyle = isClaimed ? '' : `filter: drop-shadow(0 0 12px ${neonColors[i-1]});`;
+    card.innerHTML = `<div class="neon-card-icon" style="${iconStyle}">${ninjaSVG}</div>`;
     cardsContainer.appendChild(card);
 
     // --- Modal Timeline Node ---

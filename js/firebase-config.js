@@ -70,7 +70,7 @@ window.submitScoreToFirebase = async function(score) {
 let syncTimeout = null;
 
 window.syncDataToCloud = function() {
-    if (typeof window.currentAddress === 'undefined' || !window.currentAddress) return;
+    if (typeof window.userAddress === 'undefined' || !window.userAddress) return;
     
     // Debounce to prevent spamming the KVDB api
     if (syncTimeout) clearTimeout(syncTimeout);
@@ -85,12 +85,12 @@ window.syncDataToCloud = function() {
                 }
             }
             
-            const userKey = `user_${window.currentAddress.toLowerCase()}`;
+            const userKey = `user_${window.userAddress.toLowerCase()}`;
             await fetch(`https://kvdb.io/${KVDB_BUCKET}/${userKey}`, {
                 method: 'POST',
                 body: JSON.stringify(state)
             });
-            console.log("Game state synced to cloud for wallet:", window.currentAddress);
+            console.log("Game state synced to cloud for wallet:", window.userAddress);
         } catch(e) {
             console.error("Failed to sync game state to cloud:", e);
         }

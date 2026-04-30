@@ -956,62 +956,76 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     targetCtx.strokeStyle = '#14532d'; // outline green
     targetCtx.lineWidth = Math.max(2, s*0.03);
     targetCtx.lineJoin = 'round';
+    targetCtx.lineCap = 'round';
     
     targetCtx.beginPath();
-    // Top of head (shifted up)
-    targetCtx.moveTo(-s*0.15, -s*0.25);
-    targetCtx.lineTo(s*0.25, -s*0.25);
-    // Snout curve
-    targetCtx.quadraticCurveTo(s*0.45, -s*0.25, s*0.45, -s*0.05);
-    // Front Jaw
-    targetCtx.lineTo(s*0.45, s*0.15);
-    // Bottom Jaw
-    targetCtx.lineTo(s*0.05, s*0.15);
-    // Belly curving down to legs
-    targetCtx.quadraticCurveTo(s*0.25, s*0.5, s*0.15, s*0.7);
-    // Leg base
+    // 1. Top of head (back to front)
+    targetCtx.moveTo(-s*0.1, -s*0.35); 
+    targetCtx.quadraticCurveTo(s*0.3, -s*0.35, s*0.35, -s*0.25); 
+    // 2. Front of Snout
+    targetCtx.quadraticCurveTo(s*0.4, -s*0.15, s*0.4, 0); 
+    targetCtx.lineTo(s*0.4, s*0.1); 
+    // 3. Bottom of Jaw
+    targetCtx.lineTo(s*0.1, s*0.1); 
+    // 4. Neck & Plump Belly
+    targetCtx.bezierCurveTo(s*0.1, s*0.3, s*0.35, s*0.4, s*0.15, s*0.7); 
+    // 5. Flat bottom across leg area
     targetCtx.lineTo(-s*0.15, s*0.7);
-    // Tail curving out and up
-    targetCtx.quadraticCurveTo(-s*0.2, s*0.5, -s*0.8, s*0.2);
-    // Back curving up to head (smoother, no hump)
-    targetCtx.quadraticCurveTo(-s*0.4, -s*0.05, -s*0.15, -s*0.25);
+    // 6. Tail bottom curve
+    targetCtx.quadraticCurveTo(-s*0.3, s*0.6, -s*0.85, s*0.25);
+    // 7. Tail top curve
+    targetCtx.bezierCurveTo(-s*0.6, s*0.2, -s*0.4, 0, -s*0.3, -s*0.05);
+    // 8. Mid-back up to back of head
+    targetCtx.bezierCurveTo(-s*0.2, -s*0.1, -s*0.15, -s*0.2, -s*0.1, -s*0.35);
+    targetCtx.closePath();
     targetCtx.fill();
     targetCtx.stroke();
 
     // Belly light green shade
     targetCtx.fillStyle = '#bef264';
     targetCtx.beginPath();
-    targetCtx.moveTo(s*0.05, s*0.15);
-    targetCtx.quadraticCurveTo(s*0.25, s*0.5, s*0.15, s*0.7);
+    targetCtx.moveTo(s*0.1, s*0.1);
+    targetCtx.bezierCurveTo(s*0.1, s*0.3, s*0.35, s*0.4, s*0.15, s*0.7);
     targetCtx.lineTo(0, s*0.7);
-    targetCtx.quadraticCurveTo(s*0.1, s*0.45, -s*0.05, s*0.15);
+    targetCtx.bezierCurveTo(s*0.15, s*0.4, -s*0.05, s*0.3, 0, s*0.1);
     targetCtx.fill();
 
-    // Dark green back stripes/triangles
+    // Dark green back stripes (polygons)
     targetCtx.fillStyle = '#14532d';
-    targetCtx.beginPath(); targetCtx.moveTo(-s*0.1, -s*0.1); targetCtx.lineTo(0, -s*0.1); targetCtx.lineTo(-s*0.05, 0); targetCtx.fill();
-    targetCtx.beginPath(); targetCtx.moveTo(-s*0.25, 0.0); targetCtx.lineTo(-s*0.15, 0.0); targetCtx.lineTo(-s*0.2, s*0.1); targetCtx.fill();
-    targetCtx.beginPath(); targetCtx.moveTo(-s*0.4, s*0.15); targetCtx.lineTo(-s*0.3, s*0.15); targetCtx.lineTo(-s*0.35, s*0.25); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.moveTo(-s*0.1, -s*0.2); targetCtx.lineTo(0, -s*0.2); targetCtx.lineTo(-s*0.05, -s*0.1); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.moveTo(-s*0.2, -s*0.05); targetCtx.lineTo(-s*0.1, -s*0.05); targetCtx.lineTo(-s*0.15, s*0.05); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.moveTo(-s*0.35, s*0.1); targetCtx.lineTo(-s*0.25, s*0.1); targetCtx.lineTo(-s*0.3, s*0.2); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.moveTo(-s*0.55, s*0.2); targetCtx.lineTo(-s*0.45, s*0.2); targetCtx.lineTo(-s*0.5, s*0.25); targetCtx.fill();
 
     // Dark green spots scattered
-    targetCtx.beginPath(); targetCtx.arc(s*0.05, s*0.3, s*0.03, 0, Math.PI*2); targetCtx.fill();
-    targetCtx.beginPath(); targetCtx.arc(-s*0.15, s*0.35, s*0.04, 0, Math.PI*2); targetCtx.fill();
-    targetCtx.beginPath(); targetCtx.arc(-s*0.35, s*0.3, s*0.025, 0, Math.PI*2); targetCtx.fill();
-    targetCtx.beginPath(); targetCtx.arc(-s*0.5, s*0.25, s*0.02, 0, Math.PI*2); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.arc(-s*0.05, s*0.2, s*0.03, 0, Math.PI*2); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.arc(-s*0.15, s*0.4, s*0.04, 0, Math.PI*2); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.arc(s*0.05, s*0.5, s*0.025, 0, Math.PI*2); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.arc(-s*0.3, s*0.35, s*0.03, 0, Math.PI*2); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.arc(-s*0.45, s*0.3, s*0.02, 0, Math.PI*2); targetCtx.fill();
 
-    // Tiny T-Rex Front Arm
+    // Tiny T-Rex Front Arm (Bent elbow)
     targetCtx.save();
-    targetCtx.translate(s*0.15, s*0.3); // Attachment point shifted
+    targetCtx.translate(s*0.1, s*0.35); // Shoulder point on belly
     targetCtx.rotate(armAngle1);
     targetCtx.fillStyle = '#65a30d';
     targetCtx.strokeStyle = '#14532d';
-    targetCtx.lineWidth = Math.max(1, s*0.015);
+    targetCtx.lineWidth = Math.max(2, s*0.02);
+    
+    // Arm shape
     targetCtx.beginPath();
-    targetCtx.roundRect(-s*0.02, 0, s*0.05, s*0.15, s*0.03);
+    targetCtx.moveTo(-s*0.02, -s*0.02); // Shoulder top
+    targetCtx.lineTo(s*0.05, s*0.06);   // Elbow top
+    targetCtx.lineTo(s*0.12, s*0.04);   // Wrist top
+    targetCtx.lineTo(s*0.13, s*0.08);   // Wrist bot
+    targetCtx.lineTo(s*0.04, s*0.11);   // Elbow bot
+    targetCtx.lineTo(-s*0.04, 0.03);    // Shoulder bot
+    targetCtx.closePath();
     targetCtx.fill(); targetCtx.stroke();
+    
     // Claws
-    targetCtx.beginPath(); targetCtx.moveTo(0, s*0.15); targetCtx.lineTo(-s*0.04, s*0.2); targetCtx.stroke();
-    targetCtx.beginPath(); targetCtx.moveTo(s*0.03, s*0.15); targetCtx.lineTo(s*0.07, s*0.2); targetCtx.stroke();
+    targetCtx.beginPath(); targetCtx.moveTo(s*0.12, s*0.06); targetCtx.lineTo(s*0.16, s*0.08); targetCtx.stroke();
+    targetCtx.beginPath(); targetCtx.moveTo(s*0.13, s*0.08); targetCtx.lineTo(s*0.15, s*0.12); targetCtx.stroke();
     targetCtx.restore();
   } else if (id === 'pika') {
     // Pika Custom Fat Body
@@ -1330,20 +1344,25 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     targetCtx.strokeStyle = '#14532d';
     targetCtx.lineWidth = Math.max(2, s*0.02);
     targetCtx.beginPath();
-    targetCtx.moveTo(s*0.45, -s*0.05);
-    targetCtx.lineTo(s*0.4, -s*0.1); targetCtx.lineTo(s*0.35, -s*0.05);
-    targetCtx.lineTo(s*0.3, -s*0.1); targetCtx.lineTo(s*0.25, -s*0.05);
-    targetCtx.lineTo(s*0.2, -s*0.1); targetCtx.lineTo(s*0.15, -s*0.05);
-    targetCtx.lineTo(s*0.1, -s*0.1); targetCtx.lineTo(s*0.05, -s*0.05);
+    targetCtx.moveTo(s*0.4, s*0.02);
+    targetCtx.lineTo(s*0.35, -s*0.02); targetCtx.lineTo(s*0.3, s*0.02);
+    targetCtx.lineTo(s*0.25, -s*0.02); targetCtx.lineTo(s*0.2, s*0.02);
+    targetCtx.lineTo(s*0.15, -s*0.02); targetCtx.lineTo(s*0.1, s*0.02);
     targetCtx.stroke();
 
-    // Giant Eye
+    // Secondary Eye (Background Bulge)
     targetCtx.fillStyle = '#fff';
-    targetCtx.beginPath(); targetCtx.arc(s*0.15, -s*0.15, s*0.08, 0, Math.PI*2); targetCtx.fill(); targetCtx.stroke();
+    targetCtx.beginPath(); targetCtx.arc(s*0.32, -s*0.18, s*0.05, 0, Math.PI*2); targetCtx.fill(); targetCtx.stroke();
     targetCtx.fillStyle = '#111';
-    targetCtx.beginPath(); targetCtx.arc(s*0.19, -s*0.13, s*0.03, 0, Math.PI*2); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.arc(s*0.35, -s*0.17, s*0.015, 0, Math.PI*2); targetCtx.fill();
+
+    // Giant Eye (Foreground)
     targetCtx.fillStyle = '#fff';
-    targetCtx.beginPath(); targetCtx.arc(s*0.2, -s*0.14, s*0.01, 0, Math.PI*2); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.arc(s*0.18, -s*0.2, s*0.08, 0, Math.PI*2); targetCtx.fill(); targetCtx.stroke();
+    targetCtx.fillStyle = '#111';
+    targetCtx.beginPath(); targetCtx.arc(s*0.22, -s*0.18, s*0.03, 0, Math.PI*2); targetCtx.fill();
+    targetCtx.fillStyle = '#fff';
+    targetCtx.beginPath(); targetCtx.arc(s*0.23, -s*0.19, s*0.01, 0, Math.PI*2); targetCtx.fill();
   } else if (id === 'ninja') {
     // 1. Sleeker Face Skin Area (Exposed eyes slit)
     targetCtx.fillStyle = '#ffedd5';
@@ -2421,7 +2440,7 @@ function drawPreviewCanvas() {
   if (!previewActiveItem) return;
   prevCtx.clearRect(0, 0, prevCanvas.width, prevCanvas.height);
 
-  let prevSkin = currentSkin; let prevHat = equippedHat; let prevWpn = equippedWeapon; let prevFace = equippedFace;
+  let prevSkin = 'classic'; let prevHat = equippedHat; let prevWpn = equippedWeapon; let prevFace = equippedFace;
   if (previewActiveItem.type === 'skin') prevSkin = previewActiveItem.id;
   if (previewActiveItem.type === 'hat') prevHat = previewActiveItem.id;
   if (previewActiveItem.type === 'weapon') prevWpn = previewActiveItem.id;

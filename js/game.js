@@ -48,6 +48,14 @@ const prevCtx = prevCanvas.getContext('2d');
       const style = document.createElement('style');
       style.innerHTML = `.demon-avatar { background: url('${transparentDataUrl}') no-repeat center/175% !important; mix-blend-mode: normal !important; }`;
       document.head.appendChild(style);
+      if (typeof AVATAR_LIST !== 'undefined') {
+        let d = AVATAR_LIST.find(a => a.id === 'demon');
+        if (d) {
+          d.svg = transparentDataUrl;
+          if (typeof updateProfileUI === 'function') updateProfileUI();
+          if (typeof initProfileModal === 'function') initProfileModal();
+        }
+      }
     } catch(e) {
       console.log('CORS or Canvas error processing demon avatar', e);
     }

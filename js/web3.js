@@ -79,7 +79,10 @@ function getAvatarSVG(id) {
 
 function updateProfileUI() {
   if (currentUserName) currentUserName.innerText = currentUsername;
-  if (currentUserAvatar) currentUserAvatar.style.background = `url('${getAvatarSVG(selectedAvatar)}') no-repeat center/contain`;
+  if (currentUserAvatar) {
+      let bgSize = selectedAvatar === 'demon' ? '175%' : 'contain';
+      currentUserAvatar.style.background = `#111 url('${getAvatarSVG(selectedAvatar)}') no-repeat center/${bgSize}`;
+  }
 }
 
 function initProfileModal() {
@@ -88,7 +91,8 @@ function initProfileModal() {
   AVATAR_LIST.forEach(item => {
     const div = document.createElement('div');
     div.style.width = '60px'; div.style.height = '60px'; div.style.borderRadius = '12px';
-    div.style.cursor = 'pointer'; div.style.background = `rgba(255,255,255,0.05) url('${item.svg}') no-repeat center/70%`;
+    let bgSize = item.id === 'demon' ? '120%' : '70%';
+    div.style.cursor = 'pointer'; div.style.background = `rgba(255,255,255,0.05) url('${item.svg}') no-repeat center/${bgSize}`;
     div.style.border = selectedAvatar === item.id ? '3px solid #00ff88' : '1px solid rgba(255,255,255,0.1)';
     div.style.transition = "0.2s";
     div.onclick = () => {

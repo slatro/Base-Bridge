@@ -10,11 +10,11 @@
 <link rel="icon" type="image/png" href="/favicon.png">
 
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css?v=18">
+<link rel="stylesheet" href="css/styles.css?v=19">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
 <script defer src="js/firebase-config.js"></script>
-<script defer src="js/web3.js?v=18"></script>
-<script defer src="js/game.js?v=18"></script>
+<script defer src="js/web3.js?v=19"></script>
+<script defer src="js/game.js?v=19"></script>
 </head>
 <body>
   
@@ -318,6 +318,36 @@
     window.closeModals = window.closeModals || function() {
       document.querySelectorAll('.modal-card, .modal-backdrop').forEach(el => el.classList.add('hidden'));
     };
+
+    // BULLETPROOF: Daily Check-in Modal Opener
+    // This runs inline so it works even if external JS files are cached/broken
+    document.addEventListener('DOMContentLoaded', function() {
+      var modal = document.getElementById('modal-daily-calendar');
+      if (!modal) { console.error('MODAL NOT FOUND'); return; }
+
+      function openDailyModal() {
+        console.log('Opening daily check-in modal');
+        modal.className = 'modal-backdrop';
+        modal.style.display = 'flex';
+      }
+
+      // 1. The feature card
+      var fcDaily = document.getElementById('fc-daily');
+      if (fcDaily) fcDaily.addEventListener('click', openDailyModal);
+
+      // 2. The CHECK IN button
+      var btnOpen = document.getElementById('btn-open-daily-modal');
+      if (btnOpen) btnOpen.addEventListener('click', openDailyModal);
+
+      // 3. The entire daily-checkin-section panel
+      var panel = document.getElementById('daily-checkin-section');
+      if (panel) {
+        panel.style.cursor = 'pointer';
+        panel.addEventListener('click', openDailyModal);
+      }
+
+      console.log('Daily modal listeners attached:', !!fcDaily, !!btnOpen, !!panel);
+    });
   </script>
   </body>
 </html>

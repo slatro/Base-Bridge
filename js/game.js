@@ -1483,7 +1483,7 @@ function renderSkeleton(targetCtx, skinId, hatId, capeId, wpnId, faceId, s, stat
     targetCtx.strokeStyle = '#64748b'; targetCtx.lineWidth = 1; targetCtx.stroke();
   } else if (id === 'demon') {
     targetCtx.save();
-    targetCtx.translate(-s*0.1, -s*0.23); // shifted left and up higher
+    targetCtx.translate(0, -s*0.23); // centered and up higher
 
     let hg = targetCtx.createLinearGradient(0, -s*0.1, 0, s*0.4);
     hg.addColorStop(0, '#ff3300'); hg.addColorStop(1, '#990000');

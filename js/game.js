@@ -1468,23 +1468,23 @@ function triggerGameOver() {
   document.getElementById('go-bb').innerText = sessionCoins;
 
   const breakdownHTML = `
-    <div class="breakdown-box" style="margin-top:1rem; padding:1rem; background:rgba(255,255,255,0.05); border-radius:12px; font-size:0.9rem;">
-      <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;"><span>Bridges Crossed:</span> <span>${bridgesCrossed}</span></div>
-      <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;"><span>Perfect Landings:</span> <span>${sessionPerfects}</span></div>
-      <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;"><span>Best Combo:</span> <span>x${sessionBestCombo}</span></div>
-      <div style="display:flex; justify-content:space-between; color:#facc15;"><span>Total Earned:</span> <span>${sessionCoins} BB</span></div>
-      <p style="margin-top:1rem; font-style:italic; font-size:0.85rem; color:#94a3b8; text-align:center;">${psychologyMsg}</p>
+    <div class="breakdown-box">
+      <div class="breakdown-row"><span>Bridges Crossed:</span> <strong>${bridgesCrossed}</strong></div>
+      <div class="breakdown-row"><span>Perfect Landings:</span> <strong>${sessionPerfects}</strong></div>
+      <div class="breakdown-row"><span>Best Combo:</span> <strong>x${sessionBestCombo}</strong></div>
+      <div class="breakdown-row"><span style="color:#facc15;">Total Earned:</span> <strong style="color:#facc15;">${sessionCoins} BB</strong></div>
+      <p style="margin-top:10px; font-style:italic; font-size:0.85rem; color:#cbd5e1; text-align:center; line-height:1.4;">${psychologyMsg}</p>
     </div>
   `;
 
-  const statsContainer = document.querySelector('.game-over-stats');
+  const statsContainer = document.querySelector('.go-stats-container');
   if (statsContainer) {
-    let existingBreakdown = statsContainer.parentElement.querySelector('.breakdown-box');
+    let existingBreakdown = statsContainer.querySelector('.breakdown-box');
     if (existingBreakdown) existingBreakdown.remove();
     let box = document.createElement('div');
-    box.className = 'breakdown-box';
+    box.style.display = 'contents'; // So breakdown-box participates in flex layout
     box.innerHTML = breakdownHTML;
-    statsContainer.parentElement.insertBefore(box, statsContainer.nextSibling);
+    statsContainer.appendChild(box.firstElementChild);
   }
 
   if (coins >= 25 && !reviveUsed && score > 0) {

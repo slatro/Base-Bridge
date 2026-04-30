@@ -344,12 +344,21 @@ canvas { width: 100%; height: 100%; display: block; }
 
 /* Canvas Overlays */
 .game-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10; }
-.game-overlay h2 { font-size: 3rem; color: #fff; text-shadow: 0 4px 15px rgba(0,0,0,0.8); margin-bottom: 10px; }
-.game-over-stats { margin-bottom: 10px; background: rgba(0,0,0,0.6); padding: 15px 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 20px rgba(0,0,0,0.5); display: flex; flex-direction: column; gap: 6px; width: 100%; max-width: 280px; text-align: left;}
-.go-stat-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 3px; }
-.go-stat-row:last-child { border-bottom: none; padding-bottom: 0; }
-.go-stat-row span { color: var(--text-dim); font-size: 0.85rem; font-weight: bold; }
-.go-stat-row strong { font-family: 'Fredoka One'; font-size: 1.2rem; color: #fff; text-shadow: 0 0 5px rgba(255,255,255,0.3); }
+.game-overlay h2 { font-size: 3rem; color: #fff; text-shadow: 0 4px 15px rgba(0,0,0,0.8); margin-bottom: 20px; }
+.go-stats-container { display: flex; gap: 20px; justify-content: center; align-items: stretch; width: 100%; max-width: 650px; margin-bottom: 20px; }
+.game-over-stats { background: rgba(0,0,0,0.7); padding: 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 15px 35px rgba(0,0,0,0.5); display: flex; flex-direction: column; gap: 8px; flex: 1; text-align: left; position: relative; }
+.breakdown-box { 
+  background: rgba(255,255,255,0.07); backdrop-filter: blur(20px); 
+  padding: 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.2); 
+  box-shadow: 0 15px 35px rgba(0,0,0,0.4), inset 0 0 20px rgba(255,255,255,0.05); 
+  display: flex; flex-direction: column; gap: 8px; flex: 1; text-align: left;
+}
+.go-stat-row, .breakdown-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 0 4px 20px; position: relative; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.go-stat-row::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 6px; height: 6px; background: #fff; border-radius: 50%; box-shadow: 0 0 8px #fff; }
+.breakdown-row::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 6px; height: 6px; background: #facc15; border-radius: 50%; box-shadow: 0 0 8px #facc15; }
+.go-stat-row:last-child, .breakdown-row:last-child { border-bottom: none; }
+.go-stat-row span, .breakdown-row span { color: var(--text-dim); font-size: 0.85rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+.go-stat-row strong, .breakdown-row strong { font-family: 'Fredoka One'; font-size: 1.2rem; color: #fff; text-shadow: 0 0 8px rgba(255,255,255,0.2); }
 .go-btn-wrapper { max-width: 250px; width: 100%; display: flex; flex-direction: column;}
 
 #perfect-msg { position: absolute; top: 30%; width: 100%; text-align: center; font-size: 3.5rem; font-family: 'Fredoka One'; color: #00ff88; text-shadow: 0 4px 15px rgba(0,0,0,0.8); opacity: 0; transform: scale(0.5); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 8; pointer-events: none; }

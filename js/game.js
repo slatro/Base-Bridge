@@ -33,110 +33,94 @@ const levelNameEl = document.getElementById('ui-level-name');
 const levelFillEl = document.getElementById('ui-level-fill');
 const btnRevive = document.getElementById('btn-revive');
 
-// --- DAILY CHECK-IN SYSTEM ---
-document.getElementById('fc-daily')?.addEventListener('click', () => {
-  renderDailyCalendar();
-  document.getElementById('modal-daily-calendar').classList.remove('hidden');
-});
-
-function renderDailyCalendar() {
-  const grid = document.getElementById('calendar-grid');
-  const monthTitle = document.getElementById('calendar-month-title');
-  const streakEl = document.getElementById('calendar-streak');
-  const totalEl = document.getElementById('calendar-total');
-  if (!grid) return;
-
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = now.getMonth();
-  const today = now.getDate();
-
-  const monthNames = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
-  monthTitle.innerText = `CHECK-IN: ${monthNames[month]} ${year}`;
+// --- DAILY CHECK-IN SYSTEM (7-DAY PROGRESSION) ---
+function renderDailyCheckinPanel() {
+  const row = document.getElementById('daily-checkin-row');
+  if (!row) return;
 
   const totalCheckins = parseInt(localStorage.getItem('bb_v1_total_checkins') || '0');
   const streak = parseInt(localStorage.getItem('bb_v1_checkin_streak') || '0');
-  streakEl.innerText = `STREAK: ${streak} DAYS`;
-  totalEl.innerText = `TOTAL: ${totalCheckins}`;
+  const currentWeeklyDay = (streak % 7) || 7; // 1-7
 
-  const firstDay = new Date(year, month, 1).getDay();
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-  grid.innerHTML = '';
+  row.innerHTML = '';
   
-  // Empty spaces for previous month
-  for (let i = 0; i < (firstDay === 0 ? 6 : firstDay - 1); i++) {
-    const empty = document.createElement('div');
-    empty.className = 'calendar-day locked';
-    grid.appendChild(empty);
-  }
-
-  const claimedDays = JSON.parse(localStorage.getItem(`bb_v1_checkins_${month}_${year}`) || '[]');
-
-  for (let d = 1; d <= daysInMonth; d++) {
-    const dayDiv = document.createElement('div');
-    dayDiv.className = 'calendar-day';
-    dayDiv.innerHTML = `<span class="day-num">${d}</span>`;
+  for (let i = 1; i <= 7; i++) {
+    const dayCard = document.createElement('div');
+    dayCard.className = 'checkin-day-card';
     
-    if (claimedDays.includes(d)) {
-      dayDiv.classList.add('claimed');
-    } else if (d === today) {
-      dayDiv.classList.add('current');
-    } else if (d < today) {
-      dayDiv.classList.add('locked');
+    // Rewards: 50, 75, 100, 125, 150, 175, 200
+    const reward = 50 + ((i - 1) * 25);
+    
+    dayCard.innerHTML = `
+      <span class="day-title">Day ${i}</span>
+      <span class="reward-amt">${reward}</span>
+    `;
+
+    if (i < currentWeeklyDay) {
+      dayCard.classList.add('claimed');
+    } else if (i === currentWeeklyDay) {
+      dayCard.classList.add('current');
     }
-    
-    grid.appendChild(dayDiv);
+
+    row.appendChild(dayCard);
   }
 
-  const btn = document.getElementById('btn-do-checkin');
-  if (claimedDays.includes(today)) {
-    btn.innerText = "ALREADY CHECKED-IN";
-    btn.disabled = true;
-    btn.style.opacity = '0.5';
-  } else {
-    btn.innerText = "CHECK-IN TODAY (0.10$)";
-    btn.disabled = false;
-    btn.style.opacity = '1';
-    btn.onclick = () => doCheckIn(today, month, year);
+  const claimBtn = document.getElementById('btn-claim-daily');
+  if (claimBtn) {
+    const lastCheckinDate = localStorage.getItem('bb_v1_last_checkin_date');
+    const today = new Date().toLocaleDateString();
+    
+    if (lastCheckinDate === today) {
+      claimBtn.innerText = "CLAIMED";
+      claimBtn.disabled = true;
+      claimBtn.classList.replace('btn-green', 'btn-gray');
+    } else {
+      claimBtn.innerText = "CLAIM";
+      claimBtn.disabled = false;
+      claimBtn.classList.replace('btn-gray', 'btn-green');
+      claimBtn.onclick = () => doDailyCheckin();
+    }
   }
 }
 
-async function doCheckIn(day, month, year) {
-  const btn = document.getElementById('btn-do-checkin');
-  btn.innerText = "PROCESSING...";
-  btn.disabled = true;
+async function doDailyCheckin() {
+  const claimBtn = document.getElementById('btn-claim-daily');
+  claimBtn.innerText = "PROCESSING...";
+  claimBtn.disabled = true;
 
   const success = await window.purchaseItemOnChain({ id: 'daily_checkin', name: 'Daily Check-in' });
   if (success) {
-    let claimedDays = JSON.parse(localStorage.getItem(`bb_v1_checkins_${month}_${year}`) || '[]');
-    claimedDays.push(day);
-    localStorage.setItem(`bb_v1_checkins_${month}_${year}`, JSON.stringify(claimedDays));
+    let streak = parseInt(localStorage.getItem('bb_v1_checkin_streak') || '0');
+    streak++;
+    localStorage.setItem('bb_v1_checkin_streak', streak);
 
     let total = parseInt(localStorage.getItem('bb_v1_total_checkins') || '0');
     total++;
     localStorage.setItem('bb_v1_total_checkins', total);
 
-    let streak = parseInt(localStorage.getItem('bb_v1_checkin_streak') || '0');
-    // Simple streak logic: if yesterday was claimed, streak++, else reset to 1
-    // (For now, we'll just increment it for demo)
-    streak++;
-    localStorage.setItem('bb_v1_checkin_streak', streak);
+    const today = new Date().toLocaleDateString();
+    localStorage.setItem('bb_v1_last_checkin_date', today);
 
-    // Reward BB
-    let coins = parseInt(localStorage.getItem('bb_v1_coins') || '0');
-    coins += 50; // Daily reward
+    // Award BB (base 50 + 25 per day in week)
+    const currentDayInWeek = ((streak - 1) % 7) + 1;
+    const reward = 50 + ((currentDayInWeek - 1) * 25);
+    
+    coins += reward;
     localStorage.setItem('bb_v1_coins', coins);
-    const uiCoins = document.getElementById('ui-coins');
-    if (uiCoins) uiCoins.innerText = coins;
+    uiCoinsEl.innerText = coins;
 
-    renderDailyCalendar();
-    if (typeof window.showInfoModal === 'function') window.showInfoModal("Check-in Successful!", "You earned 50 BB Tokens on-chain!");
+    renderDailyCheckinPanel();
+    if (typeof window.showInfoModal === 'function') window.showInfoModal("Check-in Successful!", `You claimed ${reward} BB Tokens on-chain!`);
   } else {
-    btn.innerText = "CHECK-IN TODAY (0.10$)";
-    btn.disabled = false;
+    claimBtn.innerText = "CLAIM";
+    claimBtn.disabled = false;
   }
 }
+
+// Initialize
+window.addEventListener('load', () => {
+  renderDailyCheckinPanel();
+});
 
 // --- NEW GAMEPLAY STATE ---
 let reviveUsed = false;

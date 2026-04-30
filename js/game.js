@@ -46,7 +46,7 @@ const prevCtx = prevCanvas.getContext('2d');
       const transparentDataUrl = tempCanvas.toDataURL('image/png');
       // Inject CSS to override .demon-avatar
       const style = document.createElement('style');
-      style.innerHTML = `.demon-avatar { background: url('${transparentDataUrl}') no-repeat center/contain !important; mix-blend-mode: normal !important; }`;
+      style.innerHTML = `.demon-avatar { background: url('${transparentDataUrl}') no-repeat center/200% !important; mix-blend-mode: normal !important; }`;
       document.head.appendChild(style);
     } catch(e) {
       console.log('CORS or Canvas error processing demon avatar', e);
@@ -1212,8 +1212,8 @@ function renderSkeleton(targetCtx, skinId, hatId, capeId, wpnId, faceId, s, stat
     targetCtx.translate(-s*0.6, -s*0.3);
     
     // Animate scale and slight rotation for flickering
-    let flickerScaleY = 1.0 + Math.sin(time * 25) * 0.2;
-    let flickerScaleX = 1.0 + Math.cos(time * 15) * 0.1;
+    let flickerScaleY = 0.6 + Math.sin(time * 25) * 0.15;
+    let flickerScaleX = 0.6 + Math.cos(time * 15) * 0.1;
     targetCtx.scale(flickerScaleX, flickerScaleY);
     
     // Layer 1: Dark Red / Orange Glow

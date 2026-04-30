@@ -973,6 +973,7 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     targetCtx.quadraticCurveTo(-s * 0.25, s * 0.5, -s * 0.15, s * 0.7);
     targetCtx.lineTo(s * 0.15, s * 0.7);
     targetCtx.quadraticCurveTo(s * 0.25, s * 0.5, s * 0.2, s * 0.3);
+  }
 
   if (id === 'ninja') {
     // Cross straps
@@ -1008,6 +1009,8 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
         targetCtx.arc((i%2?0.1:-0.1)*s, s*(0.45 + i*0.08), s*0.02, 0, Math.PI*2);
         targetCtx.fill();
     }
+  }
+
   if (id === 'troop') {
     targetCtx.fillStyle = '#e11d48';
     targetCtx.fill();

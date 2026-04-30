@@ -557,16 +557,14 @@ window.claimAchievement = async function (id, reward, type, btnElement) {
     btnElement.style.filter = 'brightness(0.7)';
   }
 
-  if (window.claimBBTokensOnchain) {
-    const success = await window.claimBBTokensOnchain(reward);
-    if (!success) {
-      if (btnElement) {
-        btnElement.innerHTML = originalHTML;
-        btnElement.style.pointerEvents = 'auto';
-        btnElement.style.filter = '';
-      }
-      return;
+  const success = await window.mintAchievementOnChain(id);
+  if (!success) {
+    if (btnElement) {
+      btnElement.innerHTML = originalHTML;
+      btnElement.style.pointerEvents = 'auto';
+      btnElement.style.filter = '';
     }
+    return;
   }
 
   localStorage.setItem('bb_v1_claimed_' + id, 'true');

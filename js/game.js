@@ -291,7 +291,7 @@ let equippedFace = null;
 
 const SHOP_DB = [
   // SKINS
-  { id: 'classic', type: 'skin', name: 'Classic', rarity: 'Common', cost: 0, icon: 'classic', desc: 'A sleek Base Pilot with a glowing visor.', colors: { body: '#0f172a', head: '#1e293b' } },
+  { id: 'classic', type: 'skin', name: 'Classic', rarity: 'Common', cost: 0, icon: 'classic', desc: 'The original legendary stick hero.', colors: { body: '#111111', head: '#111111' } },
   { id: 'ninja', type: 'skin', name: 'Ninja', rarity: 'Uncommon', cost: 250, icon: 'ninja', desc: 'A skilled ninja blending into the shadows.', colors: { body: '#374151', head: '#374151', skin: '#fcd34d', straps: '#1f2937' } },
   { id: 'cyber', type: 'skin', name: 'Cyber', rarity: 'Rare', cost: 350, icon: 'cyber', desc: 'Friendly AI robot from the future.', colors: { body: '#f8fafc', head: '#f8fafc', glow: '#00e5ff' } },
   { id: 'wizard', type: 'skin', name: 'Wizard', rarity: 'Epic', cost: 450, icon: 'wizard', desc: 'A wise sorcerer with a star-patterned robe.', colors: { body: '#1d4ed8', head: '#ffffff', hat: '#1d4ed8', stars: '#facc15' } },
@@ -761,27 +761,35 @@ function openShopPreview(id) {
       };
     }
   } else {
-    document.getElementById('preview-cost').innerText = "0.10$";
+    document.getElementById('preview-cost').innerText = item.cost + " BB";
     btn.innerText = "BUY ON-CHAIN";
     btn.classList.replace('btn-gray', 'btn-green');
-    btn.disabled = false;
-    btn.onclick = async () => {
-      btn.innerText = "PROCESSING...";
+    
+    if (coins >= item.cost) {
+      btn.disabled = false;
+      btn.onclick = async () => {
+        btn.innerText = "PROCESSING...";
+        btn.disabled = true;
+        const success = await window.purchaseItemOnChain(item);
+        if (success) {
+          coins -= item.cost; localStorage.setItem('bb_v1_coins', coins); uiCoinsEl.innerText = coins;
+          ownedItems.push(id); localStorage.setItem('bb_v1_owned', JSON.stringify(ownedItems));
+          if (item.type === 'skin') currentSkin = id;
+          if (item.type === 'hat') equippedHat = id;
+          if (item.type === 'weapon') equippedWeapon = id;
+          if (item.type === 'face') equippedFace = id;
+          renderSkinsShop();
+          if (item.type === 'skin') closeModals(); else backToShop();
+        } else {
+          btn.innerText = "BUY ON-CHAIN";
+          btn.disabled = false;
+        }
+      };
+    } else {
+      btn.innerText = "INSUFFICIENT BB";
       btn.disabled = true;
-      const success = await window.purchaseItemOnChain(item);
-      if (success) {
-        ownedItems.push(id); localStorage.setItem('bb_v1_owned', JSON.stringify(ownedItems));
-        if (item.type === 'skin') currentSkin = id;
-        if (item.type === 'hat') equippedHat = id;
-        if (item.type === 'weapon') equippedWeapon = id;
-        if (item.type === 'face') equippedFace = id;
-        renderSkinsShop();
-        if (item.type === 'skin') closeModals(); else backToShop();
-      } else {
-        btn.innerText = "BUY ON-CHAIN";
-        btn.disabled = false;
-      }
-    };
+      btn.classList.replace('btn-green', 'btn-gray');
+    }
   }
 
   const btnClose = document.getElementById('btn-preview-close');
@@ -921,6 +929,12 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     targetCtx.lineTo(s * 0.25, s * 0.75);
     targetCtx.lineTo(s * 0.15, s * 0.8);
     targetCtx.closePath();
+    targetCtx.fill();
+  } else if (id === 'classic') {
+    // Original Simple Stickman
+    targetCtx.fillStyle = '#111111';
+    targetCtx.beginPath();
+    targetCtx.arc(s * 0.25, s * 0.22, s * 0.22, 0, Math.PI * 2);
     targetCtx.fill();
   }
 

@@ -913,8 +913,8 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
   // Translate up so feet touch 0, apply squash
   const id = skinData.id;
   let yOffset = -s;
-  if (id === 'pika') yOffset = -s * 0.95; // Higher to accommodate stick legs
-  if (id === 'mini') yOffset = -s * 0.95; // Higher to accommodate stick legs
+  if (id === 'pika') yOffset = -s * 0.85; // Lowered body to align with legs better
+  if (id === 'mini') yOffset = -s * 0.8; // Lowered body to align with legs better
   targetCtx.translate(0, yOffset + bounceY);
   targetCtx.scale(1.0 + (1.0 - character.squash) * 0.5, character.squash);
   const colors = skinData.colors;
@@ -928,13 +928,14 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     targetCtx.restore();
   }
 
-  // Back Arm & Leg
-  drawLimbPath(targetCtx, -s * 0.1, s * 0.6, s * 0.15, s * 0.4, legAngle2, colors.body || '#222', true, null, id);
+  // 2. Back Leg (Drawn behind body)
+  drawLimbPath(targetCtx, -s * 0.05, s * 0.6, s * 0.15, s * 0.4, legAngle2, colors.body || '#222', true, null, id);
+  // Back Arm
   drawLimbPath(targetCtx, 0, s * 0.3, s * 0.12, s * 0.35, armAngle2, colors.body || '#222', true, null, id);
 
   // Wizard/Pika/Mini Front Leg (Drawn behind body/robe)
   if (id === 'wizard' || id === 'pika' || id === 'mini') {
-    drawLimbPath(targetCtx, s * 0.1, s * 0.6, s * 0.15, s * 0.4, legAngle1, colors.body || '#111', false, null, id);
+    drawLimbPath(targetCtx, s * 0.15, s * 0.6, s * 0.15, s * 0.4, legAngle1, colors.body || '#111', false, null, id);
   }
 
   // Body Path Details
@@ -948,8 +949,8 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     targetCtx.fillStyle = '#facc15';
     targetCtx.beginPath();
     targetCtx.moveTo(-s * 0.1, s * 0.1);
-    targetCtx.quadraticCurveTo(-s * 0.3, s * 0.5, -s * 0.05, s * 0.7);
-    targetCtx.lineTo(s * 0.35, s * 0.7);
+    targetCtx.quadraticCurveTo(-s * 0.3, s * 0.5, -s * 0.05, s * 0.85);
+    targetCtx.lineTo(s * 0.35, s * 0.85);
     targetCtx.quadraticCurveTo(s * 0.55, s * 0.5, s * 0.4, s * 0.1);
     targetCtx.fill();
     
@@ -958,9 +959,11 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     targetCtx.beginPath(); targetCtx.moveTo(-s*0.2, s*0.35); targetCtx.lineTo(0, s*0.38); targetCtx.stroke();
     targetCtx.beginPath(); targetCtx.moveTo(-s*0.22, s*0.5); targetCtx.lineTo(-s*0.02, s*0.53); targetCtx.stroke();
 
-    // Front Arm (Drawn in front of body)
+    // Front Arm (Drawn in front of body) with outline
     targetCtx.save(); targetCtx.translate(s*0.25, s*0.4); targetCtx.rotate(armAngle1);
-    targetCtx.fillStyle = '#facc15'; targetCtx.beginPath(); targetCtx.ellipse(0, s*0.1, s*0.06, s*0.15, -Math.PI/6, 0, Math.PI*2); targetCtx.fill(); targetCtx.restore();
+    targetCtx.fillStyle = '#facc15'; targetCtx.beginPath(); targetCtx.ellipse(0, s*0.1, s*0.06, s*0.15, -Math.PI/6, 0, Math.PI*2); targetCtx.fill();
+    targetCtx.strokeStyle = '#111'; targetCtx.lineWidth = 1; targetCtx.stroke();
+    targetCtx.restore();
   } else if (id === 'mini') {
     // Mini Custom Pill Body - SCALED UP & LONGER
     // Back Arm
@@ -1301,21 +1304,21 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     // Beard handled in head path
   }
   else if (id === 'pika') {
-    // Red cheek (right side) - shifted right to align with face
+    // Red cheek (right side) - shifted further right
     targetCtx.fillStyle = '#ef4444';
-    targetCtx.beginPath(); targetCtx.arc(s*0.32, s*0.25, s*0.08, 0, Math.PI*2); targetCtx.fill();
-    // Eye (right side) - shifted right
+    targetCtx.beginPath(); targetCtx.arc(s*0.38, s*0.25, s*0.08, 0, Math.PI*2); targetCtx.fill();
+    // Eye (right side) - shifted up
     targetCtx.fillStyle = '#111';
-    targetCtx.beginPath(); targetCtx.arc(s*0.42, s*0.12, s*0.04, 0, Math.PI*2); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.arc(s*0.42, s*0.08, s*0.04, 0, Math.PI*2); targetCtx.fill();
     // White eye reflection
     targetCtx.fillStyle = '#fff';
-    targetCtx.beginPath(); targetCtx.arc(s*0.4, s*0.10, s*0.015, 0, Math.PI*2); targetCtx.fill();
-    // Nose - shifted right
+    targetCtx.beginPath(); targetCtx.arc(s*0.4, s*0.06, s*0.015, 0, Math.PI*2); targetCtx.fill();
+    // Nose - on the snout tip
     targetCtx.fillStyle = '#111';
-    targetCtx.beginPath(); targetCtx.arc(s*0.52, s*0.16, s*0.01, 0, Math.PI*2); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.arc(s*0.54, s*0.15, s*0.01, 0, Math.PI*2); targetCtx.fill();
     // Mouth - shifted right
     targetCtx.strokeStyle = '#111'; targetCtx.lineWidth = Math.max(1, s*0.015); targetCtx.lineCap = 'round';
-    targetCtx.beginPath(); targetCtx.moveTo(s*0.48, s*0.2); targetCtx.quadraticCurveTo(s*0.43, s*0.23, s*0.38, s*0.2); targetCtx.stroke();
+    targetCtx.beginPath(); targetCtx.moveTo(s*0.5, s*0.2); targetCtx.quadraticCurveTo(s*0.45, s*0.23, s*0.4, s*0.2); targetCtx.stroke();
   }
   else if (id === 'mini') {
     // Lens (Better white highlights)

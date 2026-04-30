@@ -371,6 +371,7 @@ const SHOP_DB = [
   { id: 'cyber', type: 'skin', name: 'Based', rarity: 'Rare', cost: 10, icon: 'cyber', desc: 'Friendly AI robot from the future.', colors: { body: '#f8fafc', head: '#0052ff', glow: '#111111' } },
   { id: 'dino', type: 'skin', name: 'Dino', rarity: 'Epic', cost: 10, icon: 'dino', desc: 'A prehistoric powerhouse.', colors: { body: '#65a30d', head: '#65a30d' } },
   { id: 'wizard', type: 'skin', name: 'Wizard', rarity: 'Epic', cost: 10, icon: 'wizard', desc: 'A wise sorcerer with a star-patterned robe.', colors: { body: '#1d4ed8', head: '#ffffff', hat: '#1d4ed8', stars: '#facc15' } },
+  { id: 'demon', type: 'skin', name: 'Demon', rarity: 'Epic', cost: 10, icon: 'demon', desc: 'A fiery fiend from the underworld.', colors: { body: '#ef4444', head: '#ef4444' } },
   { id: 'troop', type: 'skin', name: 'Troop', rarity: 'Legendary', cost: 10, icon: 'troop', desc: 'Shadowed face hidden beneath a red hood.', colors: { body: '#e11d48', head: '#be123c', faceShadow: '#111111' } },
   { id: 'mini', type: 'skin', name: 'Mini', rarity: 'Legendary', cost: 10, icon: 'mini', desc: 'A small, yellow, pill-shaped fellow.', colors: { body: '#facc15', head: '#facc15', overalls: '#1e3a8a', height: 75 } },
   { id: 'galaxy', type: 'skin', name: 'Titan', rarity: 'Mythic', cost: 10, icon: 'galaxy', desc: 'Inspired by a cosmic powerhouse.', colors: { body: '#1e3a8a', head: '#a855f7', gauntlet: '#eab308' } },
@@ -919,6 +920,24 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
   targetCtx.scale(1.0 + (1.0 - character.squash) * 0.5, character.squash);
   const colors = skinData.colors;
 
+  // Wizard Aura
+  if (id === 'wizard') {
+    targetCtx.save();
+    targetCtx.shadowColor = '#c084fc'; targetCtx.shadowBlur = 25;
+    targetCtx.fillStyle = 'rgba(168, 85, 247, 0.15)';
+    let wave1 = Math.sin(time * 3) * s * 0.1;
+    let wave2 = Math.cos(time * 2.5) * s * 0.15;
+    targetCtx.beginPath();
+    targetCtx.ellipse(0, s * 0.4, s * 0.45 + wave1, s * 0.55 + wave2, 0, 0, Math.PI * 2);
+    targetCtx.fill();
+    targetCtx.shadowBlur = 15;
+    targetCtx.fillStyle = 'rgba(192, 132, 252, 0.2)';
+    targetCtx.beginPath();
+    targetCtx.ellipse(0, s * 0.4, s * 0.35 + wave2, s * 0.45 + wave1, 0, 0, Math.PI * 2);
+    targetCtx.fill();
+    targetCtx.restore();
+  }
+
   // Cape Rendering (Behind body)
   if (hatId === 'cape' && loadedIcons['hat_cape']) {
     targetCtx.save();
@@ -928,8 +947,8 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     targetCtx.restore();
   }
 
-  // 2. Legs (Both drawn behind body for Pika/Mini/Wizard)
-  if (id === 'wizard' || id === 'pika' || id === 'mini') {
+  // 2. Legs (Both drawn behind body for Pika/Mini/Wizard/Demon)
+  if (id === 'wizard' || id === 'pika' || id === 'mini' || id === 'demon') {
     // Leg 1 (Back)
     drawLimbPath(targetCtx, -s * 0.1, s * 0.6, s * 0.15, s * 0.4, legAngle2, colors.body || '#222', true, null, id);
     // Leg 2 (Front)
@@ -1062,13 +1081,39 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     targetCtx.fillStyle = '#1e40af';
     targetCtx.beginPath(); 
     targetCtx.roundRect(-s*0.35, s*0.55, s*0.7, s*0.35, [0, 0, s*0.35, s*0.35]); targetCtx.fill();
-    // Strap
+    // Strap (Vertical)
     targetCtx.strokeStyle = '#1e40af'; targetCtx.lineWidth = Math.max(2, s*0.1);
-    targetCtx.beginPath(); targetCtx.moveTo(-s*0.35, s*0.55); targetCtx.lineTo(s*0.15, s*0.35); targetCtx.stroke();
+    targetCtx.beginPath(); targetCtx.moveTo(-s*0.05, s*0.55); targetCtx.lineTo(-s*0.05, s*0.28); targetCtx.stroke();
 
     // Front Arm
     targetCtx.save(); targetCtx.translate(s*0.15, s*0.45); targetCtx.rotate(armAngle1);
-    targetCtx.fillStyle = '#111'; targetCtx.beginPath(); targetCtx.roundRect(-s*0.03, 0, s*0.06, s*0.35, s*0.03); targetCtx.fill(); targetCtx.restore();
+    targetCtx.fillStyle = '#111'; targetCtx.strokeStyle = '#000'; targetCtx.lineWidth = 1;
+    targetCtx.beginPath(); targetCtx.roundRect(-s*0.03, 0, s*0.06, s*0.35, s*0.03); 
+    targetCtx.fill(); targetCtx.stroke(); targetCtx.restore();
+  } else if (id === 'demon') {
+    // Demon Body (Pill shaped, red gradient)
+    let dg = targetCtx.createLinearGradient(0, s*0.2, 0, s*0.8);
+    dg.addColorStop(0, '#ef4444'); dg.addColorStop(1, '#991b1b');
+    targetCtx.fillStyle = dg;
+    targetCtx.beginPath();
+    targetCtx.roundRect(-s*0.25, s*0.2, s*0.5, s*0.5, s*0.2);
+    targetCtx.fill();
+
+    // Devil Tail
+    targetCtx.strokeStyle = '#b91c1c'; targetCtx.lineWidth = Math.max(2, s*0.04); targetCtx.lineCap = 'round';
+    targetCtx.beginPath();
+    targetCtx.moveTo(-s*0.1, s*0.6);
+    targetCtx.quadraticCurveTo(-s*0.5, s*0.7, -s*0.6, s*0.4);
+    targetCtx.stroke();
+    // Fire on tail tip
+    targetCtx.save();
+    targetCtx.translate(-s*0.6, s*0.4);
+    let firePulse = Math.abs(Math.sin(time * 15)) * s * 0.05;
+    targetCtx.fillStyle = '#ef4444'; targetCtx.shadowColor = '#ef4444'; targetCtx.shadowBlur = 10;
+    targetCtx.beginPath(); targetCtx.moveTo(0, s*0.05); targetCtx.quadraticCurveTo(-s*0.1, 0, 0, -s*0.15 - firePulse); targetCtx.quadraticCurveTo(s*0.1, 0, 0, s*0.05); targetCtx.fill();
+    targetCtx.fillStyle = '#facc15'; targetCtx.shadowColor = '#facc15'; targetCtx.shadowBlur = 5;
+    targetCtx.beginPath(); targetCtx.moveTo(0, s*0.02); targetCtx.quadraticCurveTo(-s*0.05, 0, 0, -s*0.08 - firePulse*0.5); targetCtx.quadraticCurveTo(s*0.05, 0, 0, s*0.02); targetCtx.fill();
+    targetCtx.restore();
   } else {
     targetCtx.beginPath();
     targetCtx.moveTo(-s * 0.2, s * 0.3);
@@ -1326,6 +1371,34 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     targetCtx.fillStyle = '#94a3b8';
     targetCtx.beginPath(); targetCtx.roundRect(s*0.22, s*0.1, s*0.16, s*0.28, s*0.04); targetCtx.fill();
     targetCtx.strokeStyle = '#64748b'; targetCtx.lineWidth = 1; targetCtx.stroke();
+  } else if (id === 'demon') {
+    // Horns
+    targetCtx.fillStyle = '#1f2937';
+    targetCtx.beginPath(); targetCtx.moveTo(-s*0.15, s*0.25); targetCtx.lineTo(-s*0.25, s*0.05); targetCtx.lineTo(-s*0.05, s*0.22); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.moveTo(s*0.15, s*0.25); targetCtx.lineTo(s*0.25, s*0.05); targetCtx.lineTo(s*0.05, s*0.22); targetCtx.fill();
+
+    // Angry Eyebrows
+    targetCtx.strokeStyle = '#111'; targetCtx.lineWidth = Math.max(2, s*0.04); targetCtx.lineCap = 'round';
+    targetCtx.beginPath(); targetCtx.moveTo(s*0.05, s*0.3); targetCtx.lineTo(s*0.15, s*0.35); targetCtx.stroke();
+    
+    // Eyes (Red pupil)
+    targetCtx.fillStyle = '#fff';
+    targetCtx.beginPath(); targetCtx.arc(s*0.15, s*0.38, s*0.06, 0, Math.PI*2); targetCtx.fill();
+    targetCtx.fillStyle = '#b91c1c';
+    targetCtx.beginPath(); targetCtx.arc(s*0.15, s*0.38, s*0.03, 0, Math.PI*2); targetCtx.fill();
+
+    // Toothy Smile
+    targetCtx.fillStyle = '#111';
+    targetCtx.beginPath();
+    targetCtx.moveTo(s*0.05, s*0.45);
+    targetCtx.quadraticCurveTo(s*0.15, s*0.55, s*0.25, s*0.45);
+    targetCtx.quadraticCurveTo(s*0.15, s*0.5, s*0.05, s*0.45);
+    targetCtx.fill();
+    // Teeth (Zigzag)
+    targetCtx.strokeStyle = '#fff'; targetCtx.lineWidth = Math.max(1, s*0.02); targetCtx.lineJoin = 'miter';
+    targetCtx.beginPath();
+    targetCtx.moveTo(s*0.07, s*0.47); targetCtx.lineTo(s*0.1, s*0.5); targetCtx.lineTo(s*0.13, s*0.47); targetCtx.lineTo(s*0.16, s*0.51); targetCtx.lineTo(s*0.2, s*0.47); targetCtx.lineTo(s*0.23, s*0.49); targetCtx.stroke();
+
   } else if (id === 'wizard') {
     // Face Skin area
     targetCtx.fillStyle = '#ffedd5';
@@ -1573,7 +1646,7 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
   targetCtx.restore();
 
   // Front Arm & Leg
-  if (id !== 'wizard' && id !== 'pika' && id !== 'mini') {
+  if (id !== 'wizard' && id !== 'pika' && id !== 'mini' && id !== 'dino' && id !== 'demon') {
     drawLimbPath(targetCtx, s * 0.1, s * 0.6, s * 0.15, s * 0.4, legAngle1, colors.body || '#111', false, null, id);
   }
   

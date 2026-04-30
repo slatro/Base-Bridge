@@ -48,7 +48,7 @@ function renderDailyCheckinPanel() {
   // If streak was 0, or we reached end of week, it's day 1 of a new cycle
   let currentDayInWeek = (streak % 7) + 1;
 
-  const lastCheckinDate = localStorage.getItem('bb_v1_last_checkin_date');
+  const lastCheckinDate = localStorage.getItem('bb_v2_last_checkin_date');
   const today = new Date().toLocaleDateString();
   
   // If we already claimed today, currentDayInWeek is actually the one we just finished
@@ -81,11 +81,11 @@ function renderDailyCheckinPanel() {
   const claimBtn = document.getElementById('btn-claim-daily');
   if (claimBtn) {
     if (lastCheckinDate === today) {
-      claimBtn.innerText = "CLAIMED";
+      claimBtn.innerHTML = "CHECKED IN <span style='color:#00ff88;'>✓</span>";
       claimBtn.disabled = true;
       claimBtn.classList.replace('btn-green', 'btn-gray');
     } else {
-      claimBtn.innerText = "CLAIM";
+      claimBtn.innerText = "CHECK IN";
       claimBtn.disabled = false;
       claimBtn.classList.replace('btn-gray', 'btn-green');
       claimBtn.onclick = () => doDailyCheckin();
@@ -109,7 +109,7 @@ async function doDailyCheckin() {
     localStorage.setItem('bb_v1_total_checkins', total);
 
     const today = new Date().toLocaleDateString();
-    localStorage.setItem('bb_v1_last_checkin_date', today);
+    localStorage.setItem('bb_v2_last_checkin_date', today);
 
     // Award BB (base 50 + 25 per day in week)
     const currentDayInWeek = ((streak - 1) % 7) + 1;
@@ -120,9 +120,9 @@ async function doDailyCheckin() {
     uiCoinsEl.innerText = coins;
 
     renderDailyCheckinPanel();
-    if (typeof window.showInfoModal === 'function') window.showInfoModal("Check-in Successful!", `You claimed ${reward} BB Tokens on-chain!`);
+    if (typeof window.showInfoModal === 'function') window.showInfoModal("Check-in Successful!", `You checked in and earned ${reward} BB Tokens!`);
   } else {
-    claimBtn.innerText = "CLAIM";
+    claimBtn.innerText = "CHECK IN";
     claimBtn.disabled = false;
   }
 }

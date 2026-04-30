@@ -912,6 +912,7 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
 
   // Translate up so feet touch 0, apply squash
   const id = skinData.id;
+  let yOffset = -s;
   // Removed manual yOffsets so Pika and Mini match Titan's vertical alignment
   targetCtx.translate(0, yOffset + bounceY);
   targetCtx.scale(1.0 + (1.0 - character.squash) * 0.5, character.squash);

@@ -40,54 +40,74 @@ document.getElementById('fc-daily')?.addEventListener('click', () => {
 });
 
 function renderDailyCheckinPanel() {
-  const row = document.getElementById('daily-checkin-row');
-  if (!row) return;
+  const cardsContainer = document.getElementById('neon-cards-container');
+  const nodesContainer = document.getElementById('neon-timeline-nodes');
+  const openBtn = document.getElementById('btn-open-daily-modal');
+  const claimBtn = document.getElementById('btn-claim-daily');
+  
+  if (!cardsContainer || !nodesContainer) return;
 
   let streak = parseInt(localStorage.getItem('bb_v1_checkin_streak') || '0');
-  
-  // If streak was 0, or we reached end of week, it's day 1 of a new cycle
   let currentDayInWeek = (streak % 7) + 1;
 
   const lastCheckinDate = localStorage.getItem('bb_v2_last_checkin_date');
   const today = new Date().toLocaleDateString();
   
-  // If we already claimed today, currentDayInWeek is actually the one we just finished
   if (lastCheckinDate === today) {
     currentDayInWeek = ((streak - 1) % 7) + 1;
   }
 
-  row.innerHTML = '';
-  
+  // Custom SVG icons matching the reference image
+  const icons = [
+    `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="30" fill="#facc15" stroke="#ca8a04" stroke-width="4"/><text x="50" y="60" font-size="30" fill="#ca8a04" text-anchor="middle" font-family="sans-serif" font-weight="bold">$</text></svg>`, // Day 1: Coin
+    `<svg viewBox="0 0 100 100"><polygon points="30,70 50,30 70,70" fill="#00e5ff"/><polygon points="20,50 35,20 50,50" fill="#00e5ff" opacity="0.8"/><polygon points="50,50 65,20 80,50" fill="#00e5ff" opacity="0.8"/></svg>`, // Day 2: Gems
+    `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="30" fill="#e2e8f0" stroke="#94a3b8" stroke-width="4"/><text x="50" y="60" font-size="30" fill="#94a3b8" text-anchor="middle" font-family="sans-serif" font-weight="bold">$</text></svg>`, // Day 3: Silver
+    `<svg viewBox="0 0 100 100"><polygon points="50,20 80,40 80,70 50,90 20,70 20,40" fill="#ff0055" stroke="#ff80ab" stroke-width="3"/><polygon points="50,50 80,40 50,20 20,40" fill="#ff80ab" opacity="0.8"/><polygon points="50,50 80,40 80,70 50,90" fill="#c5003e" opacity="0.6"/></svg>`, // Day 4: Pink Cube
+    `<svg viewBox="0 0 100 100"><rect x="20" y="30" width="60" height="50" fill="#ca8a04" stroke="#854d0e" stroke-width="3"/><text x="50" y="65" font-size="35" fill="#fff" text-anchor="middle" font-family="sans-serif" font-weight="bold">?</text></svg>`, // Day 5: Mystery Box
+    `<svg viewBox="0 0 100 100"><circle cx="40" cy="40" r="25" fill="#facc15" stroke="#ca8a04" stroke-width="3"/><text x="40" y="50" font-size="25" fill="#ca8a04" text-anchor="middle" font-family="sans-serif" font-weight="bold">$</text><circle cx="65" cy="65" r="20" fill="#e2e8f0" stroke="#94a3b8" stroke-width="3"/><text x="65" y="72" font-size="20" fill="#94a3b8" text-anchor="middle" font-family="sans-serif" font-weight="bold">$</text></svg>`, // Day 6: Multiple Coins
+    `<svg viewBox="0 0 100 100"><rect x="25" y="40" width="50" height="50" fill="#ef4444"/><rect x="45" y="40" width="10" height="50" fill="#facc15"/><rect x="20" y="30" width="60" height="15" fill="#ef4444"/><path d="M 50 30 C 30 10 20 30 45 30 M 50 30 C 70 10 80 30 55 30" fill="none" stroke="#facc15" stroke-width="4"/></svg>` // Day 7: Gift Box
+  ];
+
+  cardsContainer.innerHTML = '';
+  nodesContainer.innerHTML = '';
+
   for (let i = 1; i <= 7; i++) {
-    const dayCard = document.createElement('div');
-    dayCard.className = 'checkin-day-card';
-    
-    const reward = 50 + ((i - 1) * 25);
-    dayCard.innerHTML = `<span class="day-title">Day ${i}</span><span class="reward-amt">${reward}</span>`;
+    const isClaimed = i < currentDayInWeek || (i === currentDayInWeek && lastCheckinDate === today);
+    const isActive = i === currentDayInWeek && lastCheckinDate !== today;
 
-    if (i < currentDayInWeek) {
-      dayCard.classList.add('claimed');
-    } else if (i === currentDayInWeek) {
-      if (lastCheckinDate === today) {
-        dayCard.classList.add('claimed');
-      } else {
-        dayCard.classList.add('current');
-      }
-    }
+    // Card
+    const card = document.createElement('div');
+    card.className = `neon-card ${isActive ? 'active' : ''} ${isClaimed ? 'claimed' : ''}`;
+    card.innerHTML = `<div class="neon-card-icon">${icons[i-1]}</div>`;
+    cardsContainer.appendChild(card);
 
-    row.appendChild(dayCard);
+    // Timeline Node
+    const node = document.createElement('div');
+    node.className = `neon-node ${isActive ? 'active' : ''}`;
+    node.innerHTML = `<div class="neon-node-label">DAY ${i}</div>`;
+    nodesContainer.appendChild(node);
   }
 
-  const claimBtn = document.getElementById('btn-claim-daily');
-  if (claimBtn) {
-    if (lastCheckinDate === today) {
-      claimBtn.innerHTML = "CHECKED IN <span style='color:#00ff88;'>✓</span>";
+  // Update Buttons
+  if (lastCheckinDate === today) {
+    if (openBtn) {
+      openBtn.innerHTML = "CHECKED IN <span style='color:#00ff88;'>✓</span>";
+      openBtn.disabled = true;
+      openBtn.classList.replace('btn-green', 'btn-gray');
+    }
+    if (claimBtn) {
+      claimBtn.innerText = "CLAIMED ✓";
       claimBtn.disabled = true;
-      claimBtn.classList.replace('btn-green', 'btn-gray');
-    } else {
-      claimBtn.innerText = "CHECK IN";
+    }
+  } else {
+    if (openBtn) {
+      openBtn.innerText = "CHECK IN";
+      openBtn.disabled = false;
+      openBtn.classList.replace('btn-gray', 'btn-green');
+    }
+    if (claimBtn) {
+      claimBtn.innerText = "CHECK IN TODAY";
       claimBtn.disabled = false;
-      claimBtn.classList.replace('btn-gray', 'btn-green');
       claimBtn.onclick = () => doDailyCheckin();
     }
   }
@@ -1210,7 +1230,7 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
   }
 
   // Draw Equipment
-  if (hatId === 'cap' && loadedIcons['hat_cap']) targetCtx.drawImage(loadedIcons['hat_cap'], -s * 0.4, -s * 0.3, s * 0.8, s * 0.5);
+  if (hatId === 'cap' && loadedIcons['hat_cap']) targetCtx.drawImage(loadedIcons['hat_cap'], -s * 0.4, -s * 0.38, s * 0.8, s * 0.5);
   if (hatId === 'halo' && loadedIcons['hat_halo']) targetCtx.drawImage(loadedIcons['hat_halo'], -s * 0.5, -s * 0.4, s * 1.0, s * 0.4);
 
   if (faceId === 'glasses' && loadedIcons['face_glasses']) targetCtx.drawImage(loadedIcons['face_glasses'], -s * 0.15, s * 0.1, s * 0.6, s * 0.25);

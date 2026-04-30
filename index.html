@@ -183,14 +183,11 @@
       </div>
 
       <!-- Daily Check-in Panel -->
-      <div class="panel-card glass-panel daily-checkin-panel">
-        <h3 class="panel-title">DAILY REWARD</h3>
+      <div class="panel-card glass-panel daily-checkin-panel" id="daily-checkin-section">
+        <h3 class="panel-title">DAILY CHECK-IN</h3>
         <p class="panel-subtitle">Come back every day to get better rewards!</p>
-        <div class="daily-checkin-row" id="daily-checkin-row" style="display: flex; gap: 8px; margin: 15px 0; overflow-x: auto; padding-bottom: 5px;">
-          <!-- 7 Days Injected Here -->
-        </div>
-        <div class="dr-btn-wrapper">
-          <button class="btn btn-aaa btn-green" id="btn-claim-daily">CLAIM</button>
+        <div class="dr-btn-wrapper" style="margin-top: 15px;">
+          <button class="btn btn-aaa btn-green" id="btn-open-daily-modal" onclick="document.getElementById('modal-daily-calendar').classList.remove('hidden')">CHECK IN</button>
         </div>
       </div>
 
@@ -276,7 +273,7 @@
     <div id="modal-equip-shop" class="modal-card modal-large hidden">
       <h2>SHOP</h2>
       <div class="ach-tabs">
-        <button class="equip-tab active" data-tab="hat">HATS</button>
+        <button class="equip-tab active" data-tab="hat">WEAR</button>
         <button class="equip-tab" data-tab="weapon">WEAPONS</button>
       </div>
       <div class="modal-close" onclick="closeModals()"></div>
@@ -308,25 +305,27 @@
       document.querySelectorAll('.modal-card, .modal-backdrop').forEach(el => el.classList.add('hidden'));
     };
   </script>
-    <!-- Daily Check-in Modal -->
+    <!-- Neon Daily Check-in Modal -->
     <div id="modal-daily-calendar" class="modal-backdrop hidden">
-      <div class="modal-content glass-modal" style="max-width: 450px;">
-        <div class="modal-header">
-          <h2 id="calendar-month-title">DAILY CHECK-IN</h2>
-          <button class="modal-close" onclick="document.getElementById('modal-daily-calendar').classList.add('hidden')" style="background: #ef4444; color: #fff; border: none; width: 30px; height: 30px; border-radius: 8px; font-weight: 900; cursor: pointer;">&times;</button>
+      <div class="neon-modal">
+        <div class="neon-modal-header">
+          <div class="neon-title-box">DAILY REWARD</div>
+          <button class="neon-close" onclick="document.getElementById('modal-daily-calendar').classList.add('hidden')">&times;</button>
         </div>
-        <div class="calendar-container">
-          <div class="calendar-header-info" style="display:flex; justify-content:space-between; margin-bottom:15px; font-weight:800; color:#fff;">
-            <span id="calendar-streak">STREAK: 0 DAYS</span>
-            <span id="calendar-total">TOTAL: 0</span>
+        
+        <div class="neon-cards-container" id="neon-cards-container">
+          <!-- 7 Cards Injected Here via JS -->
+        </div>
+        
+        <div class="neon-timeline-container" id="neon-timeline-container">
+          <div class="neon-timeline-line"></div>
+          <div class="neon-timeline-nodes" id="neon-timeline-nodes">
+            <!-- 7 Nodes Injected Here via JS -->
           </div>
-          <div class="calendar-grid" id="calendar-grid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin-bottom: 20px;">
-            <!-- Days injected here -->
-          </div>
-          <div class="calendar-footer" style="text-align: center; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
-            <p style="font-size: 0.75rem; color: #a1a1aa; margin-bottom: 12px;">Confirm your daily check-in on-chain.</p>
-            <button class="btn btn-aaa btn-blue" id="btn-do-checkin">CHECK-IN TODAY</button>
-          </div>
+        </div>
+
+        <div class="neon-modal-footer" style="margin-top: 25px; text-align: center;">
+          <button class="btn neon-claim-btn" id="btn-claim-daily">CHECK IN TODAY</button>
         </div>
       </div>
     </div>

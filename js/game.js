@@ -173,7 +173,7 @@ const SHOP_DB = [
   { id: 'cyber', type: 'skin', name: 'Cyber', rarity: 'Rare', cost: 350, icon: 'cyber', desc: 'Neon glow lines pulsing with digital energy.', colors: { body: '#0f172a', head: '#0f172a', glow: '#00e5ff' } },
   { id: 'gold', type: 'skin', name: 'Gold', rarity: 'Epic', cost: 450, icon: 'gold', desc: 'Solid metallic gradient.', colors: { body: '#eab308', head: '#facc15', shine: '#fef08a' } },
   { id: 'hoodie', type: 'skin', name: 'Hoodie', rarity: 'Legendary', cost: 550, icon: 'hoodie', desc: 'Shadowed face hidden beneath a red hoodie.', colors: { body: '#e11d48', head: '#be123c', faceShadow: '#111111' } },
-  { id: 'galaxy', type: 'skin', name: 'Galaxy', rarity: 'Mythic', cost: 750, icon: 'galaxy', desc: 'Contains the cosmos.', colors: { body: '#111111', head: '#000000', grad1: '#b517ff', grad2: '#00e5ff' } },
+  { id: 'galaxy', type: 'skin', name: 'Cosmic Titan', rarity: 'Mythic', cost: 750, icon: 'galaxy', desc: 'Thanos-inspired cosmic power.', colors: { body: '#1e3a8a', head: '#a855f7', gauntlet: '#eab308' } },
   // HATS
   { id: 'cap', type: 'hat', name: 'Baseball Cap', rarity: 'Common', cost: 50, iconId: 'hat_cap', desc: 'Keep the sun out.' },
   { id: 'cape', type: 'hat', name: 'Hero Cape', rarity: 'Epic', cost: 250, iconId: 'hat_cape', desc: 'Flows in the wind.' },
@@ -719,10 +719,9 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     targetCtx.fillStyle = g;
     targetCtx.shadowColor = '#eab308'; targetCtx.shadowBlur = 15;
   } else if (id === 'galaxy') {
-    let g = targetCtx.createRadialGradient(0,s*0.4,0, 0,s*0.4,s*0.5); 
-    g.addColorStop(0, '#b517ff'); g.addColorStop(0.5, '#6b21a8'); g.addColorStop(1, '#00e5ff');
-    targetCtx.fillStyle = g;
-    targetCtx.shadowColor = '#00e5ff'; targetCtx.shadowBlur = 15;
+    // Thanos Purple Skin for Body / Base
+    targetCtx.fillStyle = '#a855f7'; 
+    targetCtx.shadowColor = '#a855f7'; targetCtx.shadowBlur = 5;
   } else if (id === 'hoodie') {
     targetCtx.fillStyle = '#e11d48';
   } else if (id === 'cyber') {
@@ -771,14 +770,16 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
   targetCtx.shadowBlur = 0;
 
   if (id === 'galaxy') {
-    targetCtx.fillStyle = '#fff';
-    for(let i=0; i<8; i++) {
-      targetCtx.beginPath(); 
-      targetCtx.arc((Math.random()-0.5)*s*0.3, s*0.3 + Math.random()*s*0.4, Math.random()*s*0.03, 0, Math.PI*2); 
-      targetCtx.fill();
-    }
-    targetCtx.strokeStyle = 'rgba(255,255,255,0.4)'; targetCtx.lineWidth=1;
-    targetCtx.beginPath(); targetCtx.arc(0, s*0.5, s*0.15, 0, Math.PI*2); targetCtx.stroke();
+    // Blue Suit with Gold Trim
+    targetCtx.fillStyle = '#1e3a8a';
+    targetCtx.beginPath();
+    targetCtx.moveTo(-s*0.2, s*0.35); targetCtx.lineTo(s*0.2, s*0.35);
+    targetCtx.lineTo(s*0.15, s*0.65); targetCtx.lineTo(-s*0.15, s*0.65);
+    targetCtx.closePath(); targetCtx.fill();
+    // Gold Shoulder Armor
+    targetCtx.fillStyle = '#eab308';
+    targetCtx.fillRect(-s*0.25, s*0.28, s*0.15, s*0.1);
+    targetCtx.fillRect(s*0.1, s*0.28, s*0.15, s*0.1);
   }
 
   if (id === 'cyber') {
@@ -809,7 +810,7 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     targetCtx.beginPath(); targetCtx.arc(s*0.1, s*0.3, s*0.2, 0, Math.PI*2); targetCtx.fill();
   } else {
     targetCtx.fillStyle = colors.head || '#111';
-    if(id==='galaxy') targetCtx.fillStyle = '#000';
+    if(id==='galaxy') targetCtx.fillStyle = '#a855f7';
     targetCtx.beginPath(); targetCtx.arc(0, s*0.2, s*0.3, 0, Math.PI*2); targetCtx.fill();
   }
 
@@ -847,6 +848,20 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     targetCtx.fillStyle = '#fff';
     targetCtx.beginPath(); targetCtx.arc(s*0.15, s*0.2, s*0.04, 0, Math.PI*2); targetCtx.fill();
   } 
+  else if (id === 'galaxy') {
+    // Thanos Chin Ridges
+    targetCtx.strokeStyle = 'rgba(0,0,0,0.3)';
+    targetCtx.lineWidth = 1.5;
+    for(let i=0; i<3; i++) {
+      targetCtx.beginPath();
+      targetCtx.moveTo(-s*0.1 + i*s*0.1, s*0.35);
+      targetCtx.lineTo(-s*0.1 + i*s*0.1, s*0.45);
+      targetCtx.stroke();
+    }
+    // Serious Eyes
+    targetCtx.fillStyle = '#111';
+    targetCtx.beginPath(); targetCtx.arc(s*0.15, s*0.2, s*0.05, 0, Math.PI*2); targetCtx.fill();
+  }
   else if (id === 'hoodie') {
     // No eyes for hoodie, just shadow
   }
@@ -874,6 +889,29 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
   // Front Arm & Leg (Use colors.body strictly)
   drawLimbPath(targetCtx, s*0.1, s*0.6, s*0.15, s*0.4, legAngle1, colors.body || '#111', false);
   drawLimbPath(targetCtx, 0, s*0.3, s*0.12, s*0.35, armAngle1, colors.body || '#111', false, wpnId);
+
+  // Infinity Gauntlet for Galaxy Skin
+  if (id === 'galaxy') {
+    targetCtx.save();
+    targetCtx.translate(0, s*0.3);
+    targetCtx.rotate(armAngle1);
+    // Gold Gauntlet Base
+    targetCtx.fillStyle = '#eab308';
+    targetCtx.shadowColor = '#eab308'; targetCtx.shadowBlur = 5;
+    targetCtx.beginPath();
+    targetCtx.roundRect(-s*0.08, s*0.25, s*0.16, s*0.15, s*0.04);
+    targetCtx.fill();
+    // Colored Gems
+    const gems = ['#ef4444','#22c55e','#3b82f6','#f59e0b','#a855f7','#06b6d4'];
+    gems.forEach((gc, i) => {
+      targetCtx.fillStyle = gc;
+      targetCtx.shadowBlur = 2;
+      targetCtx.beginPath();
+      targetCtx.arc(-s*0.04 + (i%3)*s*0.04, s*0.28 + Math.floor(i/3)*s*0.05, s*0.015, 0, Math.PI*2);
+      targetCtx.fill();
+    });
+    targetCtx.restore();
+  }
 
   targetCtx.restore();
 }

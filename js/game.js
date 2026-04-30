@@ -162,12 +162,12 @@ let equippedFace = null;
 
 const SHOP_DB = [
   // SKINS
-  { id: 'classic', type: 'skin', name: 'Classic', rarity: 'Common', cost: 0, icon: 'classic', desc: 'A simple but polished stick hero.', colors: { body: '#222', head: '#222' } },
+  { id: 'classic', type: 'skin', name: 'Classic', rarity: 'Common', cost: 0, icon: 'classic', desc: 'A simple but polished stick hero.', colors: { body: '#111111', head: '#111111' } },
   { id: 'ninja', type: 'skin', name: 'Ninja', rarity: 'Uncommon', cost: 250, icon: 'ninja', desc: 'Stealthy assassin with a red headband.', colors: { body: '#1a1a1a', head: '#1a1a1a', face: '#eebb99', band: '#ef4444' } },
   { id: 'cyber', type: 'skin', name: 'Cyber', rarity: 'Rare', cost: 350, icon: 'cyber', desc: 'Neon glow lines pulsing with digital energy.', colors: { body: '#0f172a', head: '#0f172a', glow: '#00e5ff' } },
   { id: 'gold', type: 'skin', name: 'Gold', rarity: 'Epic', cost: 450, icon: 'gold', desc: 'Solid metallic gradient.', colors: { body: '#eab308', head: '#facc15', shine: '#fef08a' } },
-  { id: 'hoodie', type: 'skin', name: 'Hoodie', rarity: 'Legendary', cost: 550, icon: 'hoodie', desc: 'Shadowed face hidden beneath a red hoodie.', colors: { body: '#e11d48', head: '#be123c', faceShadow: '#111' } },
-  { id: 'galaxy', type: 'skin', name: 'Galaxy', rarity: 'Mythic', cost: 750, icon: 'galaxy', desc: 'Contains the cosmos.', colors: { grad1: '#b517ff', grad2: '#00e5ff' } },
+  { id: 'hoodie', type: 'skin', name: 'Hoodie', rarity: 'Legendary', cost: 550, icon: 'hoodie', desc: 'Shadowed face hidden beneath a red hoodie.', colors: { body: '#e11d48', head: '#be123c', faceShadow: '#111111' } },
+  { id: 'galaxy', type: 'skin', name: 'Galaxy', rarity: 'Mythic', cost: 750, icon: 'galaxy', desc: 'Contains the cosmos.', colors: { body: '#111111', head: '#000000', grad1: '#b517ff', grad2: '#00e5ff' } },
   // HATS
   { id: 'cap', type: 'hat', name: 'Baseball Cap', rarity: 'Common', cost: 50, iconId: 'hat_cap', desc: 'Keep the sun out.' },
   { id: 'crown', type: 'hat', name: 'King Crown', rarity: 'Epic', cost: 250, iconId: 'hat_crown', desc: 'Rule the bridge.' },
@@ -820,15 +820,21 @@ function drawLimbPath(targetCtx, x, y, w, h, angle, color, isBack, wpnId) {
 }
 
 function shadeColor(color, percent) {
-  let R = parseInt(color.substring(1,3),16);
-  let G = parseInt(color.substring(3,5),16);
-  let B = parseInt(color.substring(5,7),16);
-  R = parseInt(R * (100 + percent) / 100); G = parseInt(G * (100 + percent) / 100); B = parseInt(B * (100 + percent) / 100);
-  R = (R<255)?R:255; G = (G<255)?G:255; B = (B<255)?B:255;
-  let RR = ((R.toString(16).length==1)?"0"+R.toString(16):R.toString(16));
-  let GG = ((G.toString(16).length==1)?"0"+G.toString(16):G.toString(16));
-  let BB = ((B.toString(16).length==1)?"0"+B.toString(16):B.toString(16));
-  return "#"+RR+GG+BB;
+  let f = parseInt(color.slice(1), 16),
+      t = percent < 0 ? 0 : 255,
+      p = percent < 0 ? percent * -1 : percent,
+      R = f >> 16,
+      G = f >> 8 & 0x00FF,
+      B = f & 0x0000FF;
+  
+  // Handle 3-digit hex (e.g. #111)
+  if (color.length === 4) {
+    R = parseInt(color[1] + color[1], 16);
+    G = parseInt(color[2] + color[2], 16);
+    B = parseInt(color[3] + color[3], 16);
+  }
+
+  return "#" + (0x1000000 + (Math.round((t - R) * (p / 100)) + R) * 0x10000 + (Math.round((t - G) * (p / 100)) + G) * 0x100 + (Math.round((t - B) * (p / 100)) + B)).toString(16).slice(1);
 }
 
 function setupInitialState() {

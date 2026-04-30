@@ -1164,7 +1164,7 @@ function renderSkeleton(targetCtx, skinId, hatId, capeId, wpnId, faceId, s, stat
     targetCtx.beginPath(); targetCtx.moveTo(-s*0.1, s*0.55); targetCtx.lineTo(s*0.1, s*0.55); targetCtx.stroke();
 
     // Devil Tail
-    let tailAngle = Math.sin(time * 5) * 0.2;
+    let tailAngle = 0; // Fixed tail
     targetCtx.save();
     targetCtx.translate(-s*0.1, s*0.7);
     targetCtx.rotate(tailAngle);
@@ -1178,23 +1178,25 @@ function renderSkeleton(targetCtx, skinId, hatId, capeId, wpnId, faceId, s, stat
     
     // Tail Flame (Animated)
     targetCtx.translate(-s*0.6, -s*0.3);
-    let flameScale = 1.0 + Math.sin(time * 20) * 0.2; // Flickering
+    let flameScale = 1.0 + Math.sin(time * 20) * 0.15; // Flickering
     targetCtx.scale(flameScale, flameScale);
     
     // Outer Flame (Red)
     targetCtx.fillStyle = '#ff3300'; 
     targetCtx.beginPath(); 
-    targetCtx.moveTo(0, s*0.05); 
-    targetCtx.quadraticCurveTo(-s*0.1, -s*0.1, 0, -s*0.25); 
-    targetCtx.quadraticCurveTo(s*0.1, -s*0.1, 0, s*0.05); 
+    targetCtx.moveTo(0, -s*0.25); 
+    targetCtx.quadraticCurveTo(-s*0.15, -s*0.1, -s*0.1, s*0.05); 
+    targetCtx.quadraticCurveTo(0, s*0.15, s*0.1, s*0.05); 
+    targetCtx.quadraticCurveTo(s*0.15, -s*0.1, 0, -s*0.25); 
     targetCtx.fill();
     
     // Inner Flame (Yellow)
     targetCtx.fillStyle = '#facc15'; 
     targetCtx.beginPath(); 
-    targetCtx.moveTo(0, s*0.02); 
-    targetCtx.quadraticCurveTo(-s*0.05, -s*0.05, 0, -s*0.12); 
-    targetCtx.quadraticCurveTo(s*0.05, -s*0.05, 0, s*0.02); 
+    targetCtx.moveTo(0, -s*0.12); 
+    targetCtx.quadraticCurveTo(-s*0.08, -s*0.03, -s*0.05, s*0.03); 
+    targetCtx.quadraticCurveTo(0, s*0.08, s*0.05, s*0.03); 
+    targetCtx.quadraticCurveTo(s*0.08, -s*0.03, 0, -s*0.12); 
     targetCtx.fill();
 
     targetCtx.restore();
@@ -1481,7 +1483,7 @@ function renderSkeleton(targetCtx, skinId, hatId, capeId, wpnId, faceId, s, stat
     targetCtx.strokeStyle = '#64748b'; targetCtx.lineWidth = 1; targetCtx.stroke();
   } else if (id === 'demon') {
     targetCtx.save();
-    targetCtx.translate(-s*0.05, -s*0.15); // shifted up higher and left
+    targetCtx.translate(0, -s*0.18); // shifted up higher and right
 
     let hg = targetCtx.createLinearGradient(0, -s*0.1, 0, s*0.4);
     hg.addColorStop(0, '#ff3300'); hg.addColorStop(1, '#990000');
@@ -1504,24 +1506,24 @@ function renderSkeleton(targetCtx, skinId, hatId, capeId, wpnId, faceId, s, stat
     // Angry Blank White Eye (Facing Right)
     targetCtx.fillStyle = '#ffffff';
     targetCtx.beginPath();
-    targetCtx.moveTo(s*0.05, s*0.2); 
-    targetCtx.lineTo(s*0.25, s*0.15); 
-    targetCtx.lineTo(s*0.25, s*0.22); 
-    targetCtx.lineTo(s*0.15, s*0.25); 
+    targetCtx.moveTo(s*0.02, s*0.2); 
+    targetCtx.lineTo(s*0.18, s*0.16); 
+    targetCtx.lineTo(s*0.18, s*0.21); 
+    targetCtx.lineTo(s*0.10, s*0.23); 
     targetCtx.fill();
 
     // Fang Mouth (Facing Right)
     targetCtx.fillStyle = '#111';
     targetCtx.beginPath(); 
-    targetCtx.moveTo(0, s*0.35); 
-    targetCtx.quadraticCurveTo(s*0.15, s*0.45, s*0.25, s*0.35); 
-    targetCtx.quadraticCurveTo(s*0.15, s*0.4, 0, s*0.35); 
+    targetCtx.moveTo(-s*0.05, s*0.30); 
+    targetCtx.quadraticCurveTo(s*0.05, s*0.40, s*0.18, s*0.30); 
+    targetCtx.quadraticCurveTo(s*0.05, s*0.35, -s*0.05, s*0.30); 
     targetCtx.fill();
     
     // Fangs
     targetCtx.fillStyle = '#fff';
-    targetCtx.beginPath(); targetCtx.moveTo(s*0.05, s*0.37); targetCtx.lineTo(s*0.08, s*0.42); targetCtx.lineTo(s*0.1, s*0.38); targetCtx.fill();
-    targetCtx.beginPath(); targetCtx.moveTo(s*0.15, s*0.37); targetCtx.lineTo(s*0.18, s*0.42); targetCtx.lineTo(s*0.2, s*0.38); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.moveTo(0, s*0.32); targetCtx.lineTo(s*0.03, s*0.37); targetCtx.lineTo(s*0.05, s*0.33); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.moveTo(s*0.10, s*0.32); targetCtx.lineTo(s*0.13, s*0.37); targetCtx.lineTo(s*0.15, s*0.33); targetCtx.fill();
     targetCtx.restore();
 
   } else if (id === 'wizard') {

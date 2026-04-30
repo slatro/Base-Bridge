@@ -1174,6 +1174,40 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
   }
 
   if (id === 'cyber') {
+    // Cyber Rocket Jetpack (Drawn before body)
+    targetCtx.fillStyle = '#94a3b8'; // grey metal
+    targetCtx.strokeStyle = '#334155'; // dark metal edge
+    targetCtx.lineWidth = Math.max(1, s * 0.02);
+    targetCtx.beginPath();
+    if (targetCtx.roundRect) {
+      targetCtx.roundRect(-s * 0.35, s * 0.35, s * 0.2, s * 0.3, s * 0.05);
+    } else {
+      targetCtx.rect(-s * 0.35, s * 0.35, s * 0.2, s * 0.3);
+    }
+    targetCtx.fill(); targetCtx.stroke();
+    // Inner panel
+    targetCtx.fillStyle = '#475569';
+    targetCtx.fillRect(-s * 0.3, s * 0.4, s * 0.1, s * 0.2);
+
+    // Animated Rocket Thrust
+    let thrustLength = s * 0.2 + Math.abs(Math.sin(time * 20)) * (s * 0.15);
+    targetCtx.fillStyle = '#00e5ff'; // neon blue thrust
+    targetCtx.shadowColor = '#00e5ff';
+    targetCtx.shadowBlur = 10;
+    targetCtx.beginPath();
+    targetCtx.moveTo(-s * 0.32, s * 0.65);
+    targetCtx.lineTo(-s * 0.18, s * 0.65);
+    targetCtx.lineTo(-s * 0.25, s * 0.65 + thrustLength);
+    targetCtx.fill();
+    // Hot white core
+    targetCtx.fillStyle = '#ffffff';
+    targetCtx.beginPath();
+    targetCtx.moveTo(-s * 0.28, s * 0.65);
+    targetCtx.lineTo(-s * 0.22, s * 0.65);
+    targetCtx.lineTo(-s * 0.25, s * 0.65 + thrustLength * 0.6);
+    targetCtx.fill();
+    targetCtx.shadowBlur = 0;
+
     // Astro Bot Body
     let g = targetCtx.createLinearGradient(-s * 0.2, s * 0.3, s * 0.2, s * 0.7);
     g.addColorStop(0, '#ffffff'); g.addColorStop(1, '#cbd5e1');
@@ -1184,16 +1218,6 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     } else {
       targetCtx.rect(-s * 0.2, s * 0.3, s * 0.4, s * 0.45);
     }
-    targetCtx.fill();
-
-    // Blue Chest Plate removed per request
-    
-    // Tiny blue cape
-    targetCtx.fillStyle = '#0078ff';
-    targetCtx.beginPath();
-    targetCtx.moveTo(-s * 0.1, s * 0.35);
-    targetCtx.lineTo(-s * 0.3, s * 0.5);
-    targetCtx.lineTo(-s * 0.2, s * 0.6);
     targetCtx.fill();
   }
 
@@ -1499,7 +1523,7 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
   }
 
   // Draw Equipment
-  if (hatId === 'cap' && loadedIcons['hat_cap']) targetCtx.drawImage(loadedIcons['hat_cap'], -s * 0.4, -s * 0.38, s * 0.8, s * 0.5);
+  if (hatId === 'cap' && loadedIcons['hat_cap']) targetCtx.drawImage(loadedIcons['hat_cap'], -s * 0.25, -s * 0.42, s * 0.7, s * 0.45);
   if (hatId === 'halo' && loadedIcons['hat_halo']) targetCtx.drawImage(loadedIcons['hat_halo'], -s * 0.5, -s * 0.4, s * 1.0, s * 0.4);
 
   if (faceId === 'glasses' && loadedIcons['face_glasses']) targetCtx.drawImage(loadedIcons['face_glasses'], -s * 0.15, s * 0.1, s * 0.6, s * 0.25);

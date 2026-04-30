@@ -952,7 +952,11 @@ function renderSkeleton(targetCtx, skinId, hatId, capeId, wpnId, faceId, s, stat
       targetCtx.translate(-s * 0.1, s * 0.3);
       targetCtx.rotate(state === 'WALK' ? Math.sin(time * 15) * 0.2 : Math.sin(time * 3) * 0.05);
       targetCtx.drawImage(loadedIcons['hat_cape'], -s * 0.2, 0, s * 0.5, s * 0.6);
-      targetCtx.restore();  // Demon Wings (Behind body and limbs)
+      targetCtx.restore();
+    }
+  }
+
+  // Demon Wings (Behind body and limbs)
   if (id === 'demon') {
     let flap = Math.sin(time * (state === 'WALK' ? 15 : 5)) * 0.1; // Gentle flap
     
@@ -990,7 +994,6 @@ function renderSkeleton(targetCtx, skinId, hatId, capeId, wpnId, faceId, s, stat
     // Internal wing bone
     targetCtx.beginPath(); targetCtx.moveTo(0,0); targetCtx.quadraticCurveTo(-s*0.5, -s*0.4, -s*1.0, s*0.3); targetCtx.stroke();
     targetCtx.restore();
-  }store();
   }
 
   // 2. Legs (Both drawn behind body for Pika/Mini/Wizard/Demon)

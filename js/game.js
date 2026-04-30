@@ -964,11 +964,7 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     targetCtx.beginPath(); targetCtx.moveTo(-s*0.35, s*0.35); targetCtx.lineTo(-s*0.15, s*0.38); targetCtx.stroke();
     targetCtx.beginPath(); targetCtx.moveTo(-s*0.37, s*0.5); targetCtx.lineTo(-s*0.17, s*0.53); targetCtx.stroke();
 
-    // Front Arm (Drawn in front of body) with outline (shifted left)
-    targetCtx.save(); targetCtx.translate(s*0.1, s*0.4); targetCtx.rotate(armAngle1);
-    targetCtx.fillStyle = '#facc15'; targetCtx.beginPath(); targetCtx.ellipse(0, s*0.1, s*0.06, s*0.15, -Math.PI/6, 0, Math.PI*2); targetCtx.fill();
-    targetCtx.strokeStyle = '#111'; targetCtx.lineWidth = 1; targetCtx.stroke();
-    targetCtx.restore();
+
   } else if (id === 'mini') {
     // Mini Custom Pill Body - SCALED UP & LONGER
     // Back Arm
@@ -1309,21 +1305,21 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     // Beard handled in head path
   }
   else if (id === 'pika') {
-    // Red cheek - Shifted LEFT
+    // Red cheek
     targetCtx.fillStyle = '#ef4444';
-    targetCtx.beginPath(); targetCtx.arc(s*0.05, s*0.25, s*0.08, 0, Math.PI*2); targetCtx.fill();
-    // Eye - Shifted LEFT
+    targetCtx.beginPath(); targetCtx.arc(s*0.12, s*0.24, s*0.08, 0, Math.PI*2); targetCtx.fill();
+    // Eye - Above and slightly left of nose
     targetCtx.fillStyle = '#111';
-    targetCtx.beginPath(); targetCtx.arc(s*0.15, s*0.08, s*0.04, 0, Math.PI*2); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.arc(s*0.24, s*0.08, s*0.04, 0, Math.PI*2); targetCtx.fill();
     // White eye reflection
     targetCtx.fillStyle = '#fff';
-    targetCtx.beginPath(); targetCtx.arc(s*0.13, s*0.06, s*0.015, 0, Math.PI*2); targetCtx.fill();
-    // Nose - Between eye and mouth
+    targetCtx.beginPath(); targetCtx.arc(s*0.22, s*0.06, s*0.015, 0, Math.PI*2); targetCtx.fill();
+    // Nose - On the outer edge of the face
     targetCtx.fillStyle = '#111';
-    targetCtx.beginPath(); targetCtx.arc(s*0.24, s*0.12, s*0.012, 0, Math.PI*2); targetCtx.fill();
-    // Mouth - Shifted LEFT and smaller
+    targetCtx.beginPath(); targetCtx.arc(s*0.32, s*0.14, s*0.012, 0, Math.PI*2); targetCtx.fill();
+    // Mouth - Starting from outer edge, going left
     targetCtx.strokeStyle = '#111'; targetCtx.lineWidth = Math.max(1, s*0.015); targetCtx.lineCap = 'round';
-    targetCtx.beginPath(); targetCtx.moveTo(s*0.2, s*0.18); targetCtx.quadraticCurveTo(s*0.17, s*0.22, s*0.12, s*0.18); targetCtx.stroke();
+    targetCtx.beginPath(); targetCtx.moveTo(s*0.3, s*0.18); targetCtx.quadraticCurveTo(s*0.26, s*0.22, s*0.22, s*0.18); targetCtx.stroke();
   }
   else if (id === 'mini') {
     // Lens (Better white highlights)
@@ -1474,9 +1470,9 @@ function drawLimbPath(targetCtx, x, y, w, h, angle, color, isBack, wpnId, skinId
   targetCtx.save();
   targetCtx.translate(x, y); targetCtx.rotate(angle);
   
-  // Thin black outline for Troop and Ninja arms/legs
+  // Thin black outline for Troop, Ninja, and Pika limbs
   let drawStroke = false;
-  if (color === '#e11d48' || skinId === 'ninja') drawStroke = true;
+  if (color === '#e11d48' || skinId === 'ninja' || skinId === 'pika') drawStroke = true;
 
   const baseColor = isBack ? shadeColor(color, -20) : color;
   targetCtx.fillStyle = baseColor;

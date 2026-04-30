@@ -373,7 +373,7 @@ const SHOP_DB = [
   { id: 'troop', type: 'skin', name: 'Troop', rarity: 'Legendary', cost: 550, icon: 'troop', desc: 'Shadowed face hidden beneath a red hood.', colors: { body: '#e11d48', head: '#be123c', faceShadow: '#111111' } },
   { id: 'mini', type: 'skin', name: 'Mini', rarity: 'Legendary', cost: 550, icon: 'mini', desc: 'A small, yellow, pill-shaped fellow.', colors: { body: '#facc15', head: '#facc15', overalls: '#1e3a8a' } },
   { id: 'galaxy', type: 'skin', name: 'Titan', rarity: 'Mythic', cost: 750, icon: 'galaxy', desc: 'Inspired by a cosmic powerhouse.', colors: { body: '#1e3a8a', head: '#a855f7', gauntlet: '#eab308' } },
-  { id: 'pika', type: 'skin', name: 'Pika', rarity: 'Mythic', cost: 750, icon: 'pika', desc: 'An electric mouse with a shocking attitude.', colors: { body: '#facc15', head: '#facc15', cheeks: '#ef4444', ears: '#111111' } },
+  { id: 'pika', type: 'skin', name: 'Pika', rarity: 'Mythic', cost: 10, icon: 'pika', desc: 'An electric mouse with a shocking attitude.', colors: { body: '#facc15', head: '#facc15', cheeks: '#ef4444', ears: '#111111' } },
   // HATS
   { id: 'cap', type: 'hat', name: 'Baseball Cap', rarity: 'Common', cost: 50, iconId: 'hat_cap', desc: 'Keep the sun out.' },
   { id: 'cape', type: 'hat', name: 'Hero Cape', rarity: 'Epic', cost: 250, iconId: 'hat_cape', desc: 'Flows in the wind.' },
@@ -947,9 +947,9 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     targetCtx.save(); targetCtx.translate(-s*0.15, s*0.65); targetCtx.rotate(legAngle2);
     targetCtx.fillStyle = '#ca8a04'; targetCtx.beginPath(); targetCtx.ellipse(s*0.05, s*0.05, s*0.12, s*0.08, 0, 0, Math.PI*2); targetCtx.fill(); targetCtx.restore();
     
-    // Zigzag tail
-    targetCtx.beginPath(); targetCtx.moveTo(-s*0.35, s*0.45); targetCtx.lineTo(-s*0.55, s*0.5); targetCtx.lineTo(-s*0.45, s*0.35); targetCtx.lineTo(-s*0.65, s*0.25); targetCtx.lineTo(-s*0.55, s*0.1); targetCtx.lineTo(-s*0.8, -s*0.1); targetCtx.lineTo(-s*0.65, -s*0.2); targetCtx.lineWidth = Math.max(3, s*0.12); targetCtx.strokeStyle = '#facc15'; targetCtx.lineJoin = 'miter'; targetCtx.stroke();
-    targetCtx.beginPath(); targetCtx.moveTo(-s*0.35, s*0.45); targetCtx.lineTo(-s*0.41, s*0.46); targetCtx.strokeStyle = '#854d0e'; targetCtx.stroke();
+    // Zigzag tail - Extended start point to touch body
+    targetCtx.beginPath(); targetCtx.moveTo(-s*0.2, s*0.45); targetCtx.lineTo(-s*0.55, s*0.5); targetCtx.lineTo(-s*0.45, s*0.35); targetCtx.lineTo(-s*0.65, s*0.25); targetCtx.lineTo(-s*0.55, s*0.1); targetCtx.lineTo(-s*0.8, -s*0.1); targetCtx.lineTo(-s*0.65, -s*0.2); targetCtx.lineWidth = Math.max(3, s*0.12); targetCtx.strokeStyle = '#facc15'; targetCtx.lineJoin = 'miter'; targetCtx.stroke();
+    targetCtx.beginPath(); targetCtx.moveTo(-s*0.2, s*0.45); targetCtx.lineTo(-s*0.28, s*0.46); targetCtx.strokeStyle = '#854d0e'; targetCtx.stroke();
     
     // Fat Body - Shifted right to contain face
     targetCtx.fillStyle = '#facc15';
@@ -1317,21 +1317,21 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     // Beard handled in head path
   }
   else if (id === 'pika') {
-    // Red cheek (right side) - moved left to avoid mouth
+    // Red cheek (right side) - shifted right to align with face
     targetCtx.fillStyle = '#ef4444';
-    targetCtx.beginPath(); targetCtx.arc(s*0.12, s*0.25, s*0.08, 0, Math.PI*2); targetCtx.fill();
-    // Eye (right side)
+    targetCtx.beginPath(); targetCtx.arc(s*0.32, s*0.25, s*0.08, 0, Math.PI*2); targetCtx.fill();
+    // Eye (right side) - shifted right
     targetCtx.fillStyle = '#111';
-    targetCtx.beginPath(); targetCtx.arc(s*0.3, s*0.12, s*0.04, 0, Math.PI*2); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.arc(s*0.42, s*0.12, s*0.04, 0, Math.PI*2); targetCtx.fill();
     // White eye reflection
     targetCtx.fillStyle = '#fff';
-    targetCtx.beginPath(); targetCtx.arc(s*0.28, s*0.10, s*0.015, 0, Math.PI*2); targetCtx.fill();
-    // Nose
+    targetCtx.beginPath(); targetCtx.arc(s*0.4, s*0.10, s*0.015, 0, Math.PI*2); targetCtx.fill();
+    // Nose - shifted right
     targetCtx.fillStyle = '#111';
-    targetCtx.beginPath(); targetCtx.arc(s*0.38, s*0.16, s*0.01, 0, Math.PI*2); targetCtx.fill();
-    // Mouth
+    targetCtx.beginPath(); targetCtx.arc(s*0.52, s*0.16, s*0.01, 0, Math.PI*2); targetCtx.fill();
+    // Mouth - shifted right
     targetCtx.strokeStyle = '#111'; targetCtx.lineWidth = Math.max(1, s*0.015); targetCtx.lineCap = 'round';
-    targetCtx.beginPath(); targetCtx.moveTo(s*0.35, s*0.2); targetCtx.quadraticCurveTo(s*0.3, s*0.23, s*0.25, s*0.2); targetCtx.stroke();
+    targetCtx.beginPath(); targetCtx.moveTo(s*0.48, s*0.2); targetCtx.quadraticCurveTo(s*0.43, s*0.23, s*0.38, s*0.2); targetCtx.stroke();
   }
   else if (id === 'mini') {
     // Lens (Better white highlights)

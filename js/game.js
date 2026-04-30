@@ -797,10 +797,13 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     targetCtx.ellipse(0, s * 0.5, s * 0.22, s * 0.25, 0, 0, Math.PI * 2);
     targetCtx.fill();
 
-    // Core/Joint light
-    targetCtx.fillStyle = '#00e5ff';
-    targetCtx.shadowColor = '#00e5ff'; targetCtx.shadowBlur = 10;
-    targetCtx.beginPath(); targetCtx.arc(0, s * 0.35, s * 0.04, 0, Math.PI * 2); targetCtx.fill();
+    // Golden Circular Core (Glowing)
+    targetCtx.fillStyle = '#f59e0b'; // Gold/Amber
+    targetCtx.shadowColor = '#f59e0b'; targetCtx.shadowBlur = 10;
+    targetCtx.beginPath(); targetCtx.arc(0, s * 0.5, s * 0.08, 0, Math.PI * 2); targetCtx.fill();
+    // Core center
+    targetCtx.fillStyle = '#fff';
+    targetCtx.beginPath(); targetCtx.arc(0, s * 0.5, s * 0.04, 0, Math.PI * 2); targetCtx.fill();
     targetCtx.shadowBlur = 0;
   }
 
@@ -832,29 +835,30 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     targetCtx.ellipse(s * 0.12, s * 0.2, s * 0.22, s * 0.18, 0, 0, Math.PI * 2);
     targetCtx.fill();
 
-    // Detailed Robotic Eye (Cyan)
-    targetCtx.strokeStyle = '#00e5ff';
-    targetCtx.lineWidth = 2;
-    targetCtx.shadowColor = '#00e5ff'; targetCtx.shadowBlur = 10;
-    targetCtx.beginPath();
-    targetCtx.arc(s * 0.18, s * 0.2, s * 0.06, 0, Math.PI * 2);
-    targetCtx.stroke();
+    // Robotic Eye (Prominent Side Profile)
     targetCtx.fillStyle = '#00e5ff';
-    targetCtx.beginPath(); targetCtx.arc(s * 0.18, s * 0.2, s * 0.02, 0, Math.PI * 2); targetCtx.fill();
+    targetCtx.shadowColor = '#00e5ff'; targetCtx.shadowBlur = 10;
+    targetCtx.beginPath(); targetCtx.arc(s*0.15, s*0.2, s*0.07, 0, Math.PI*2); targetCtx.fill();
+    // Inner Glint
+    targetCtx.fillStyle = '#fff';
+    targetCtx.beginPath(); targetCtx.arc(s*0.17, s*0.18, s*0.02, 0, Math.PI*2); targetCtx.fill();
     targetCtx.shadowBlur = 0;
 
-    // Robot Antenna with Glowing Tip
-    targetCtx.strokeStyle = '#f8fafc';
-    targetCtx.lineWidth = 5;
+    // Signal Antenna (Black rod + waves)
+    targetCtx.strokeStyle = '#111';
+    targetCtx.lineWidth = 3;
     targetCtx.beginPath();
     targetCtx.moveTo(-s * 0.1, -s * 0.05);
-    targetCtx.lineTo(-s * 0.15, -s * 0.3);
+    targetCtx.lineTo(-s * 0.15, -s * 0.25);
     targetCtx.stroke();
-    // Glowing Tip
-    targetCtx.fillStyle = '#00e5ff';
-    targetCtx.shadowColor = '#00e5ff'; targetCtx.shadowBlur = 8;
-    targetCtx.beginPath(); targetCtx.arc(-s * 0.15, -s * 0.32, s * 0.04, 0, Math.PI * 2); targetCtx.fill();
-    targetCtx.shadowBlur = 0;
+    
+    // Signal Waves
+    targetCtx.lineWidth = 2;
+    for(let i=1; i<=3; i++) {
+        targetCtx.beginPath();
+        targetCtx.arc(-s * 0.15, -s * 0.25, i * s * 0.06, -Math.PI * 0.8, -Math.PI * 0.2);
+        targetCtx.stroke();
+    }
   }
 
   if (id === 'hoodie') {
@@ -929,6 +933,13 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     targetCtx.beginPath(); targetCtx.arc(s * 0.15, s * 0.185, s * 0.015, 0, Math.PI * 2); targetCtx.fill();
   } 
   else if (id === 'wizard') {
+    // Face Skin area
+    targetCtx.fillStyle = '#ffedd5';
+    targetCtx.beginPath(); targetCtx.arc(s*0.05, s*0.2, s*0.15, 0, Math.PI*2); targetCtx.fill();
+    // Eye
+    targetCtx.fillStyle = '#111';
+    targetCtx.beginPath(); targetCtx.arc(s*0.12, s*0.2, s*0.04, 0, Math.PI*2); targetCtx.fill();
+
     // Long White Beard
     targetCtx.fillStyle = '#fff';
     targetCtx.beginPath();

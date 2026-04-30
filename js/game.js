@@ -1186,7 +1186,7 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     // Star on Hat
     targetCtx.fillStyle = '#facc15';
     targetCtx.beginPath(); targetCtx.arc(0, -s*0.05, s*0.03, 0, Math.PI*2); targetCtx.fill();
-  } else {
+  } else if (id !== 'cyber') {
     targetCtx.fillStyle = colors.head || '#111';
     if (id === 'galaxy') targetCtx.fillStyle = '#a855f7';
     targetCtx.beginPath(); targetCtx.arc(0, s * 0.2, s * 0.3, 0, Math.PI * 2); targetCtx.fill();
@@ -1283,6 +1283,9 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
   }
   else if (id === 'troop') {
     // No eyes for troop, just shadow
+  }
+  else if (id === 'cyber') {
+    // Eye already drawn in body block
   }
   else {
     targetCtx.fillStyle = colors.face || '#fff';

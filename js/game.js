@@ -426,9 +426,9 @@ const SHOP_DB = [
   { id: 'galaxy', type: 'skin', name: 'Titan', rarity: 'Mythic', cost: 600, icon: 'galaxy', desc: 'Inspired by a cosmic powerhouse.', colors: { body: '#1e3a8a', head: '#a855f7', gauntlet: '#eab308' } },
   { id: 'pika', type: 'skin', name: 'Pika', rarity: 'Mythic', cost: 650, icon: 'pika', desc: 'An electric mouse with a shocking attitude.', colors: { body: '#facc15', head: '#facc15', cheeks: '#ef4444', ears: '#111111' } },
   // HATS
-  { id: 'cap', type: 'hat', name: 'Baseball Cap', rarity: 'Common', cost: 10, iconId: 'hat_cap', desc: 'Keep the sun out.' },
-  { id: 'cape', type: 'hat', name: 'Hero Cape', rarity: 'Epic', cost: 10, iconId: 'hat_cape', desc: 'Flows in the wind.' },
-  { id: 'halo', type: 'hat', name: 'Halo', rarity: 'Mythic', cost: 10, iconId: 'hat_halo', desc: 'Divine protection.' },
+  { id: 'cap', type: 'hat', name: 'Baseball Cap', rarity: 'Common', cost: 250, iconId: 'hat_cap', desc: 'Keep the sun out.' },
+  { id: 'cape', type: 'hat', name: 'Hero Cape', rarity: 'Epic', cost: 250, iconId: 'hat_cape', desc: 'Flows in the wind.' },
+  { id: 'halo', type: 'hat', name: 'Halo', rarity: 'Mythic', cost: 250, iconId: 'hat_halo', desc: 'Divine protection.' },
   // WEAPONS
   { id: 'iron_sword', type: 'weapon', name: 'Iron Sword', rarity: 'Rare', cost: 150, iconId: 'wpn_sword', desc: 'A trusty blade.' },
   { id: 'battle_axe', type: 'weapon', name: 'Battle Axe', rarity: 'Epic', cost: 250, iconId: 'wpn_axe', desc: 'Heavy hitter.' },

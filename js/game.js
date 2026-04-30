@@ -46,7 +46,7 @@ const prevCtx = prevCanvas.getContext('2d');
       const transparentDataUrl = tempCanvas.toDataURL('image/png');
       // Inject CSS to override .demon-avatar
       const style = document.createElement('style');
-      style.innerHTML = `.demon-avatar { background: url('${transparentDataUrl}') no-repeat center/200% !important; mix-blend-mode: normal !important; }`;
+      style.innerHTML = `.demon-avatar { background: url('${transparentDataUrl}') no-repeat center/175% !important; mix-blend-mode: normal !important; }`;
       document.head.appendChild(style);
     } catch(e) {
       console.log('CORS or Canvas error processing demon avatar', e);

@@ -844,21 +844,16 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     targetCtx.beginPath(); targetCtx.arc(s*0.17, s*0.18, s*0.02, 0, Math.PI*2); targetCtx.fill();
     targetCtx.shadowBlur = 0;
 
-    // Signal Antenna (Black rod + waves)
-    targetCtx.strokeStyle = '#111';
-    targetCtx.lineWidth = 3;
-    targetCtx.beginPath();
-    targetCtx.moveTo(-s * 0.1, -s * 0.05);
-    targetCtx.lineTo(-s * 0.15, -s * 0.25);
-    targetCtx.stroke();
-    
-    // Signal Waves
+    // Signal Waves (Glowing Cyan)
+    targetCtx.strokeStyle = '#00e5ff';
     targetCtx.lineWidth = 2;
+    targetCtx.shadowColor = '#00e5ff'; targetCtx.shadowBlur = 5;
     for(let i=1; i<=3; i++) {
         targetCtx.beginPath();
         targetCtx.arc(-s * 0.15, -s * 0.25, i * s * 0.06, -Math.PI * 0.8, -Math.PI * 0.2);
         targetCtx.stroke();
     }
+    targetCtx.shadowBlur = 0;
   }
 
   if (id === 'hoodie') {
@@ -875,12 +870,19 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     targetCtx.fillStyle = colors.faceShadow;
     targetCtx.beginPath(); targetCtx.arc(s * 0.1, s * 0.3, s * 0.2, 0, Math.PI * 2); targetCtx.fill();
   } else if (id === 'wizard') {
-    // 1. Wizard Face (Skin Tone) - Drawn behind hat/beard
+    // Face Skin area
     targetCtx.fillStyle = '#ffedd5';
     targetCtx.beginPath(); targetCtx.arc(0, s*0.2, s*0.22, 0, Math.PI*2); targetCtx.fill();
-    // 2. Wizard Eye
+    // Eye
     targetCtx.fillStyle = '#111';
     targetCtx.beginPath(); targetCtx.arc(s*0.1, s*0.2, s*0.04, 0, Math.PI*2); targetCtx.fill();
+
+    // Long White Beard (Drawn over the bottom of the face)
+    targetCtx.fillStyle = '#fff';
+    targetCtx.beginPath();
+    targetCtx.moveTo(-s*0.18, s*0.28);
+    targetCtx.quadraticCurveTo(0, s*0.68, s*0.17, s*0.28);
+    targetCtx.fill();
 
     // 3. Pointy Wizard Hat (Drawn on top)
     targetCtx.fillStyle = '#1e40af';
@@ -909,7 +911,7 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
 
     // 2. Ninja Mask / Hood (Black)
     targetCtx.fillStyle = '#111';
-    // Mask covering lower face - adjusted to give more room to eyes
+    // Mask covering lower face
     targetCtx.beginPath();
     targetCtx.moveTo(-s * 0.05, s * 0.26);
     targetCtx.lineTo(s * 0.35, s * 0.26);
@@ -932,20 +934,15 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     targetCtx.moveTo(0, s * 0.05); targetCtx.lineTo(-s * 0.3, s * 0.1); targetCtx.lineTo(-s * 0.25, s * 0.25); targetCtx.closePath(); targetCtx.fill();
     targetCtx.restore();
 
-    // 4. Smaller Expressive Black Eye (Well-placed)
+    // 4. Smaller Expressive Black Eye (Shifted right, lower, smaller)
     targetCtx.fillStyle = '#000';
-    targetCtx.beginPath(); targetCtx.arc(s * 0.14, s * 0.2, s * 0.045, 0, Math.PI * 2); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.arc(s * 0.21, s * 0.24, s * 0.025, 0, Math.PI * 2); targetCtx.fill();
     // Glint
     targetCtx.fillStyle = '#fff';
-    targetCtx.beginPath(); targetCtx.arc(s * 0.15, s * 0.185, s * 0.015, 0, Math.PI * 2); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.arc(s * 0.22, s * 0.23, s * 0.01, 0, Math.PI * 2); targetCtx.fill();
   } 
   else if (id === 'wizard') {
-    // Long White Beard (Drawn over the bottom of the face)
-    targetCtx.fillStyle = '#fff';
-    targetCtx.beginPath();
-    targetCtx.moveTo(-s*0.2, s*0.2);
-    targetCtx.quadraticCurveTo(0, s*0.7, s*0.25, s*0.2);
-    targetCtx.fill();
+    // Beard handled in head path
   }
   else if (id === 'galaxy') {
     // Thanos Chin Ridges
@@ -985,7 +982,7 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
 
   targetCtx.restore();
 
-  // Front Arm & Leg (Use colors.body strictly)
+  // Front Arm & Leg
   drawLimbPath(targetCtx, s * 0.1, s * 0.6, s * 0.15, s * 0.4, legAngle1, colors.body || '#111', false);
   drawLimbPath(targetCtx, 0, s * 0.3, s * 0.12, s * 0.35, armAngle1, colors.body || '#111', false, wpnId);
 
@@ -1037,16 +1034,30 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
 function drawLimbPath(targetCtx, x, y, w, h, angle, color, isBack, wpnId) {
   targetCtx.save();
   targetCtx.translate(x, y); targetCtx.rotate(angle);
+  
+  // Thin black outline for Hoodie arms
+  let drawStroke = false;
+  if (color === '#e11d48') drawStroke = true;
+
   targetCtx.fillStyle = isBack ? shadeColor(color, -20) : color;
   targetCtx.beginPath(); targetCtx.roundRect(-w / 2, 0, w, h, w / 2);
   targetCtx.fill();
+  if (drawStroke) {
+    targetCtx.strokeStyle = '#000';
+    targetCtx.lineWidth = 0.5;
+    targetCtx.stroke();
+  }
 
-  // Ninja Red Boots (Logic for Ninja skin legs)
-  if (color === '#111' && h > w * 1.5 && !wpnId) {
-    targetCtx.fillStyle = '#ef4444';
-    targetCtx.beginPath();
-    targetCtx.roundRect(-w / 2, h * 0.7, w, h * 0.3, w / 4);
-    targetCtx.fill();
+  // Universal Feet (for legs)
+  if (h > w * 1.5 && !wpnId) {
+    targetCtx.fillStyle = (color === '#111') ? '#ef4444' : (isBack ? shadeColor(color, -30) : shadeColor(color, -10));
+    targetCtx.beginPath(); targetCtx.arc(0, h, w*0.6, 0, Math.PI*2); targetCtx.fill();
+  }
+  
+  // Universal Hands (for arms)
+  if (h < w * 2 || wpnId) {
+    targetCtx.fillStyle = isBack ? shadeColor(color, -30) : shadeColor(color, -10);
+    targetCtx.beginPath(); targetCtx.arc(0, h, w*0.5, 0, Math.PI*2); targetCtx.fill();
   }
 
   if (!isBack && wpnId) {

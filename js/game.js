@@ -646,7 +646,7 @@ function openShopPreview(id) {
       };
     }
   } else {
-    document.getElementById('preview-cost').innerText = "0.01$";
+    document.getElementById('preview-cost').innerText = "0.10$";
     btn.innerText = "BUY ON-CHAIN";
     btn.classList.replace('btn-gray', 'btn-green');
     btn.disabled = false;

@@ -741,9 +741,12 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
   }
 
   // Eyes
-  if (id === 'gold' || id === 'galaxy' || id === 'classic') {
-    targetCtx.fillStyle = (id === 'gold') ? '#111' : '#fff';
-    targetCtx.beginPath(); targetCtx.arc(s*0.15, s*0.15, s*0.05, 0, Math.PI*2); targetCtx.fill();
+  if (id === 'gold' || id === 'galaxy' || id === 'classic' || id === 'hoodie') {
+    if (id === 'gold' || id === 'galaxy' || id === 'classic') {
+      targetCtx.fillStyle = (id === 'gold') ? '#111' : '#fff';
+      targetCtx.beginPath(); targetCtx.arc(s*0.15, s*0.15, s*0.05, 0, Math.PI*2); targetCtx.fill();
+    }
+    // Hoodie has no eyes (face shadow only)
   } else if (id === 'ninja') {
     targetCtx.fillStyle = colors.face;
     targetCtx.beginPath(); targetCtx.ellipse(s*0.1, s*0.2, s*0.15, s*0.1, 0, 0, Math.PI*2); targetCtx.fill();
@@ -766,7 +769,7 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
 
   targetCtx.restore();
 
-  // Front Arm & Leg
+  // Front Arm & Leg (Use colors.body strictly)
   drawLimbPath(targetCtx, s*0.1, s*0.6, s*0.15, s*0.4, legAngle1, colors.body || '#111', false);
   drawLimbPath(targetCtx, 0, s*0.3, s*0.12, s*0.35, armAngle1, colors.body || '#111', false, wpnId);
 

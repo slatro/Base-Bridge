@@ -333,7 +333,7 @@ function updateDailyBestScore(s) {
 }
 
 const SVG_ICONS = {
-  hat_cap: `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M10 65 Q50 65 90 65 L85 55 L75 40 Q50 30 25 40 Z" fill="%23e11d48"/><path d="M10 65 Q50 75 90 65" fill="none" stroke="%23be123c" stroke-width="5"/><circle cx="50" cy="35" r="5" fill="%23fff"/></svg>`,
+  hat_cap: `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M 5 70 Q 15 55 65 65 L 65 75 Q 15 65 5 75 Z" fill="%23000"/><path d="M 5 70 C 5 20, 60 20, 65 60 L 65 65 Q 30 55 5 70" fill="%23d90000" stroke="%23000" stroke-width="4"/><path d="M 30 28 C 30 24, 40 24, 40 28" fill="%23d90000" stroke="%23000" stroke-width="4" stroke-linecap="round"/><path d="M 35 28 C 32 40, 30 50, 30 63" fill="none" stroke="%23000" stroke-width="2"/><path d="M 20 66 C 50 50, 95 65, 95 72 C 70 75, 40 70, 20 72 Z" fill="%23000" stroke="%23000" stroke-width="3" stroke-linejoin="round"/><path d="M 25 65 C 50 53, 90 66, 90 69 C 70 70, 40 66, 25 69 Z" fill="%23d90000"/></svg>`,
   hat_cape: `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M20 20 L80 20 L95 100 L5 100 Z" fill="%23ef4444" stroke="%23b91c1c" stroke-width="2"/><path d="M20 20 L50 40 L80 20" fill="none" stroke="%23b91c1c" stroke-width="3"/></svg>`,
   hat_halo: `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><ellipse cx="50" cy="50" rx="40" ry="15" fill="none" stroke="%23fef08a" stroke-width="6" filter="drop-shadow(0 0 8px %23facc15)"/></svg>`,
   face_visor: `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M10 40 L90 40 L75 60 L25 60 Z" fill="%230a192f" stroke="%2300e5ff" stroke-width="6"/><path d="M20 50 L80 50" stroke="%2300e5ff" stroke-width="6" opacity="0.8"/></svg>`,
@@ -369,6 +369,7 @@ const SHOP_DB = [
   { id: 'classic', type: 'skin', name: 'Classic', rarity: 'Common', cost: 10, icon: 'classic', desc: 'The original legendary stick hero.', colors: { body: '#334155', head: '#fed7aa' } },
   { id: 'ninja', type: 'skin', name: 'Ninja', rarity: 'Uncommon', cost: 10, icon: 'ninja', desc: 'A swift warrior of the night.', colors: { body: '#111111', head: '#111111', straps: '#1f2937' } },
   { id: 'cyber', type: 'skin', name: 'Cyber', rarity: 'Rare', cost: 10, icon: 'cyber', desc: 'Friendly AI robot from the future.', colors: { body: '#f8fafc', head: '#f8fafc', glow: '#00e5ff' } },
+  { id: 'dino', type: 'skin', name: 'Dino', rarity: 'Epic', cost: 10, icon: 'dino', desc: 'A prehistoric powerhouse.', colors: { body: '#65a30d', head: '#65a30d' } },
   { id: 'wizard', type: 'skin', name: 'Wizard', rarity: 'Epic', cost: 10, icon: 'wizard', desc: 'A wise sorcerer with a star-patterned robe.', colors: { body: '#1d4ed8', head: '#ffffff', hat: '#1d4ed8', stars: '#facc15' } },
   { id: 'troop', type: 'skin', name: 'Troop', rarity: 'Legendary', cost: 10, icon: 'troop', desc: 'Shadowed face hidden beneath a red hood.', colors: { body: '#e11d48', head: '#be123c', faceShadow: '#111111' } },
   { id: 'mini', type: 'skin', name: 'Mini', rarity: 'Legendary', cost: 10, icon: 'mini', desc: 'A small, yellow, pill-shaped fellow.', colors: { body: '#facc15', head: '#facc15', overalls: '#1e3a8a', height: 75 } },
@@ -939,12 +940,76 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
   }
   
   // Back Arm
-  drawLimbPath(targetCtx, 0, s * 0.3, s * 0.12, s * 0.35, armAngle2, colors.body || '#222', true, null, id);
+  if (id !== 'dino') {
+    drawLimbPath(targetCtx, 0, s * 0.3, s * 0.12, s * 0.35, armAngle2, colors.body || '#222', true, null, id);
+  }
 
 
 
   // Body Path Details
-  if (id === 'pika') {
+  if (id === 'dino') {
+    // Single Continuous Body Path for Dino
+    targetCtx.fillStyle = '#65a30d'; // main green
+    targetCtx.strokeStyle = '#14532d'; // outline green
+    targetCtx.lineWidth = Math.max(2, s*0.03);
+    targetCtx.lineJoin = 'round';
+    
+    targetCtx.beginPath();
+    // Top of head
+    targetCtx.moveTo(-s*0.15, s*0.05);
+    targetCtx.lineTo(s*0.25, s*0.05);
+    // Snout
+    targetCtx.quadraticCurveTo(s*0.4, s*0.05, s*0.4, s*0.2);
+    // Front Jaw
+    targetCtx.lineTo(s*0.4, s*0.35);
+    // Bottom Jaw
+    targetCtx.lineTo(s*0.1, s*0.35);
+    // Belly down to legs
+    targetCtx.quadraticCurveTo(s*0.25, s*0.6, s*0.15, s*0.7);
+    // Leg base
+    targetCtx.lineTo(-s*0.15, s*0.7);
+    // Tail curve up
+    targetCtx.quadraticCurveTo(-s*0.3, s*0.6, -s*0.8, s*0.4);
+    // Top of back/tail curve to head
+    targetCtx.quadraticCurveTo(-s*0.3, s*0.35, -s*0.15, s*0.05);
+    targetCtx.fill();
+    targetCtx.stroke();
+
+    // Belly light green shade
+    targetCtx.fillStyle = '#bef264';
+    targetCtx.beginPath();
+    targetCtx.moveTo(s*0.1, s*0.35);
+    targetCtx.quadraticCurveTo(s*0.25, s*0.6, s*0.15, s*0.7);
+    targetCtx.lineTo(0, s*0.7);
+    targetCtx.quadraticCurveTo(s*0.15, s*0.5, 0, s*0.35);
+    targetCtx.fill();
+
+    // Dark green back stripes/triangles
+    targetCtx.fillStyle = '#14532d';
+    targetCtx.beginPath(); targetCtx.moveTo(-s*0.1, s*0.15); targetCtx.lineTo(0, s*0.15); targetCtx.lineTo(-s*0.05, s*0.25); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.moveTo(-s*0.2, s*0.25); targetCtx.lineTo(-s*0.1, s*0.25); targetCtx.lineTo(-s*0.15, s*0.35); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.moveTo(-s*0.35, s*0.35); targetCtx.lineTo(-s*0.25, s*0.35); targetCtx.lineTo(-s*0.3, s*0.45); targetCtx.fill();
+
+    // Dark green spots
+    targetCtx.beginPath(); targetCtx.arc(-s*0.1, s*0.5, s*0.04, 0, Math.PI*2); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.arc(-s*0.3, s*0.5, s*0.025, 0, Math.PI*2); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.arc(s*0.05, s*0.6, s*0.03, 0, Math.PI*2); targetCtx.fill();
+
+    // Tiny T-Rex Front Arm
+    targetCtx.save();
+    targetCtx.translate(s*0.1, s*0.45);
+    targetCtx.rotate(armAngle1);
+    targetCtx.fillStyle = '#65a30d';
+    targetCtx.strokeStyle = '#14532d';
+    targetCtx.lineWidth = Math.max(1, s*0.015);
+    targetCtx.beginPath();
+    targetCtx.roundRect(-s*0.02, 0, s*0.06, s*0.15, s*0.03);
+    targetCtx.fill(); targetCtx.stroke();
+    // Two little claws
+    targetCtx.beginPath(); targetCtx.moveTo(0, s*0.15); targetCtx.lineTo(-s*0.05, s*0.2); targetCtx.stroke();
+    targetCtx.beginPath(); targetCtx.moveTo(s*0.04, s*0.15); targetCtx.lineTo(s*0.09, s*0.2); targetCtx.stroke();
+    targetCtx.restore();
+  } else if (id === 'pika') {
     // Pika Custom Fat Body
     // Zigzag tail - Better body connection
     targetCtx.beginPath(); targetCtx.moveTo(-s*0.2, s*0.4); targetCtx.lineTo(-s*0.4, s*0.45); targetCtx.lineTo(-s*0.65, s*0.5); targetCtx.lineTo(-s*0.55, s*0.35); targetCtx.lineTo(-s*0.75, s*0.25); targetCtx.lineTo(-s*0.65, s*0.1); targetCtx.lineTo(-s*0.9, -s*0.1); targetCtx.lineTo(-s*0.75, -s*0.2); targetCtx.lineWidth = Math.max(3, s*0.12); targetCtx.strokeStyle = '#facc15'; targetCtx.lineJoin = 'miter'; targetCtx.stroke();
@@ -1030,7 +1095,7 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     targetCtx.lineTo(s * 0.05, s * 0.55);
     targetCtx.lineTo(s * 0.1, s * 0.65);
     targetCtx.stroke();
-  } else if (id !== 'ninja' && id !== 'pika' && id !== 'mini') {
+  } else if (id !== 'ninja' && id !== 'pika' && id !== 'mini' && id !== 'dino') {
     targetCtx.fillStyle = colors.body || '#111';
     targetCtx.fill();
   }
@@ -1250,13 +1315,31 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     targetCtx.beginPath();
     targetCtx.roundRect(-s*0.28, -s*0.1, s*0.56, s*0.56, s*0.08); // Square/Blocky head
     targetCtx.fill();
-  } else if (id !== 'cyber') {
+  } else if (id !== 'cyber' && id !== 'dino') {
     targetCtx.fillStyle = colors.head || '#111';
     targetCtx.beginPath(); targetCtx.arc(0, s * 0.2, s * 0.3, 0, Math.PI * 2); targetCtx.fill();
   }
 
   // Eyes & Details
-  if (id === 'ninja') {
+  if (id === 'dino') {
+    // Zigzag Mouth
+    targetCtx.strokeStyle = '#14532d';
+    targetCtx.lineWidth = Math.max(2, s*0.02);
+    targetCtx.beginPath();
+    targetCtx.moveTo(s*0.4, s*0.25);
+    targetCtx.lineTo(s*0.35, s*0.22); targetCtx.lineTo(s*0.3, s*0.26);
+    targetCtx.lineTo(s*0.25, s*0.22); targetCtx.lineTo(s*0.2, s*0.26);
+    targetCtx.lineTo(s*0.15, s*0.22); targetCtx.lineTo(s*0.1, s*0.26);
+    targetCtx.stroke();
+
+    // Giant Eye
+    targetCtx.fillStyle = '#fff';
+    targetCtx.beginPath(); targetCtx.arc(s*0.18, s*0.15, s*0.08, 0, Math.PI*2); targetCtx.fill(); targetCtx.stroke();
+    targetCtx.fillStyle = '#111';
+    targetCtx.beginPath(); targetCtx.arc(s*0.22, s*0.16, s*0.03, 0, Math.PI*2); targetCtx.fill();
+    targetCtx.fillStyle = '#fff';
+    targetCtx.beginPath(); targetCtx.arc(s*0.23, s*0.15, s*0.01, 0, Math.PI*2); targetCtx.fill();
+  } else if (id === 'ninja') {
     // 1. Sleeker Face Skin Area (Exposed eyes slit)
     targetCtx.fillStyle = '#ffedd5';
     targetCtx.beginPath();
@@ -1449,7 +1532,9 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
   // Troop Arm alignment fix
   let armX = 0;
   if (id === 'troop') armX = s * 0.1;
-  drawLimbPath(targetCtx, armX, s * 0.3, s * 0.12, s * 0.35, armAngle1, colors.body || '#111', false, wpnId, id);
+  if (id !== 'dino') {
+    drawLimbPath(targetCtx, armX, s * 0.3, s * 0.12, s * 0.35, armAngle1, colors.body || '#111', false, wpnId, id);
+  }
 
   // Infinity Gauntlet for Galaxy Skin
   if (id === 'galaxy') {

@@ -1684,28 +1684,23 @@ function triggerGameOver() {
     else psychologyMsg = "Great effort! One more run for the win?";
   }
 
-  document.getElementById('go-score').innerText = score;
-  document.getElementById('go-best').innerText = bestScore;
-  document.getElementById('go-bb').innerText = sessionCoins;
-
   const breakdownHTML = `
-    <div class="breakdown-box">
+    <div class="breakdown-box" style="width: 100%; max-width: 320px; text-transform: uppercase;">
+      <div class="breakdown-row"><span>SCORE:</span> <strong style="color:#00ff88;">${score}</strong></div>
+      <div class="breakdown-row"><span>BEST:</span> <strong>${bestScore}</strong></div>
+      <hr style="border:0; height:1px; background:rgba(255,255,255,0.1); margin: 8px 0;">
       <div class="breakdown-row"><span>Bridges Crossed:</span> <strong>${bridgesCrossed}</strong></div>
       <div class="breakdown-row"><span>Perfect Landings:</span> <strong>${sessionPerfects}</strong></div>
       <div class="breakdown-row"><span>Best Combo:</span> <strong>x${sessionBestCombo}</strong></div>
+      <hr style="border:0; height:1px; background:rgba(255,255,255,0.1); margin: 8px 0;">
       <div class="breakdown-row"><span style="color:#facc15;">Total Earned:</span> <strong style="color:#facc15;">${sessionCoins} BB</strong></div>
-      <p style="margin-top:10px; font-style:italic; font-size:0.85rem; color:#cbd5e1; text-align:center; line-height:1.4;">${psychologyMsg}</p>
+      <p style="margin-top:15px; font-style:italic; font-size:0.8rem; color:#94a3b8; text-align:center; line-height:1.4; text-transform: none;">${psychologyMsg}</p>
     </div>
   `;
 
   const statsContainer = document.querySelector('.go-stats-container');
   if (statsContainer) {
-    let existingBreakdown = statsContainer.querySelector('.breakdown-box');
-    if (existingBreakdown) existingBreakdown.remove();
-    let box = document.createElement('div');
-    box.style.display = 'contents'; // So breakdown-box participates in flex layout
-    box.innerHTML = breakdownHTML;
-    statsContainer.appendChild(box.firstElementChild);
+    statsContainer.innerHTML = breakdownHTML;
   }
 
   if (coins >= 25 && !reviveUsed && score > 0) {
@@ -1735,13 +1730,23 @@ function triggerGameWon() {
   document.querySelector('.go-title').innerText = "CONGRATULATIONS!";
   document.querySelector('.go-title').style.color = '#10b981';
 
-  // Update the detailed stats
-  document.getElementById('go-score').innerText = score;
-  document.getElementById('go-best').innerText = bestScore;
-  document.getElementById('go-bb').innerText = sessionCoins;
-  document.getElementById('go-perfects').innerText = sessionPerfects;
-  document.getElementById('go-combo').innerText = sessionBestCombo;
-  document.getElementById('go-level').innerText = level;
+  const psychologyMsg = isNewBest ? "UNBELIEVABLE! New Personal Record! 🏆" : "Amazing run! Can you do even better?";
+  const breakdownHTML = `
+    <div class="breakdown-box" style="width: 100%; max-width: 320px; text-transform: uppercase;">
+      <div class="breakdown-row"><span>SCORE:</span> <strong style="color:#00ff88;">${score}</strong></div>
+      <div class="breakdown-row"><span>BEST:</span> <strong>${bestScore}</strong></div>
+      <hr style="border:0; height:1px; background:rgba(255,255,255,0.1); margin: 8px 0;">
+      <div class="breakdown-row"><span>Bridges Crossed:</span> <strong>${bridgesCrossed}</strong></div>
+      <div class="breakdown-row"><span>Perfect Landings:</span> <strong>${sessionPerfects}</strong></div>
+      <div class="breakdown-row"><span>Best Combo:</span> <strong>x${sessionBestCombo}</strong></div>
+      <hr style="border:0; height:1px; background:rgba(255,255,255,0.1); margin: 8px 0;">
+      <div class="breakdown-row"><span style="color:#facc15;">Total Earned:</span> <strong style="color:#facc15;">${sessionCoins} BB</strong></div>
+      <p style="margin-top:15px; font-style:italic; font-size:0.8rem; color:#94a3b8; text-align:center; line-height:1.4; text-transform: none;">${psychologyMsg}</p>
+    </div>
+  `;
+  const statsContainer = document.querySelector('.go-stats-container');
+  if (statsContainer) statsContainer.innerHTML = breakdownHTML;
+  
   updateLeaderboardUI();
 
   document.querySelector('.gh-center').style.opacity = '0';

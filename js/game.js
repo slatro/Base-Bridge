@@ -945,6 +945,43 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
 
   // Body Path Details
   if (id === 'pika') {
+    // Animated Electricity Aura
+    targetCtx.save();
+    targetCtx.strokeStyle = '#0ea5e9'; // Bright cyan sparks
+    targetCtx.shadowColor = '#38bdf8';
+    targetCtx.shadowBlur = 15;
+    targetCtx.lineWidth = Math.max(2, s*0.04);
+    targetCtx.lineJoin = 'miter';
+    targetCtx.lineCap = 'round';
+    
+    const sparkCount = 3;
+    for(let i=0; i<sparkCount; i++) {
+      // Flashy flickering effect based on time
+      const cycle = Math.floor(time * 15 + i * 7) % 10;
+      if (cycle < 3) {
+        const angle = (Math.PI * 2 / sparkCount) * i + time * 5;
+        const radius = s*0.4 + Math.random() * s*0.2;
+        const sx = Math.cos(angle) * radius;
+        const sy = Math.sin(angle) * radius + s*0.4;
+        
+        targetCtx.beginPath();
+        targetCtx.moveTo(sx, sy);
+        targetCtx.lineTo(sx + s*0.15, sy - s*0.1);
+        targetCtx.lineTo(sx + s*0.05, sy - s*0.15);
+        targetCtx.lineTo(sx + s*0.2, sy - s*0.3);
+        targetCtx.stroke();
+        
+        // Inner white core
+        targetCtx.strokeStyle = '#ffffff';
+        targetCtx.lineWidth = Math.max(1, s*0.02);
+        targetCtx.stroke();
+        // Reset
+        targetCtx.strokeStyle = '#0ea5e9';
+        targetCtx.lineWidth = Math.max(2, s*0.04);
+      }
+    }
+    targetCtx.restore();
+
     // Pika Custom Fat Body
     // Zigzag tail - Better body connection
     targetCtx.beginPath(); targetCtx.moveTo(-s*0.2, s*0.4); targetCtx.lineTo(-s*0.4, s*0.45); targetCtx.lineTo(-s*0.65, s*0.5); targetCtx.lineTo(-s*0.55, s*0.35); targetCtx.lineTo(-s*0.75, s*0.25); targetCtx.lineTo(-s*0.65, s*0.1); targetCtx.lineTo(-s*0.9, -s*0.1); targetCtx.lineTo(-s*0.75, -s*0.2); targetCtx.lineWidth = Math.max(3, s*0.12); targetCtx.strokeStyle = '#facc15'; targetCtx.lineJoin = 'miter'; targetCtx.stroke();
@@ -994,22 +1031,7 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     targetCtx.quadraticCurveTo(s * 0.25, s * 0.5, s * 0.2, s * 0.3);
   }
 
-  if (id === 'ninja') {
-    // Cross straps
-    targetCtx.strokeStyle = colors.straps || '#1f2937'; 
-    targetCtx.lineWidth = Math.max(3, s * 0.05);
-    targetCtx.beginPath(); targetCtx.moveTo(-s*0.1, s*0.35); targetCtx.lineTo(s*0.1, s*0.55); targetCtx.stroke();
-    targetCtx.beginPath(); targetCtx.moveTo(s*0.1, s*0.35); targetCtx.lineTo(-s*0.1, s*0.55); targetCtx.stroke();
-    
-    // Pouch
-    targetCtx.fillStyle = '#1f2937';
-    targetCtx.strokeStyle = '#111'; targetCtx.lineWidth = 1;
-    targetCtx.beginPath(); targetCtx.roundRect(0, s*0.48, s*0.15, s*0.15, 3); targetCtx.fill(); targetCtx.stroke();
-    // Pouch flap
-    targetCtx.beginPath(); targetCtx.moveTo(0, s*0.48); targetCtx.lineTo(s*0.075, s*0.56); targetCtx.lineTo(s*0.15, s*0.48); targetCtx.stroke();
-    // Button
-    targetCtx.fillStyle = '#111'; targetCtx.beginPath(); targetCtx.arc(s*0.075, s*0.56, Math.max(1, s*0.02), 0, Math.PI*2); targetCtx.fill();
-  }
+    // Removed old cross straps and pouch since they were drawn out of order
 
   if (id === 'wizard') {
     // Long Mystic Robe/Coat
@@ -1051,27 +1073,37 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
   }
 
   if (id === 'ninja') {
-    // Solid Black Ninja Body Shape
+    // Advanced Ninja Body (More athletic V-shape armor)
     targetCtx.fillStyle = '#111';
     targetCtx.beginPath();
-    targetCtx.moveTo(-s * 0.2, s * 0.3);
-    targetCtx.quadraticCurveTo(-s * 0.25, s * 0.5, -s * 0.2, s * 0.7);
-    targetCtx.lineTo(s * 0.2, s * 0.7);
-    targetCtx.quadraticCurveTo(s * 0.25, s * 0.5, s * 0.2, s * 0.3);
+    targetCtx.moveTo(-s * 0.25, s * 0.3);
+    targetCtx.lineTo(s * 0.25, s * 0.3);
+    targetCtx.lineTo(s * 0.15, s * 0.7);
+    targetCtx.lineTo(-s * 0.15, s * 0.7);
     targetCtx.fill();
+    
+    // Dark Gray Armor Chest Plate
+    targetCtx.fillStyle = '#374151';
+    targetCtx.beginPath(); targetCtx.moveTo(-s*0.15, s*0.35); targetCtx.lineTo(s*0.15, s*0.35); targetCtx.lineTo(s*0.1, s*0.5); targetCtx.lineTo(-s*0.1, s*0.5); targetCtx.fill();
 
-    // Integrated Red Belt (Thicker)
+    // Cross straps
+    targetCtx.strokeStyle = '#1f2937'; targetCtx.lineWidth = Math.max(3, s * 0.05);
+    targetCtx.beginPath(); targetCtx.moveTo(-s*0.15, s*0.35); targetCtx.lineTo(s*0.1, s*0.55); targetCtx.stroke();
+    targetCtx.beginPath(); targetCtx.moveTo(s*0.15, s*0.35); targetCtx.lineTo(-s*0.1, s*0.55); targetCtx.stroke();
+
+    // High-quality Red Belt with gold buckle
     targetCtx.fillStyle = '#ef4444';
-    targetCtx.beginPath();
-    targetCtx.roundRect(-s * 0.22, s * 0.52, s * 0.44, s * 0.1, s * 0.02);
-    targetCtx.fill();
-    // Belt Tail
-    targetCtx.beginPath();
-    targetCtx.moveTo(s * 0.1, s * 0.6);
-    targetCtx.lineTo(s * 0.25, s * 0.75);
-    targetCtx.lineTo(s * 0.15, s * 0.8);
-    targetCtx.closePath();
-    targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.roundRect(-s * 0.2, s * 0.52, s * 0.4, s * 0.08, s * 0.02); targetCtx.fill();
+    targetCtx.fillStyle = '#facc15';
+    targetCtx.fillRect(-s*0.05, s*0.51, s*0.1, s*0.1);
+    
+    // Dynamic Belt Tails (Animated)
+    targetCtx.save();
+    targetCtx.translate(s * 0.1, s * 0.55);
+    targetCtx.rotate(-Math.sin(time * 5) * 0.2);
+    targetCtx.fillStyle = '#ef4444';
+    targetCtx.beginPath(); targetCtx.moveTo(0, 0); targetCtx.lineTo(s * 0.2, s * 0.25); targetCtx.lineTo(s * 0.1, s * 0.3); targetCtx.closePath(); targetCtx.fill();
+    targetCtx.restore();
   }
 
   // Character Outline for Troop
@@ -1108,12 +1140,7 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     }
     targetCtx.fill();
 
-    // Blue Chest Plate
-    targetCtx.fillStyle = '#0078ff';
-    targetCtx.beginPath();
-    targetCtx.moveTo(-s * 0.15, s * 0.4);
-    targetCtx.quadraticCurveTo(0, s * 0.6, s * 0.15, s * 0.4);
-    targetCtx.fill();
+    // Blue Chest Plate removed per request
     
     // Tiny blue cape
     targetCtx.fillStyle = '#0078ff';
@@ -1255,51 +1282,49 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     // Star on Hat
     targetCtx.fillStyle = '#facc15';
     targetCtx.beginPath(); targetCtx.arc(0, -s*0.05, s*0.03, 0, Math.PI*2); targetCtx.fill();
+  } else if (id === 'galaxy') {
+    targetCtx.fillStyle = '#a855f7';
+    targetCtx.beginPath();
+    targetCtx.roundRect(-s*0.28, -s*0.1, s*0.56, s*0.56, s*0.08); // Square/Blocky head
+    targetCtx.fill();
   } else if (id !== 'cyber') {
     targetCtx.fillStyle = colors.head || '#111';
-    if (id === 'galaxy') targetCtx.fillStyle = '#a855f7';
     targetCtx.beginPath(); targetCtx.arc(0, s * 0.2, s * 0.3, 0, Math.PI * 2); targetCtx.fill();
   }
 
   // Eyes & Details
   if (id === 'ninja') {
-    // 1. Larger Face Skin Area (Exposed eyes)
+    // 1. Sleeker Face Skin Area (Exposed eyes slit)
     targetCtx.fillStyle = '#ffedd5';
     targetCtx.beginPath();
-    targetCtx.ellipse(s * 0.15, s * 0.2, s * 0.2, s * 0.1, 0, 0, Math.PI * 2);
+    targetCtx.roundRect(s * 0.05, s * 0.15, s * 0.25, s * 0.08, s * 0.04);
     targetCtx.fill();
 
-    // 2. Ninja Mask / Hood (Black)
+    // 2. Ninja Mask / Hood (Overlapping fabric folds)
     targetCtx.fillStyle = '#111';
-    // Mask covering lower face
-    targetCtx.beginPath();
-    targetCtx.moveTo(-s * 0.05, s * 0.26);
-    targetCtx.lineTo(s * 0.35, s * 0.26);
-    targetCtx.lineTo(s * 0.25, s * 0.45);
-    targetCtx.lineTo(-s * 0.05, s * 0.45);
-    targetCtx.closePath();
-    targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.moveTo(-s * 0.1, s * 0.22); targetCtx.lineTo(s * 0.35, s * 0.22); targetCtx.lineTo(s * 0.2, s * 0.5); targetCtx.lineTo(-s * 0.1, s * 0.4); targetCtx.fill();
+    targetCtx.fillStyle = '#1f2937'; // Highlight fold
+    targetCtx.beginPath(); targetCtx.moveTo(s * 0.05, s * 0.22); targetCtx.lineTo(s * 0.3, s * 0.22); targetCtx.lineTo(s * 0.2, s * 0.3); targetCtx.fill();
 
     // 3. Thick Red Bandana
     targetCtx.fillStyle = '#ef4444';
-    targetCtx.fillRect(-s * 0.32, s * 0.05, s * 0.65, s * 0.12);
+    targetCtx.fillRect(-s * 0.3, s * 0.05, s * 0.6, s * 0.1);
 
-    // Bandana Tails
+    // Bandana Tails (Animated behind head)
     targetCtx.save();
-    targetCtx.translate(-s * 0.3, s * 0.1);
-    targetCtx.rotate(Math.sin(time * 5) * 0.15);
-    targetCtx.beginPath();
-    targetCtx.moveTo(0, 0); targetCtx.lineTo(-s * 0.25, -s * 0.05); targetCtx.lineTo(-s * 0.2, s * 0.15); targetCtx.closePath(); targetCtx.fill();
-    targetCtx.beginPath();
-    targetCtx.moveTo(0, s * 0.05); targetCtx.lineTo(-s * 0.3, s * 0.1); targetCtx.lineTo(-s * 0.25, s * 0.25); targetCtx.closePath(); targetCtx.fill();
+    targetCtx.translate(-s * 0.25, s * 0.1);
+    targetCtx.rotate(Math.sin(time * 8) * 0.2);
+    targetCtx.fillStyle = '#ef4444';
+    targetCtx.beginPath(); targetCtx.moveTo(0, 0); targetCtx.quadraticCurveTo(-s * 0.3, -s * 0.1, -s * 0.4, s * 0.1); targetCtx.lineTo(-s * 0.2, s * 0.15); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.moveTo(0, s * 0.05); targetCtx.quadraticCurveTo(-s * 0.3, s * 0.1, -s * 0.35, s * 0.25); targetCtx.lineTo(-s * 0.15, s * 0.2); targetCtx.fill();
     targetCtx.restore();
 
-    // 4. Smaller Expressive Black Eye (Shifted up)
+    // 4. Intense Eye & Scar
     targetCtx.fillStyle = '#000';
-    targetCtx.beginPath(); targetCtx.arc(s * 0.21, s * 0.2, s * 0.025, 0, Math.PI * 2); targetCtx.fill();
-    // Glint
-    targetCtx.fillStyle = '#fff';
-    targetCtx.beginPath(); targetCtx.arc(s * 0.22, s * 0.19, s * 0.01, 0, Math.PI * 2); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.ellipse(s * 0.2, s * 0.19, s * 0.03, s * 0.02, 0, 0, Math.PI * 2); targetCtx.fill();
+    // Scar
+    targetCtx.strokeStyle = '#ef4444'; targetCtx.lineWidth = 1.5;
+    targetCtx.beginPath(); targetCtx.moveTo(s * 0.15, s * 0.12); targetCtx.lineTo(s * 0.25, s * 0.25); targetCtx.stroke();
   } 
   else if (id === 'wizard') {
     // Beard handled in head path

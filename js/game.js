@@ -172,7 +172,7 @@ const SHOP_DB = [
   { id: 'ninja', type: 'skin', name: 'Ninja', rarity: 'Uncommon', cost: 250, icon: 'ninja', desc: 'Stealthy assassin with a red headband.', colors: { body: '#1a1a1a', head: '#1a1a1a', face: '#eebb99', band: '#ef4444' } },
   { id: 'cyber', type: 'skin', name: 'Cyber', rarity: 'Rare', cost: 350, icon: 'cyber', desc: 'Friendly AI robot from the future.', colors: { body: '#f8fafc', head: '#f8fafc', glow: '#00e5ff' } },
   { id: 'wizard', type: 'skin', name: 'Wizard', rarity: 'Epic', cost: 450, icon: 'wizard', desc: 'A wise sorcerer with a star-patterned robe.', colors: { body: '#1d4ed8', head: '#ffffff', hat: '#1d4ed8', stars: '#facc15' } },
-  { id: 'hoodie', type: 'skin', name: 'Hoodie', rarity: 'Legendary', cost: 550, icon: 'hoodie', desc: 'Shadowed face hidden beneath a red hoodie.', colors: { body: '#e11d48', head: '#be123c', faceShadow: '#111111' } },
+  { id: 'troop', type: 'skin', name: 'Troop', rarity: 'Legendary', cost: 550, icon: 'troop', desc: 'Elite crimson trooper armor.', colors: { body: '#991b1b', head: '#dc2626' } },
   { id: 'galaxy', type: 'skin', name: 'Titan', rarity: 'Mythic', cost: 750, icon: 'galaxy', desc: 'Inspired by a cosmic powerhouse.', colors: { body: '#1e3a8a', head: '#a855f7', gauntlet: '#eab308' } },
   // HATS
   { id: 'cap', type: 'hat', name: 'Baseball Cap', rarity: 'Common', cost: 50, iconId: 'hat_cap', desc: 'Keep the sun out.' },
@@ -744,7 +744,7 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     targetCtx.fillStyle = '#a855f7';
     targetCtx.shadowColor = '#a855f7'; targetCtx.shadowBlur = 5;
     targetCtx.fill();
-  } else if (id === 'hoodie') {
+  } else if (id === 'troop') {
     targetCtx.fillStyle = '#e11d48';
     targetCtx.fill();
   } else if (id === 'cyber') {
@@ -778,8 +778,8 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     targetCtx.fill();
   }
 
-  // Character Outline for Hoodie
-  if (id === 'hoodie') {
+  // Character Outline for Troop
+  if (id === 'troop') {
     targetCtx.strokeStyle = '#000';
     targetCtx.lineWidth = 0.5;
     targetCtx.stroke();
@@ -875,19 +875,19 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     targetCtx.shadowBlur = 0;
   }
 
-  if (id === 'hoodie') {
+  if (id === 'troop') {
     targetCtx.strokeStyle = '#9f1239'; targetCtx.lineWidth = 3;
     targetCtx.beginPath(); targetCtx.moveTo(0, s * 0.3); targetCtx.lineTo(0, s * 0.6); targetCtx.stroke();
   }
 
   // Head Path
   targetCtx.save();
-  if (id === 'hoodie') {
-    targetCtx.fillStyle = colors.head;
-    targetCtx.beginPath(); targetCtx.arc(0, s * 0.2, s * 0.35, Math.PI, 0); targetCtx.fill();
-    targetCtx.fillRect(-s * 0.35, s * 0.2, s * 0.7, s * 0.2);
-    targetCtx.fillStyle = colors.faceShadow;
-    targetCtx.beginPath(); targetCtx.arc(s * 0.1, s * 0.3, s * 0.2, 0, Math.PI * 2); targetCtx.fill();
+  if (id === 'troop') {
+    targetCtx.fillStyle = colors.head || '#dc2626';
+    targetCtx.beginPath(); targetCtx.arc(0, s * 0.2, s * 0.35, 0, Math.PI * 2); targetCtx.fill();
+    // Troop Jaw/Cheeks
+    targetCtx.fillStyle = '#991b1b';
+    targetCtx.beginPath(); targetCtx.moveTo(-s*0.25, s*0.35); targetCtx.lineTo(s*0.25, s*0.35); targetCtx.lineTo(s*0.1, s*0.55); targetCtx.lineTo(-s*0.1, s*0.55); targetCtx.closePath(); targetCtx.fill();
   } else if (id === 'galaxy') {
     // Square Head for Titan
     targetCtx.fillStyle = '#a855f7';
@@ -983,8 +983,16 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     targetCtx.fillStyle = '#111';
     targetCtx.beginPath(); targetCtx.arc(s * 0.15, s * 0.2, s * 0.05, 0, Math.PI * 2); targetCtx.fill();
   }
-  else if (id === 'hoodie') {
-    // No eyes for hoodie, just shadow
+  else if (id === 'troop') {
+    // Troop Visor (Black band)
+    targetCtx.fillStyle = '#111';
+    targetCtx.beginPath(); targetCtx.moveTo(-s*0.35, s*0.15); targetCtx.quadraticCurveTo(0, s*0.05, s*0.35, s*0.15); targetCtx.lineTo(s*0.3, s*0.25); targetCtx.quadraticCurveTo(0, s*0.15, -s*0.3, s*0.25); targetCtx.closePath(); targetCtx.fill();
+    // Troop Lower Cheek Accents
+    targetCtx.fillStyle = '#111';
+    targetCtx.beginPath(); targetCtx.moveTo(-s*0.2, s*0.25); targetCtx.lineTo(s*0.2, s*0.25); targetCtx.lineTo(s*0.15, s*0.45); targetCtx.lineTo(-s*0.15, s*0.45); targetCtx.closePath(); targetCtx.fill();
+    // Red Center Nose Block
+    targetCtx.fillStyle = '#dc2626';
+    targetCtx.beginPath(); targetCtx.moveTo(-s*0.1, s*0.2); targetCtx.lineTo(s*0.1, s*0.2); targetCtx.lineTo(s*0.12, s*0.4); targetCtx.lineTo(0, s*0.5); targetCtx.lineTo(-s*0.12, s*0.4); targetCtx.closePath(); targetCtx.fill();
   }
   else {
     targetCtx.fillStyle = colors.face || '#fff';
@@ -992,8 +1000,8 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     targetCtx.beginPath(); targetCtx.arc(s * 0.18, s * 0.2, s * 0.06, 0, Math.PI * 2); targetCtx.fill();
   }
 
-  // Final Outline for Hoodie (Head)
-  if (id === 'hoodie') {
+  // Final Outline for Troop (Head)
+  if (id === 'troop') {
     targetCtx.strokeStyle = '#000';
     targetCtx.lineWidth = 0.5;
     targetCtx.stroke();
@@ -1012,9 +1020,9 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     drawLimbPath(targetCtx, s * 0.1, s * 0.6, s * 0.15, s * 0.4, legAngle1, colors.body || '#111', false);
   }
   
-  // Hoodie Arm alignment fix
+  // Troop Arm alignment fix
   let armX = 0;
-  if (id === 'hoodie') armX = s * 0.1;
+  if (id === 'troop') armX = s * 0.1;
   drawLimbPath(targetCtx, armX, s * 0.3, s * 0.12, s * 0.35, armAngle1, colors.body || '#111', false, wpnId);
 
   // Infinity Gauntlet for Galaxy Skin
@@ -1066,9 +1074,9 @@ function drawLimbPath(targetCtx, x, y, w, h, angle, color, isBack, wpnId) {
   targetCtx.save();
   targetCtx.translate(x, y); targetCtx.rotate(angle);
   
-  // Thin black outline for Hoodie arms
+  // Thin black outline for Troop arms
   let drawStroke = false;
-  if (color === '#e11d48') drawStroke = true;
+  if (color === '#991b1b') drawStroke = true;
 
   const baseColor = isBack ? shadeColor(color, -20) : color;
   targetCtx.fillStyle = baseColor;
@@ -1886,7 +1894,7 @@ function drawPreviewCanvas() {
   if (prevSkin === 'ninja') bIdx = 1;
   else if (prevSkin === 'cyber') bIdx = 2;
   else if (prevSkin === 'gold') bIdx = 3;
-  else if (prevSkin === 'hoodie') bIdx = 4;
+  else if (prevSkin === 'troop') bIdx = 4;
   else if (prevSkin === 'galaxy') bIdx = 5;
   const biome = BIOMES[bIdx];
 

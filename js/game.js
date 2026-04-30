@@ -170,7 +170,7 @@ const SHOP_DB = [
   // SKINS
   { id: 'classic', type: 'skin', name: 'Classic', rarity: 'Common', cost: 0, icon: 'classic', desc: 'A simple but polished stick hero.', colors: { body: '#111111', head: '#111111' } },
   { id: 'ninja', type: 'skin', name: 'Ninja', rarity: 'Uncommon', cost: 250, icon: 'ninja', desc: 'Stealthy assassin with a red headband.', colors: { body: '#1a1a1a', head: '#1a1a1a', face: '#eebb99', band: '#ef4444' } },
-  { id: 'cyber', type: 'skin', name: 'Cyber', rarity: 'Rare', cost: 350, icon: 'cyber', desc: 'Neon glow lines pulsing with digital energy.', colors: { body: '#0f172a', head: '#0f172a', glow: '#00e5ff' } },
+  { id: 'cyber', type: 'skin', name: 'Cyber', rarity: 'Rare', cost: 350, icon: 'cyber', desc: 'Friendly AI robot from the future.', colors: { body: '#f8fafc', head: '#f8fafc', glow: '#00e5ff' } },
   { id: 'gold', type: 'skin', name: 'Gold', rarity: 'Epic', cost: 450, icon: 'gold', desc: 'Solid metallic gradient.', colors: { body: '#eab308', head: '#facc15', shine: '#fef08a' } },
   { id: 'hoodie', type: 'skin', name: 'Hoodie', rarity: 'Legendary', cost: 550, icon: 'hoodie', desc: 'Shadowed face hidden beneath a red hoodie.', colors: { body: '#e11d48', head: '#be123c', faceShadow: '#111111' } },
   { id: 'galaxy', type: 'skin', name: 'Titan', rarity: 'Mythic', cost: 750, icon: 'galaxy', desc: 'Inspired by a cosmic powerhouse.', colors: { body: '#1e3a8a', head: '#a855f7', gauntlet: '#eab308' } },
@@ -725,7 +725,7 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
   } else if (id === 'hoodie') {
     targetCtx.fillStyle = '#e11d48';
   } else if (id === 'cyber') {
-    targetCtx.fillStyle = '#0891b2';
+    targetCtx.fillStyle = '#f1f5f9'; // Sleek White/Silver
   } else {
     targetCtx.fillStyle = colors.body || '#111';
   }
@@ -778,17 +778,18 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
   }
 
   if (id === 'cyber') {
-    // Robotic Panel Lines
-    targetCtx.strokeStyle = 'rgba(255,255,255,0.1)';
-    targetCtx.lineWidth = 1;
+    // 3D Silver Gradient for Body
+    let g = targetCtx.createLinearGradient(-s*0.2, s*0.3, s*0.2, s*0.7);
+    g.addColorStop(0, '#f8fafc'); g.addColorStop(0.5, '#cbd5e1'); g.addColorStop(1, '#94a3b8');
+    targetCtx.fillStyle = g;
     targetCtx.beginPath();
-    targetCtx.moveTo(-s*0.2, s*0.5); targetCtx.lineTo(s*0.2, s*0.5);
-    targetCtx.moveTo(0, s*0.3); targetCtx.lineTo(0, s*0.7);
-    targetCtx.stroke();
-    // Glowing Core
-    targetCtx.fillStyle = colors.glow;
-    targetCtx.shadowColor = colors.glow; targetCtx.shadowBlur = 10;
-    targetCtx.beginPath(); targetCtx.arc(0, s*0.45, s*0.05, 0, Math.PI*2); targetCtx.fill();
+    targetCtx.ellipse(0, s*0.5, s*0.22, s*0.25, 0, 0, Math.PI*2);
+    targetCtx.fill();
+    
+    // Core/Joint light
+    targetCtx.fillStyle = '#00e5ff';
+    targetCtx.shadowColor = '#00e5ff'; targetCtx.shadowBlur = 10;
+    targetCtx.beginPath(); targetCtx.arc(0, s*0.35, s*0.04, 0, Math.PI*2); targetCtx.fill();
     targetCtx.shadowBlur = 0;
   }
 
@@ -808,16 +809,34 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
   }
 
   if (id === 'cyber') {
-    targetCtx.strokeStyle = colors.glow; targetCtx.lineWidth = 2;
-    targetCtx.beginPath(); targetCtx.moveTo(-s*0.1, s*0.4); targetCtx.lineTo(0, s*0.5); targetCtx.lineTo(-s*0.05, s*0.6); targetCtx.stroke();
-    // Glowing Cyber Eye (Modern Android)
-    targetCtx.fillStyle = colors.glow;
-    targetCtx.shadowColor = colors.glow; targetCtx.shadowBlur = 10;
-    targetCtx.beginPath(); targetCtx.arc(s*0.15, s*0.2, s*0.06, 0, Math.PI*2); targetCtx.fill();
+    // 3D Silver Head
+    let hg = targetCtx.createRadialGradient(-s*0.1, s*0.1, 0, 0, s*0.2, s*0.3);
+    hg.addColorStop(0, '#ffffff'); hg.addColorStop(1, '#cbd5e1');
+    targetCtx.fillStyle = hg;
+    targetCtx.beginPath(); targetCtx.arc(0, s*0.2, s*0.32, 0, Math.PI*2); targetCtx.fill();
+
+    // Black Visor
+    targetCtx.fillStyle = '#0f172a';
+    targetCtx.beginPath(); 
+    targetCtx.ellipse(s*0.12, s*0.2, s*0.22, s*0.18, 0, 0, Math.PI*2);
+    targetCtx.fill();
+
+    // Friendly Glowing Eye (Cyan)
+    targetCtx.strokeStyle = '#00e5ff';
+    targetCtx.lineWidth = 3;
+    targetCtx.shadowColor = '#00e5ff'; targetCtx.shadowBlur = 8;
+    targetCtx.beginPath(); 
+    targetCtx.arc(s*0.18, s*0.22, s*0.06, -Math.PI*0.8, -Math.PI*0.2); 
+    targetCtx.stroke();
     targetCtx.shadowBlur = 0;
-    // Android Head Detail
-    targetCtx.strokeStyle = 'rgba(255,255,255,0.2)';
-    targetCtx.beginPath(); targetCtx.arc(0, s*0.2, s*0.3, -Math.PI/2, Math.PI/2); targetCtx.stroke();
+
+    // Antenna
+    targetCtx.strokeStyle = '#f8fafc';
+    targetCtx.lineWidth = 4;
+    targetCtx.beginPath();
+    targetCtx.moveTo(-s*0.1, -s*0.05);
+    targetCtx.lineTo(-s*0.15, -s*0.2);
+    targetCtx.stroke();
   }
   
   if (id === 'hoodie') {

@@ -22,6 +22,38 @@ const ctx = canvas.getContext('2d');
 const prevCanvas = document.getElementById('previewCanvas');
 const prevCtx = prevCanvas.getContext('2d');
 
+// Remove dark background from Demon avatar dynamically
+(function() {
+  const demonAvatarImg = new Image();
+  demonAvatarImg.src = 'images/demon_avatar.jpg';
+  demonAvatarImg.crossOrigin = 'Anonymous';
+  demonAvatarImg.onload = () => {
+    try {
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.width = demonAvatarImg.width;
+      tempCanvas.height = demonAvatarImg.height;
+      const tempCtx = tempCanvas.getContext('2d', { willReadFrequently: true });
+      tempCtx.drawImage(demonAvatarImg, 0, 0);
+      const imgData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
+      const data = imgData.data;
+      for (let i = 0; i < data.length; i += 4) {
+          // If the pixel is dark (R<40, G<45, B<40 - matching the dark green/black background)
+          if (data[i] < 40 && data[i+1] < 45 && data[i+2] < 40) {
+              data[i+3] = 0; // Make transparent
+          }
+      }
+      tempCtx.putImageData(imgData, 0, 0);
+      const transparentDataUrl = tempCanvas.toDataURL('image/png');
+      // Inject CSS to override .demon-avatar
+      const style = document.createElement('style');
+      style.innerHTML = `.demon-avatar { background: url('${transparentDataUrl}') no-repeat center/contain !important; mix-blend-mode: normal !important; }`;
+      document.head.appendChild(style);
+    } catch(e) {
+      console.log('CORS or Canvas error processing demon avatar', e);
+    }
+  };
+})();
+
 const scoreEl = document.getElementById('ui-score');
 const bestEl = document.getElementById('ui-best');
 const perfectEl = document.getElementById('perfect-msg');
@@ -1176,33 +1208,44 @@ function renderSkeleton(targetCtx, skinId, hatId, capeId, wpnId, faceId, s, stat
     targetCtx.lineWidth = Math.max(3, s*0.06);
     targetCtx.stroke();
     
-    // Tail Flame (Animated)
+    // Tail Flame (Animated & Realistic)
     targetCtx.translate(-s*0.6, -s*0.3);
-    let flameScale = 1.0 + Math.sin(time * 20) * 0.15; // Flickering
-    targetCtx.scale(flameScale, flameScale);
     
-    // Outer Flame (Vibrant Orange)
-    targetCtx.fillStyle = '#f97316'; 
-    targetCtx.beginPath(); 
-    targetCtx.moveTo(0, -s*0.25); 
-    targetCtx.quadraticCurveTo(-s*0.15, -s*0.1, -s*0.1, s*0.05); 
-    targetCtx.quadraticCurveTo(0, s*0.15, s*0.1, s*0.05); 
-    targetCtx.quadraticCurveTo(s*0.15, -s*0.1, 0, -s*0.25); 
-    targetCtx.fill();
+    // Animate scale and slight rotation for flickering
+    let flickerScaleY = 1.0 + Math.sin(time * 25) * 0.2;
+    let flickerScaleX = 1.0 + Math.cos(time * 15) * 0.1;
+    targetCtx.scale(flickerScaleX, flickerScaleY);
     
-    // Inner Flame (Lighter Yellow)
-    targetCtx.fillStyle = '#fef08a'; 
-    targetCtx.beginPath(); 
-    targetCtx.moveTo(0, -s*0.12); 
-    targetCtx.quadraticCurveTo(-s*0.08, -s*0.03, -s*0.05, s*0.03); 
-    targetCtx.quadraticCurveTo(0, s*0.08, s*0.05, s*0.03); 
-    targetCtx.quadraticCurveTo(s*0.08, -s*0.03, 0, -s*0.12); 
+    // Layer 1: Dark Red / Orange Glow
+    targetCtx.fillStyle = 'rgba(239, 68, 68, 0.8)'; 
+    targetCtx.beginPath();
+    targetCtx.moveTo(0, s*0.05); // Base
+    targetCtx.bezierCurveTo(-s*0.25, -s*0.1, -s*0.2, -s*0.3, 0, -s*0.45); // Left side to tip
+    targetCtx.bezierCurveTo(s*0.2, -s*0.3, s*0.25, -s*0.1, 0, s*0.05); // Right side
     targetCtx.fill();
 
-    // Core Flame (White)
-    targetCtx.fillStyle = '#ffffff';
+    // Layer 2: Bright Orange
+    targetCtx.fillStyle = '#f97316'; 
     targetCtx.beginPath();
-    targetCtx.arc(0, 0, s*0.02, 0, Math.PI*2);
+    targetCtx.moveTo(0, s*0.02); 
+    targetCtx.bezierCurveTo(-s*0.15, -s*0.05, -s*0.15, -s*0.2, 0, -s*0.35); 
+    targetCtx.bezierCurveTo(s*0.15, -s*0.2, s*0.15, -s*0.05, 0, s*0.02); 
+    targetCtx.fill();
+
+    // Layer 3: Yellow Core
+    targetCtx.fillStyle = '#facc15'; 
+    targetCtx.beginPath();
+    targetCtx.moveTo(0, 0); 
+    targetCtx.bezierCurveTo(-s*0.08, -s*0.02, -s*0.08, -s*0.1, 0, -s*0.2); 
+    targetCtx.bezierCurveTo(s*0.08, -s*0.1, s*0.08, -s*0.02, 0, 0); 
+    targetCtx.fill();
+
+    // Layer 4: White Hot Center
+    targetCtx.fillStyle = '#ffffff'; 
+    targetCtx.beginPath();
+    targetCtx.moveTo(0, -s*0.02); 
+    targetCtx.bezierCurveTo(-s*0.03, -s*0.04, -s*0.03, -s*0.08, 0, -s*0.12); 
+    targetCtx.bezierCurveTo(s*0.03, -s*0.08, s*0.03, -s*0.04, 0, -s*0.02); 
     targetCtx.fill();
 
     targetCtx.restore();

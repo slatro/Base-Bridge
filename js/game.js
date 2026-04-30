@@ -924,7 +924,7 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     targetCtx.lineTo(s * 0.15, s * 0.8);
     targetCtx.closePath();
     targetCtx.fill();
-
+  }
 
   // Character Outline for Troop
   if (id === 'troop') {

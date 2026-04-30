@@ -875,12 +875,19 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     targetCtx.fillStyle = colors.faceShadow;
     targetCtx.beginPath(); targetCtx.arc(s * 0.1, s * 0.3, s * 0.2, 0, Math.PI * 2); targetCtx.fill();
   } else if (id === 'wizard') {
-    // Pointy Wizard Hat
+    // 1. Wizard Face (Skin Tone) - Drawn behind hat/beard
+    targetCtx.fillStyle = '#ffedd5';
+    targetCtx.beginPath(); targetCtx.arc(0, s*0.2, s*0.22, 0, Math.PI*2); targetCtx.fill();
+    // 2. Wizard Eye
+    targetCtx.fillStyle = '#111';
+    targetCtx.beginPath(); targetCtx.arc(s*0.1, s*0.2, s*0.04, 0, Math.PI*2); targetCtx.fill();
+
+    // 3. Pointy Wizard Hat (Drawn on top)
     targetCtx.fillStyle = '#1e40af';
     targetCtx.beginPath();
-    targetCtx.moveTo(-s*0.4, s*0.2);
-    targetCtx.lineTo(s*0.4, s*0.2);
-    targetCtx.lineTo(0, -s*0.3);
+    targetCtx.moveTo(-s*0.4, s*0.18);
+    targetCtx.lineTo(s*0.4, s*0.18);
+    targetCtx.lineTo(0, -s*0.35);
     targetCtx.closePath();
     targetCtx.fill();
     // Star on Hat
@@ -933,18 +940,11 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     targetCtx.beginPath(); targetCtx.arc(s * 0.15, s * 0.185, s * 0.015, 0, Math.PI * 2); targetCtx.fill();
   } 
   else if (id === 'wizard') {
-    // Face Skin area
-    targetCtx.fillStyle = '#ffedd5';
-    targetCtx.beginPath(); targetCtx.arc(s*0.05, s*0.2, s*0.15, 0, Math.PI*2); targetCtx.fill();
-    // Eye
-    targetCtx.fillStyle = '#111';
-    targetCtx.beginPath(); targetCtx.arc(s*0.12, s*0.2, s*0.04, 0, Math.PI*2); targetCtx.fill();
-
-    // Long White Beard
+    // Long White Beard (Drawn over the bottom of the face)
     targetCtx.fillStyle = '#fff';
     targetCtx.beginPath();
-    targetCtx.moveTo(-s*0.15, s*0.25);
-    targetCtx.quadraticCurveTo(s*0.05, s*0.65, s*0.2, s*0.25);
+    targetCtx.moveTo(-s*0.2, s*0.2);
+    targetCtx.quadraticCurveTo(0, s*0.7, s*0.25, s*0.2);
     targetCtx.fill();
   }
   else if (id === 'galaxy') {

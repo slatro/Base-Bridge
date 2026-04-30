@@ -945,43 +945,6 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
 
   // Body Path Details
   if (id === 'pika') {
-    // Animated Electricity Aura
-    targetCtx.save();
-    targetCtx.strokeStyle = '#0ea5e9'; // Bright cyan sparks
-    targetCtx.shadowColor = '#38bdf8';
-    targetCtx.shadowBlur = 15;
-    targetCtx.lineWidth = Math.max(2, s*0.04);
-    targetCtx.lineJoin = 'miter';
-    targetCtx.lineCap = 'round';
-    
-    const sparkCount = 3;
-    for(let i=0; i<sparkCount; i++) {
-      // Flashy flickering effect based on time
-      const cycle = Math.floor(time * 15 + i * 7) % 10;
-      if (cycle < 3) {
-        const angle = (Math.PI * 2 / sparkCount) * i + time * 5;
-        const radius = s*0.4 + Math.random() * s*0.2;
-        const sx = Math.cos(angle) * radius;
-        const sy = Math.sin(angle) * radius + s*0.4;
-        
-        targetCtx.beginPath();
-        targetCtx.moveTo(sx, sy);
-        targetCtx.lineTo(sx + s*0.15, sy - s*0.1);
-        targetCtx.lineTo(sx + s*0.05, sy - s*0.15);
-        targetCtx.lineTo(sx + s*0.2, sy - s*0.3);
-        targetCtx.stroke();
-        
-        // Inner white core
-        targetCtx.strokeStyle = '#ffffff';
-        targetCtx.lineWidth = Math.max(1, s*0.02);
-        targetCtx.stroke();
-        // Reset
-        targetCtx.strokeStyle = '#0ea5e9';
-        targetCtx.lineWidth = Math.max(2, s*0.04);
-      }
-    }
-    targetCtx.restore();
-
     // Pika Custom Fat Body
     // Zigzag tail - Better body connection
     targetCtx.beginPath(); targetCtx.moveTo(-s*0.2, s*0.4); targetCtx.lineTo(-s*0.4, s*0.45); targetCtx.lineTo(-s*0.65, s*0.5); targetCtx.lineTo(-s*0.55, s*0.35); targetCtx.lineTo(-s*0.75, s*0.25); targetCtx.lineTo(-s*0.65, s*0.1); targetCtx.lineTo(-s*0.9, -s*0.1); targetCtx.lineTo(-s*0.75, -s*0.2); targetCtx.lineWidth = Math.max(3, s*0.12); targetCtx.strokeStyle = '#facc15'; targetCtx.lineJoin = 'miter'; targetCtx.stroke();
@@ -1433,6 +1396,48 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
   if (hatId === 'halo' && loadedIcons['hat_halo']) targetCtx.drawImage(loadedIcons['hat_halo'], -s * 0.5, -s * 0.4, s * 1.0, s * 0.4);
 
   if (faceId === 'glasses' && loadedIcons['face_glasses']) targetCtx.drawImage(loadedIcons['face_glasses'], -s * 0.15, s * 0.1, s * 0.6, s * 0.25);
+
+  // Animated Electricity Aura (Drawn IN FRONT of the body)
+  if (id === 'pika') {
+    targetCtx.save();
+    targetCtx.strokeStyle = '#0ea5e9'; // Bright cyan sparks
+    targetCtx.shadowColor = '#38bdf8';
+    targetCtx.shadowBlur = 15;
+    targetCtx.lineWidth = Math.max(2, s*0.04);
+    targetCtx.lineJoin = 'miter';
+    targetCtx.lineCap = 'round';
+    
+    const sparkCount = 3;
+    for(let i=0; i<sparkCount; i++) {
+      // Create a flashy flickering effect that jumps around
+      const t = Math.floor(time * 15 + i * 7) % 20;
+      if (t < 5) {
+        // Discrete random positions (does not smoothly rotate)
+        const seed = Math.floor(time * 15) + i * 100;
+        const pseudoRandX = (Math.sin(seed * 13.5) * 0.5 - 0.05) * s;
+        const pseudoRandY = (Math.cos(seed * 21.3) * 0.4 + 0.45) * s;
+        
+        // Random flip horizontally for variety
+        const dir = (seed % 2 === 0) ? 1 : -1;
+
+        targetCtx.beginPath();
+        targetCtx.moveTo(pseudoRandX, pseudoRandY);
+        targetCtx.lineTo(pseudoRandX + dir*s*0.15, pseudoRandY - s*0.1);
+        targetCtx.lineTo(pseudoRandX + dir*s*0.05, pseudoRandY - s*0.15);
+        targetCtx.lineTo(pseudoRandX + dir*s*0.2, pseudoRandY - s*0.3);
+        targetCtx.stroke();
+        
+        // Inner white core
+        targetCtx.strokeStyle = '#ffffff';
+        targetCtx.lineWidth = Math.max(1, s*0.02);
+        targetCtx.stroke();
+        // Reset
+        targetCtx.strokeStyle = '#0ea5e9';
+        targetCtx.lineWidth = Math.max(2, s*0.04);
+      }
+    }
+    targetCtx.restore();
+  }
 
   targetCtx.restore();
 

@@ -948,22 +948,32 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
   }
 
   if (id === 'cyber') {
-    // 3D Silver Gradient for Body
+    // Astro Bot Body
     let g = targetCtx.createLinearGradient(-s * 0.2, s * 0.3, s * 0.2, s * 0.7);
-    g.addColorStop(0, '#f8fafc'); g.addColorStop(0.5, '#cbd5e1'); g.addColorStop(1, '#94a3b8');
+    g.addColorStop(0, '#ffffff'); g.addColorStop(1, '#cbd5e1');
     targetCtx.fillStyle = g;
     targetCtx.beginPath();
-    targetCtx.ellipse(0, s * 0.5, s * 0.22, s * 0.25, 0, 0, Math.PI * 2);
+    if (targetCtx.roundRect) {
+      targetCtx.roundRect(-s * 0.2, s * 0.3, s * 0.4, s * 0.45, s * 0.15);
+    } else {
+      targetCtx.rect(-s * 0.2, s * 0.3, s * 0.4, s * 0.45);
+    }
     targetCtx.fill();
 
-    // Golden Circular Core (Glowing)
-    targetCtx.fillStyle = '#f59e0b'; // Gold/Amber
-    targetCtx.shadowColor = '#f59e0b'; targetCtx.shadowBlur = 10;
-    targetCtx.beginPath(); targetCtx.arc(0, s * 0.5, s * 0.08, 0, Math.PI * 2); targetCtx.fill();
-    // Core center
-    targetCtx.fillStyle = '#fff';
-    targetCtx.beginPath(); targetCtx.arc(0, s * 0.5, s * 0.04, 0, Math.PI * 2); targetCtx.fill();
-    targetCtx.shadowBlur = 0;
+    // Blue Chest Plate
+    targetCtx.fillStyle = '#0078ff';
+    targetCtx.beginPath();
+    targetCtx.moveTo(-s * 0.15, s * 0.4);
+    targetCtx.quadraticCurveTo(0, s * 0.6, s * 0.15, s * 0.4);
+    targetCtx.fill();
+    
+    // Tiny blue cape
+    targetCtx.fillStyle = '#0078ff';
+    targetCtx.beginPath();
+    targetCtx.moveTo(-s * 0.1, s * 0.35);
+    targetCtx.lineTo(-s * 0.3, s * 0.5);
+    targetCtx.lineTo(-s * 0.2, s * 0.6);
+    targetCtx.fill();
   }
 
   targetCtx.shadowBlur = 0;
@@ -982,44 +992,53 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
   }
 
   if (id === 'cyber') {
-    // 3D Silver Head
-    let hg = targetCtx.createRadialGradient(-s * 0.1, s * 0.1, 0, 0, s * 0.2, s * 0.3);
+    // Astro Bot Head
+    let hg = targetCtx.createRadialGradient(0, s * 0.1, 0, 0, s * 0.1, s * 0.3);
     hg.addColorStop(0, '#ffffff'); hg.addColorStop(1, '#cbd5e1');
     targetCtx.fillStyle = hg;
-    targetCtx.beginPath(); targetCtx.arc(0, s * 0.2, s * 0.32, 0, Math.PI * 2); targetCtx.fill();
+    
+    // Antenna
+    targetCtx.strokeStyle = '#cbd5e1'; targetCtx.lineWidth = s * 0.04;
+    targetCtx.beginPath(); targetCtx.moveTo(0, 0); targetCtx.lineTo(s * 0.1, -s * 0.15); targetCtx.stroke();
+    targetCtx.fillStyle = '#00e5ff';
+    targetCtx.beginPath(); targetCtx.arc(s * 0.1, -s * 0.15, s * 0.05, 0, Math.PI * 2); targetCtx.fill();
 
-    // Black Visor
-    targetCtx.fillStyle = '#0f172a';
+    // Head Base
+    targetCtx.fillStyle = hg;
     targetCtx.beginPath();
-    targetCtx.ellipse(s * 0.12, s * 0.2, s * 0.22, s * 0.18, 0, 0, Math.PI * 2);
+    if (targetCtx.roundRect) {
+      targetCtx.roundRect(-s * 0.25, 0, s * 0.5, s * 0.4, s * 0.15);
+    } else {
+      targetCtx.rect(-s * 0.25, 0, s * 0.5, s * 0.4);
+    }
     targetCtx.fill();
 
-    // Robotic Eye (Prominent Side Profile)
+    // Black Visor
+    targetCtx.fillStyle = '#000000';
+    targetCtx.beginPath();
+    if (targetCtx.roundRect) {
+      targetCtx.roundRect(-s * 0.2, s * 0.05, s * 0.4, s * 0.3, s * 0.1);
+    } else {
+      targetCtx.rect(-s * 0.2, s * 0.05, s * 0.4, s * 0.3);
+    }
+    targetCtx.fill();
+
+    // Astro Eyes (Two Blue Semi-circles)
     targetCtx.fillStyle = '#00e5ff';
     targetCtx.shadowColor = '#00e5ff'; targetCtx.shadowBlur = 10;
-    targetCtx.beginPath(); targetCtx.arc(s*0.15, s*0.2, s*0.07, 0, Math.PI*2); targetCtx.fill();
-    // Inner Glint
-    targetCtx.fillStyle = '#fff';
-    targetCtx.beginPath(); targetCtx.arc(s*0.17, s*0.18, s*0.02, 0, Math.PI*2); targetCtx.fill();
-    targetCtx.shadowBlur = 0;
-
-    // Signal Antenna (Black rod)
-    targetCtx.strokeStyle = '#111';
-    targetCtx.lineWidth = 3;
+    
+    // Eye 1
     targetCtx.beginPath();
-    targetCtx.moveTo(-s * 0.1, -s * 0.05);
-    targetCtx.lineTo(-s * 0.15, -s * 0.25);
-    targetCtx.stroke();
+    targetCtx.moveTo(-s * 0.1, s * 0.25);
+    targetCtx.quadraticCurveTo(-s * 0.05, s * 0.15, 0, s * 0.25);
+    targetCtx.fill();
+    
+    // Eye 2
+    targetCtx.beginPath();
+    targetCtx.moveTo(s * 0.05, s * 0.25);
+    targetCtx.quadraticCurveTo(s * 0.1, s * 0.15, s * 0.15, s * 0.25);
+    targetCtx.fill();
 
-    // Signal Waves (Glowing Cyan)
-    targetCtx.strokeStyle = '#00e5ff';
-    targetCtx.lineWidth = 2;
-    targetCtx.shadowColor = '#00e5ff'; targetCtx.shadowBlur = 5;
-    for(let i=1; i<=3; i++) {
-        targetCtx.beginPath();
-        targetCtx.arc(-s * 0.15, -s * 0.25, i * s * 0.06, -Math.PI * 0.8, -Math.PI * 0.2);
-        targetCtx.stroke();
-    }
     targetCtx.shadowBlur = 0;
   }
 

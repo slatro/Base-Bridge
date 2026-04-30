@@ -1181,8 +1181,8 @@ function renderSkeleton(targetCtx, skinId, hatId, capeId, wpnId, faceId, s, stat
     let flameScale = 1.0 + Math.sin(time * 20) * 0.15; // Flickering
     targetCtx.scale(flameScale, flameScale);
     
-    // Outer Flame (Red)
-    targetCtx.fillStyle = '#ff3300'; 
+    // Outer Flame (Vibrant Orange)
+    targetCtx.fillStyle = '#f97316'; 
     targetCtx.beginPath(); 
     targetCtx.moveTo(0, -s*0.25); 
     targetCtx.quadraticCurveTo(-s*0.15, -s*0.1, -s*0.1, s*0.05); 
@@ -1190,13 +1190,19 @@ function renderSkeleton(targetCtx, skinId, hatId, capeId, wpnId, faceId, s, stat
     targetCtx.quadraticCurveTo(s*0.15, -s*0.1, 0, -s*0.25); 
     targetCtx.fill();
     
-    // Inner Flame (Yellow)
-    targetCtx.fillStyle = '#facc15'; 
+    // Inner Flame (Lighter Yellow)
+    targetCtx.fillStyle = '#fef08a'; 
     targetCtx.beginPath(); 
     targetCtx.moveTo(0, -s*0.12); 
     targetCtx.quadraticCurveTo(-s*0.08, -s*0.03, -s*0.05, s*0.03); 
     targetCtx.quadraticCurveTo(0, s*0.08, s*0.05, s*0.03); 
     targetCtx.quadraticCurveTo(s*0.08, -s*0.03, 0, -s*0.12); 
+    targetCtx.fill();
+
+    // Core Flame (White)
+    targetCtx.fillStyle = '#ffffff';
+    targetCtx.beginPath();
+    targetCtx.arc(0, 0, s*0.02, 0, Math.PI*2);
     targetCtx.fill();
 
     targetCtx.restore();

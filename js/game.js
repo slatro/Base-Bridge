@@ -186,7 +186,7 @@ let equippedFace = null;
 
 const SHOP_DB = [
   // SKINS
-  { id: 'classic', type: 'skin', name: 'Classic', rarity: 'Common', cost: 0, icon: 'classic', desc: 'The original hero with a black cap.', colors: { body: '#111111', head: '#ffedd5', cap: '#111111' } },
+  { id: 'classic', type: 'skin', name: 'Classic', rarity: 'Common', cost: 0, icon: 'classic', desc: 'A sleek Base Pilot with a glowing visor.', colors: { body: '#0f172a', head: '#1e293b' } },
   { id: 'ninja', type: 'skin', name: 'Ninja', rarity: 'Uncommon', cost: 250, icon: 'ninja', desc: 'A skilled ninja blending into the shadows.', colors: { body: '#374151', head: '#374151', skin: '#fcd34d', straps: '#1f2937' } },
   { id: 'cyber', type: 'skin', name: 'Cyber', rarity: 'Rare', cost: 350, icon: 'cyber', desc: 'Friendly AI robot from the future.', colors: { body: '#f8fafc', head: '#f8fafc', glow: '#00e5ff' } },
   { id: 'wizard', type: 'skin', name: 'Wizard', rarity: 'Epic', cost: 450, icon: 'wizard', desc: 'A wise sorcerer with a star-patterned robe.', colors: { body: '#1d4ed8', head: '#ffffff', hat: '#1d4ed8', stars: '#facc15' } },

@@ -55,8 +55,14 @@ function renderDailyCheckinPanel() {
     currentDayInWeek = ((streak - 1) % 7) + 1;
   }
 
-  // Same BB Coin Icon for all 7 days
-  const bbCoinSVG = `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="30" fill="#facc15" stroke="#ca8a04" stroke-width="4"/><text x="50" y="60" font-size="30" fill="#ca8a04" text-anchor="middle" font-family="sans-serif" font-weight="bold">$</text></svg>`;
+  // Ninja Icon for all 7 days (matching the user's uploaded image)
+  const ninjaSVG = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="50" cy="50" r="45" fill="#111"/>
+    <rect x="30" y="45" width="40" height="20" rx="5" fill="#ffbda1"/>
+    <circle cx="42" cy="55" r="4" fill="#111"/>
+    <circle cx="58" cy="55" r="4" fill="#111"/>
+    <rect x="15" y="30" width="70" height="20" rx="8" fill="#ff0000"/>
+  </svg>`;
   
   // 7 Different Neon Glow Colors
   const neonColors = ['#ef4444', '#f97316', '#facc15', '#4ade80', '#00e5ff', '#3b82f6', '#d946ef'];
@@ -73,12 +79,14 @@ function renderDailyCheckinPanel() {
     // --- Modal Neon Card ---
     const card = document.createElement('div');
     card.className = `neon-card ${isActive ? 'active' : ''} ${isClaimed ? 'claimed' : ''}`;
-    // Apply dynamic neon border/shadow if active
-    if (isActive) {
-      card.style.borderColor = neonColors[i-1];
-      card.style.boxShadow = `0 0 15px ${neonColors[i-1]}, inset 0 0 10px ${neonColors[i-1]}`;
+    // Apply dynamic neon border/shadow if active or claimed
+    if (isActive || isClaimed) {
+      const color = isActive ? neonColors[i-1] : '#00ff88';
+      card.style.borderColor = color;
+      card.style.boxShadow = `0 0 20px ${color}, inset 0 0 15px ${color}`;
+      card.style.filter = `drop-shadow(0 0 5px ${color})`;
     }
-    card.innerHTML = `<div class="neon-card-icon">${bbCoinSVG}</div>`;
+    card.innerHTML = `<div class="neon-card-icon" style="filter: drop-shadow(0 0 8px ${neonColors[i-1]});">${ninjaSVG}</div>`;
     cardsContainer.appendChild(card);
 
     // --- Modal Timeline Node ---

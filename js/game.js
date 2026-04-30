@@ -186,7 +186,7 @@ let equippedFace = null;
 
 const SHOP_DB = [
   // SKINS
-  { id: 'classic', type: 'skin', name: 'Classic', rarity: 'Common', cost: 0, icon: 'classic', desc: 'A sleek Base Pilot with a glowing visor.', colors: { body: '#0f172a', head: '#1e293b' } },
+  { id: 'classic', type: 'skin', name: 'Classic', rarity: 'Common', cost: 0, icon: 'classic', desc: 'The original hero with a black cap.', colors: { body: '#111111', head: '#ffedd5', cap: '#111111' } },
   { id: 'ninja', type: 'skin', name: 'Ninja', rarity: 'Uncommon', cost: 250, icon: 'ninja', desc: 'A skilled ninja blending into the shadows.', colors: { body: '#374151', head: '#374151', skin: '#fcd34d', straps: '#1f2937' } },
   { id: 'cyber', type: 'skin', name: 'Cyber', rarity: 'Rare', cost: 350, icon: 'cyber', desc: 'Friendly AI robot from the future.', colors: { body: '#f8fafc', head: '#f8fafc', glow: '#00e5ff' } },
   { id: 'wizard', type: 'skin', name: 'Wizard', rarity: 'Epic', cost: 450, icon: 'wizard', desc: 'A wise sorcerer with a star-patterned robe.', colors: { body: '#1d4ed8', head: '#ffffff', hat: '#1d4ed8', stars: '#facc15' } },
@@ -1019,17 +1019,26 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     targetCtx.beginPath(); targetCtx.arc(s * 0.15, s * 0.2, s * 0.05, 0, Math.PI * 2); targetCtx.fill();
   }
   else if (id === 'classic') {
-    // Base Pilot Visor
-    targetCtx.fillStyle = '#0052FF';
+    // Boy with Black Cap
+    targetCtx.fillStyle = '#111';
+    // Backwards Cap
     targetCtx.beginPath();
-    targetCtx.roundRect(s * 0.05, s * 0.12, s * 0.35, s * 0.18, s * 0.05);
+    targetCtx.arc(0, -s * 0.1, s * 0.45, Math.PI, 0); // Top of cap
     targetCtx.fill();
-    targetCtx.fillStyle = '#00e5ff';
-    targetCtx.shadowColor = '#00e5ff'; targetCtx.shadowBlur = 10;
+    targetCtx.fillRect(-s * 0.6, -s * 0.1, s * 0.4, s * 0.1); // Brim (backwards)
+    
+    // Eyes
+    targetCtx.fillStyle = '#111';
+    targetCtx.beginPath(); targetCtx.arc(s * 0.1, s * 0.15, s * 0.05, 0, Math.PI * 2); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.arc(s * 0.3, s * 0.15, s * 0.05, 0, Math.PI * 2); targetCtx.fill();
+    
+    // Smirk
+    targetCtx.strokeStyle = '#111';
+    targetCtx.lineWidth = 1.5;
     targetCtx.beginPath();
-    targetCtx.roundRect(s * 0.1, s * 0.18, s * 0.25, s * 0.06, 2);
-    targetCtx.fill();
-    targetCtx.shadowBlur = 0;
+    targetCtx.moveTo(s * 0.15, s * 0.3);
+    targetCtx.quadraticCurveTo(s * 0.25, s * 0.35, s * 0.35, s * 0.28);
+    targetCtx.stroke();
   }
   else if (id === 'troop') {
     // No eyes for troop, just shadow

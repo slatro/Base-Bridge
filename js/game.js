@@ -34,9 +34,7 @@ const levelFillEl = document.getElementById('ui-level-fill');
 const btnRevive = document.getElementById('btn-revive');
 
 // --- DAILY CHECK-IN SYSTEM (7-DAY PROGRESSION) ---
-document.getElementById('fc-daily')?.addEventListener('click', () => {
-  document.getElementById('modal-daily-calendar')?.classList.remove('hidden');
-});
+// Daily Check-in Modal Opening Listener moved to the bottom for consolidation.
 
 function renderDailyCheckinPanel() {
   const cardsContainer = document.getElementById('neon-cards-container');
@@ -1686,13 +1684,13 @@ function triggerGameOver() {
 
   const breakdownHTML = `
     <div class="breakdown-box" style="width: 100%; max-width: 320px; text-transform: uppercase;">
-      <div class="breakdown-row"><span>SCORE:</span> <strong style="color:#00ff88;">${score}</strong></div>
-      <div class="breakdown-row"><span>BEST:</span> <strong>${bestScore}</strong></div>
-      <hr style="border:0; height:1px; background:rgba(255,255,255,0.1); margin: 8px 0;">
+      <div class="breakdown-row" style="margin-bottom: 4px;"><span>SCORE:</span> <strong style="color:#00ff88;">${score}</strong></div>
+      <div class="breakdown-row" style="border-bottom: 2px solid rgba(255,255,255,0.1); padding-bottom: 8px; margin-bottom: 8px;"><span>BEST:</span> <strong>${bestScore}</strong></div>
+      
       <div class="breakdown-row"><span>Bridges Crossed:</span> <strong>${bridgesCrossed}</strong></div>
       <div class="breakdown-row"><span>Perfect Landings:</span> <strong>${sessionPerfects}</strong></div>
-      <div class="breakdown-row"><span>Best Combo:</span> <strong>x${sessionBestCombo}</strong></div>
-      <hr style="border:0; height:1px; background:rgba(255,255,255,0.1); margin: 8px 0;">
+      <div class="breakdown-row" style="border-bottom: 2px solid rgba(255,255,255,0.1); padding-bottom: 8px; margin-bottom: 8px;"><span>Best Combo:</span> <strong>x${sessionBestCombo}</strong></div>
+      
       <div class="breakdown-row"><span style="color:#facc15;">Total Earned:</span> <strong style="color:#facc15;">${sessionCoins} BB</strong></div>
       <p style="margin-top:15px; font-style:italic; font-size:0.8rem; color:#94a3b8; text-align:center; line-height:1.4; text-transform: none;">${psychologyMsg}</p>
     </div>
@@ -1725,21 +1723,16 @@ function triggerGameWon() {
 
   let isNewBest = false;
   if (score > bestScore) { bestScore = score; bestEl.innerText = bestScore; localStorage.setItem('bb_v1_best', bestScore); isNewBest = true; }
-  updateDailyBestScore(score);
-
-  document.querySelector('.go-title').innerText = "CONGRATULATIONS!";
-  document.querySelector('.go-title').style.color = '#10b981';
-
   const psychologyMsg = isNewBest ? "UNBELIEVABLE! New Personal Record! 🏆" : "Amazing run! Can you do even better?";
   const breakdownHTML = `
     <div class="breakdown-box" style="width: 100%; max-width: 320px; text-transform: uppercase;">
-      <div class="breakdown-row"><span>SCORE:</span> <strong style="color:#00ff88;">${score}</strong></div>
-      <div class="breakdown-row"><span>BEST:</span> <strong>${bestScore}</strong></div>
-      <hr style="border:0; height:1px; background:rgba(255,255,255,0.1); margin: 8px 0;">
+      <div class="breakdown-row" style="margin-bottom: 4px;"><span>SCORE:</span> <strong style="color:#00ff88;">${score}</strong></div>
+      <div class="breakdown-row" style="border-bottom: 2px solid rgba(255,255,255,0.1); padding-bottom: 8px; margin-bottom: 8px;"><span>BEST:</span> <strong>${bestScore}</strong></div>
+      
       <div class="breakdown-row"><span>Bridges Crossed:</span> <strong>${bridgesCrossed}</strong></div>
       <div class="breakdown-row"><span>Perfect Landings:</span> <strong>${sessionPerfects}</strong></div>
-      <div class="breakdown-row"><span>Best Combo:</span> <strong>x${sessionBestCombo}</strong></div>
-      <hr style="border:0; height:1px; background:rgba(255,255,255,0.1); margin: 8px 0;">
+      <div class="breakdown-row" style="border-bottom: 2px solid rgba(255,255,255,0.1); padding-bottom: 8px; margin-bottom: 8px;"><span>Best Combo:</span> <strong>x${sessionBestCombo}</strong></div>
+      
       <div class="breakdown-row"><span style="color:#facc15;">Total Earned:</span> <strong style="color:#facc15;">${sessionCoins} BB</strong></div>
       <p style="margin-top:15px; font-style:italic; font-size:0.8rem; color:#94a3b8; text-align:center; line-height:1.4; text-transform: none;">${psychologyMsg}</p>
     </div>
@@ -1796,16 +1789,23 @@ document.getElementById('btn-restart').addEventListener('click', startGame);
 document.getElementById('btn-start-overlay').addEventListener('click', startGame);
 document.getElementById('btn-revive').addEventListener('click', reviveGame);
 
+// Consolidated Feature Card Listeners
+document.getElementById('fc-daily')?.addEventListener('click', () => {
+  console.log("Daily Check-in Card Clicked");
+  document.getElementById('modal-daily-calendar')?.classList.remove('hidden');
+});
 document.getElementById('fc-skill')?.addEventListener('click', () => {
+  console.log("Skill Missions Card Clicked");
   if (typeof showInfoModal === 'function') {
     showInfoModal('Skill Based Gameplay', 'Hold to grow the bridge. Release to cross. Perfect landing gives bonus points and combo multiplier. Levels get harder dynamically!');
   }
 });
-// Duplicate fc-daily listener removed
 document.getElementById('fc-compete')?.addEventListener('click', () => {
+  console.log("Compete Card Clicked");
   document.getElementById('btn-leaderboard')?.click();
 });
 document.getElementById('fc-own')?.addEventListener('click', () => {
+  console.log("Gear Up Card Clicked");
   document.getElementById('btn-equipment')?.click();
 });
 

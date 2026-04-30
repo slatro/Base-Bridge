@@ -937,8 +937,8 @@ function renderSkeleton(targetCtx, skinId, hatId, capeId, wpnId, faceId, s, stat
   // Removed manual yOffsets so Pika and Mini match Titan's vertical alignment
   targetCtx.translate(0, yOffset + bounceY);
   if (id === 'demon') {
-    targetCtx.translate(0, s - s*1.3); 
-    targetCtx.scale(1.3 * (1.0 + (1.0 - character.squash) * 0.5), 1.3 * character.squash);
+    targetCtx.translate(0, s - s*1.15); 
+    targetCtx.scale(1.1 * (1.0 + (1.0 - character.squash) * 0.5), 1.1 * character.squash);
   } else {
     targetCtx.scale(1.0 + (1.0 - character.squash) * 0.5, character.squash);
   }
@@ -962,8 +962,9 @@ function renderSkeleton(targetCtx, skinId, hatId, capeId, wpnId, faceId, s, stat
     
     // Back Wing (Left) - behind body, slightly smaller/darker
     targetCtx.save();
-    targetCtx.translate(0, s*0.3); // Wing root
+    targetCtx.translate(-s*0.25, s*0.3); // Wing root shifted left to hump
     targetCtx.rotate( flap * 0.8 );
+    targetCtx.scale(0.8, 0.8); // Shrink wing size
     targetCtx.fillStyle = '#1e3a8a'; // Blue inner
     targetCtx.strokeStyle = '#94a3b8'; // Darker bone
     targetCtx.lineWidth = Math.max(2, s*0.03);
@@ -980,8 +981,9 @@ function renderSkeleton(targetCtx, skinId, hatId, capeId, wpnId, faceId, s, stat
 
     // Front Wing (Right) - closer to camera, overlaps the back wing
     targetCtx.save();
-    targetCtx.translate(0, s*0.3);
+    targetCtx.translate(-s*0.25, s*0.3); // Wing root shifted left to hump
     targetCtx.rotate( flap );
+    targetCtx.scale(0.8, 0.8); // Shrink wing size
     targetCtx.fillStyle = '#1e3a8a';
     targetCtx.strokeStyle = '#e2e8f0'; // Brighter bone
     targetCtx.lineWidth = Math.max(3, s*0.04);
@@ -1162,16 +1164,39 @@ function renderSkeleton(targetCtx, skinId, hatId, capeId, wpnId, faceId, s, stat
     targetCtx.beginPath(); targetCtx.moveTo(-s*0.1, s*0.55); targetCtx.lineTo(s*0.1, s*0.55); targetCtx.stroke();
 
     // Devil Tail
-    targetCtx.strokeStyle = '#990000'; targetCtx.lineWidth = Math.max(2, s*0.04); targetCtx.lineCap = 'round';
-    targetCtx.beginPath();
-    targetCtx.moveTo(-s*0.1, s*0.7);
-    targetCtx.quadraticCurveTo(-s*0.6, s*0.9, -s*0.7, s*0.4);
-    targetCtx.stroke();
-    // Tail spike
+    let tailAngle = Math.sin(time * 5) * 0.2;
     targetCtx.save();
-    targetCtx.translate(-s*0.7, s*0.4);
-    targetCtx.fillStyle = '#ff3300';
-    targetCtx.beginPath(); targetCtx.moveTo(0, s*0.05); targetCtx.lineTo(-s*0.15, 0); targetCtx.lineTo(0, -s*0.05); targetCtx.lineTo(-s*0.05, 0); targetCtx.closePath(); targetCtx.fill();
+    targetCtx.translate(-s*0.1, s*0.7);
+    targetCtx.rotate(tailAngle);
+    
+    targetCtx.beginPath();
+    targetCtx.moveTo(0,0);
+    targetCtx.quadraticCurveTo(-s*0.5, s*0.2, -s*0.6, -s*0.3);
+    targetCtx.strokeStyle = '#990000';
+    targetCtx.lineWidth = Math.max(3, s*0.06);
+    targetCtx.stroke();
+    
+    // Tail Flame (Animated)
+    targetCtx.translate(-s*0.6, -s*0.3);
+    let flameScale = 1.0 + Math.sin(time * 20) * 0.2; // Flickering
+    targetCtx.scale(flameScale, flameScale);
+    
+    // Outer Flame (Red)
+    targetCtx.fillStyle = '#ff3300'; 
+    targetCtx.beginPath(); 
+    targetCtx.moveTo(0, s*0.05); 
+    targetCtx.quadraticCurveTo(-s*0.1, -s*0.1, 0, -s*0.25); 
+    targetCtx.quadraticCurveTo(s*0.1, -s*0.1, 0, s*0.05); 
+    targetCtx.fill();
+    
+    // Inner Flame (Yellow)
+    targetCtx.fillStyle = '#facc15'; 
+    targetCtx.beginPath(); 
+    targetCtx.moveTo(0, s*0.02); 
+    targetCtx.quadraticCurveTo(-s*0.05, -s*0.05, 0, -s*0.12); 
+    targetCtx.quadraticCurveTo(s*0.05, -s*0.05, 0, s*0.02); 
+    targetCtx.fill();
+
     targetCtx.restore();
   } else {
     targetCtx.beginPath();
@@ -1456,7 +1481,7 @@ function renderSkeleton(targetCtx, skinId, hatId, capeId, wpnId, faceId, s, stat
     targetCtx.strokeStyle = '#64748b'; targetCtx.lineWidth = 1; targetCtx.stroke();
   } else if (id === 'demon') {
     targetCtx.save();
-    targetCtx.translate(-s*0.05, -s*0.05); // slightly shifted up/left
+    targetCtx.translate(-s*0.05, -s*0.15); // shifted up higher and left
 
     let hg = targetCtx.createLinearGradient(0, -s*0.1, 0, s*0.4);
     hg.addColorStop(0, '#ff3300'); hg.addColorStop(1, '#990000');
@@ -1472,12 +1497,9 @@ function renderSkeleton(targetCtx, skinId, hatId, capeId, wpnId, faceId, s, stat
 
     // Horns / Pointy Ears
     targetCtx.fillStyle = '#ff3300';
-    // Left ear/horn (partially hidden)
+    // Left ear/horn (only visible one, side profile)
     targetCtx.beginPath(); targetCtx.moveTo(-s*0.05, s*0.1); targetCtx.lineTo(-s*0.3, -s*0.05); targetCtx.lineTo(-s*0.1, s*0.2); targetCtx.fill();
     targetCtx.beginPath(); targetCtx.moveTo(-s*0.05, s*0.1); targetCtx.lineTo(-s*0.3, -s*0.05); targetCtx.lineTo(-s*0.1, s*0.2); targetCtx.stroke();
-    // Right ear/horn (fully visible)
-    targetCtx.beginPath(); targetCtx.moveTo(s*0.15, s*0.1); targetCtx.lineTo(s*0.4, -s*0.1); targetCtx.lineTo(s*0.2, s*0.2); targetCtx.fill();
-    targetCtx.beginPath(); targetCtx.moveTo(s*0.15, s*0.1); targetCtx.lineTo(s*0.4, -s*0.1); targetCtx.lineTo(s*0.2, s*0.2); targetCtx.stroke();
 
     // Angry Blank White Eye (Facing Right)
     targetCtx.fillStyle = '#ffffff';
@@ -1679,8 +1701,8 @@ function renderSkeleton(targetCtx, skinId, hatId, capeId, wpnId, faceId, s, stat
     // Beanie Brim
     targetCtx.fillRect(-s * 0.3, s * 0.1, s * 0.6, s * 0.08);
   }
-  else if (id === 'troop') {
-    // No eyes for troop, just shadow
+  else if (id === 'troop' || id === 'demon') {
+    // No default eyes or white highlights for troop or demon, handled entirely in custom block
   }
   else if (id === 'cyber') {
     // Eye already drawn in body block

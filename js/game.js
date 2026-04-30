@@ -793,6 +793,9 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
 
   // Draw Equipment
   if (hatId === 'cap' && loadedIcons['hat_cap']) targetCtx.drawImage(loadedIcons['hat_cap'], -s*0.4, -s*0.3, s*0.8, s*0.5);
+  if (hatId === 'crown' && loadedIcons['hat_crown']) targetCtx.drawImage(loadedIcons['hat_crown'], -s*0.45, -s*0.45, s*0.9, s*0.7);
+  if (hatId === 'halo' && loadedIcons['hat_halo']) targetCtx.drawImage(loadedIcons['hat_halo'], -s*0.5, -s*0.4, s*1.0, s*0.4);
+  
   if (faceId === 'glasses' && loadedIcons['face_glasses']) targetCtx.drawImage(loadedIcons['face_glasses'], -s*0.15, s*0.1, s*0.6, s*0.25);
 
   targetCtx.restore();

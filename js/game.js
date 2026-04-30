@@ -935,7 +935,12 @@ function renderSkeleton(targetCtx, skinId, hatId, capeId, wpnId, faceId, s, stat
   let yOffset = -s;
   // Removed manual yOffsets so Pika and Mini match Titan's vertical alignment
   targetCtx.translate(0, yOffset + bounceY);
-  targetCtx.scale(1.0 + (1.0 - character.squash) * 0.5, character.squash);
+  if (id === 'demon') {
+    targetCtx.translate(0, s - s*1.3); 
+    targetCtx.scale(1.3 * (1.0 + (1.0 - character.squash) * 0.5), 1.3 * character.squash);
+  } else {
+    targetCtx.scale(1.0 + (1.0 - character.squash) * 0.5, character.squash);
+  }
   const colors = skinData.colors;
 
 
@@ -948,6 +953,44 @@ function renderSkeleton(targetCtx, skinId, hatId, capeId, wpnId, faceId, s, stat
       targetCtx.drawImage(loadedIcons['hat_cape'], -s * 0.2, 0, s * 0.5, s * 0.6);
       targetCtx.restore();
     }
+  }
+
+  // Demon Wings (Behind body and limbs)
+  if (id === 'demon') {
+    let flap = Math.sin(time * (state === 'WALK' ? 15 : 5)) * s * 0.15;
+    
+    // Back Wing (Left)
+    targetCtx.save();
+    targetCtx.translate(0, s*0.3); // Wing root
+    targetCtx.rotate(Math.PI/5 + flap*0.5);
+    targetCtx.fillStyle = '#1e3a8a'; // Blue inner
+    targetCtx.strokeStyle = '#e2e8f0'; // White/gray bone
+    targetCtx.lineWidth = Math.max(3, s*0.04);
+    targetCtx.beginPath();
+    targetCtx.moveTo(0,0);
+    targetCtx.quadraticCurveTo(-s, -s*0.9, -s*1.2, -s*0.1); // Top edge to tip
+    targetCtx.quadraticCurveTo(-s*0.8, -s*0.1, -s*0.6, s*0.4); // Webbing
+    targetCtx.quadraticCurveTo(-s*0.3, s*0.2, 0, 0); // Webbing back to root
+    targetCtx.fill(); targetCtx.stroke();
+    // Internal wing bone
+    targetCtx.beginPath(); targetCtx.moveTo(0,0); targetCtx.quadraticCurveTo(-s*0.5, -s*0.4, -s*0.6, s*0.4); targetCtx.stroke();
+    targetCtx.restore();
+
+    // Front Wing (Right)
+    targetCtx.save();
+    targetCtx.translate(0, s*0.3);
+    targetCtx.rotate(-Math.PI/6 - flap);
+    targetCtx.fillStyle = '#1e3a8a';
+    targetCtx.strokeStyle = '#e2e8f0';
+    targetCtx.lineWidth = Math.max(3, s*0.04);
+    targetCtx.beginPath();
+    targetCtx.moveTo(0,0);
+    targetCtx.quadraticCurveTo(s*0.8, -s*1.0, s*1.3, -s*0.2);
+    targetCtx.quadraticCurveTo(s*0.9, -s*0.2, s*0.7, s*0.5);
+    targetCtx.quadraticCurveTo(s*0.4, s*0.2, 0, 0);
+    targetCtx.fill(); targetCtx.stroke();
+    targetCtx.beginPath(); targetCtx.moveTo(0,0); targetCtx.quadraticCurveTo(s*0.5, -s*0.4, s*0.7, s*0.5); targetCtx.stroke();
+    targetCtx.restore();
   }
 
   // 2. Legs (Both drawn behind body for Pika/Mini/Wizard/Demon)
@@ -1087,28 +1130,45 @@ function renderSkeleton(targetCtx, skinId, hatId, capeId, wpnId, faceId, s, stat
     targetCtx.strokeStyle = '#1e40af'; targetCtx.lineWidth = Math.max(2, s*0.1);
     targetCtx.beginPath(); targetCtx.moveTo(-s*0.12, s*0.55); targetCtx.lineTo(-s*0.12, s*0.28); targetCtx.stroke();
   } else if (id === 'demon') {
-    // Demon Body (Pill shaped, red gradient)
-    let dg = targetCtx.createLinearGradient(0, s*0.2, 0, s*0.8);
-    dg.addColorStop(0, '#ef4444'); dg.addColorStop(1, '#991b1b');
+    // Muscular Gargoyle Body
+    let dg = targetCtx.createLinearGradient(0, 0, 0, s*0.8);
+    dg.addColorStop(0, '#ff3300'); dg.addColorStop(1, '#990000');
     targetCtx.fillStyle = dg;
+    targetCtx.strokeStyle = '#7f1d1d';
+    targetCtx.lineWidth = Math.max(2, s*0.02);
+
     targetCtx.beginPath();
-    targetCtx.roundRect(-s*0.25, s*0.2, s*0.5, s*0.75, s*0.2);
-    targetCtx.fill();
+    targetCtx.moveTo(-s*0.2, s*0.1); // Neck
+    // Massive chest
+    targetCtx.quadraticCurveTo(-s*0.45, s*0.25, -s*0.3, s*0.5);
+    // Narrow waist
+    targetCtx.lineTo(-s*0.15, s*0.8);
+    // Flat bottom
+    targetCtx.lineTo(s*0.15, s*0.8);
+    // Right side chest
+    targetCtx.lineTo(s*0.25, s*0.5);
+    targetCtx.quadraticCurveTo(s*0.4, s*0.25, s*0.2, s*0.1);
+    targetCtx.closePath();
+    targetCtx.fill(); targetCtx.stroke();
+
+    // Pectorals / Muscle definitions
+    targetCtx.beginPath(); targetCtx.moveTo(-s*0.25, s*0.35); targetCtx.quadraticCurveTo(0, s*0.45, s*0.2, s*0.35); targetCtx.stroke();
+    targetCtx.beginPath(); targetCtx.moveTo(0, s*0.35); targetCtx.lineTo(0, s*0.7); targetCtx.stroke(); // center abs line
+    // Six pack lines
+    targetCtx.beginPath(); targetCtx.moveTo(-s*0.1, s*0.45); targetCtx.lineTo(s*0.1, s*0.45); targetCtx.stroke();
+    targetCtx.beginPath(); targetCtx.moveTo(-s*0.1, s*0.55); targetCtx.lineTo(s*0.1, s*0.55); targetCtx.stroke();
 
     // Devil Tail
-    targetCtx.strokeStyle = '#b91c1c'; targetCtx.lineWidth = Math.max(2, s*0.04); targetCtx.lineCap = 'round';
+    targetCtx.strokeStyle = '#990000'; targetCtx.lineWidth = Math.max(2, s*0.04); targetCtx.lineCap = 'round';
     targetCtx.beginPath();
-    targetCtx.moveTo(-s*0.1, s*0.6);
-    targetCtx.quadraticCurveTo(-s*0.5, s*0.7, -s*0.6, s*0.4);
+    targetCtx.moveTo(-s*0.1, s*0.7);
+    targetCtx.quadraticCurveTo(-s*0.6, s*0.9, -s*0.7, s*0.4);
     targetCtx.stroke();
-    // Fire on tail tip
+    // Tail spike
     targetCtx.save();
-    targetCtx.translate(-s*0.6, s*0.4);
-    let firePulse = Math.abs(Math.sin(time * 15)) * s * 0.05;
-    targetCtx.fillStyle = '#ef4444'; targetCtx.shadowColor = '#ef4444'; targetCtx.shadowBlur = 10;
-    targetCtx.beginPath(); targetCtx.moveTo(0, s*0.05); targetCtx.quadraticCurveTo(-s*0.1, 0, 0, -s*0.15 - firePulse); targetCtx.quadraticCurveTo(s*0.1, 0, 0, s*0.05); targetCtx.fill();
-    targetCtx.fillStyle = '#facc15'; targetCtx.shadowColor = '#facc15'; targetCtx.shadowBlur = 5;
-    targetCtx.beginPath(); targetCtx.moveTo(0, s*0.02); targetCtx.quadraticCurveTo(-s*0.05, 0, 0, -s*0.08 - firePulse*0.5); targetCtx.quadraticCurveTo(s*0.05, 0, 0, s*0.02); targetCtx.fill();
+    targetCtx.translate(-s*0.7, s*0.4);
+    targetCtx.fillStyle = '#ff3300';
+    targetCtx.beginPath(); targetCtx.moveTo(0, s*0.05); targetCtx.lineTo(-s*0.15, 0); targetCtx.lineTo(0, -s*0.05); targetCtx.lineTo(-s*0.05, 0); targetCtx.closePath(); targetCtx.fill();
     targetCtx.restore();
   } else {
     targetCtx.beginPath();
@@ -1392,32 +1452,46 @@ function renderSkeleton(targetCtx, skinId, hatId, capeId, wpnId, faceId, s, stat
     targetCtx.beginPath(); targetCtx.roundRect(s*0.22, s*0.1, s*0.16, s*0.28, s*0.04); targetCtx.fill();
     targetCtx.strokeStyle = '#64748b'; targetCtx.lineWidth = 1; targetCtx.stroke();
   } else if (id === 'demon') {
-    // Horns
-    targetCtx.fillStyle = '#1f2937';
-    targetCtx.beginPath(); targetCtx.moveTo(-s*0.15, s*0.25); targetCtx.lineTo(-s*0.25, s*0.05); targetCtx.lineTo(-s*0.05, s*0.22); targetCtx.fill();
-    targetCtx.beginPath(); targetCtx.moveTo(s*0.15, s*0.25); targetCtx.lineTo(s*0.25, s*0.05); targetCtx.lineTo(s*0.05, s*0.22); targetCtx.fill();
+    targetCtx.save();
+    targetCtx.translate(-s*0.05, -s*0.05); // slightly shifted up/left
 
-    // Angry Eyebrows
-    targetCtx.strokeStyle = '#111'; targetCtx.lineWidth = Math.max(2, s*0.04); targetCtx.lineCap = 'round';
-    targetCtx.beginPath(); targetCtx.moveTo(s*0.05, s*0.3); targetCtx.lineTo(s*0.15, s*0.35); targetCtx.stroke();
+    let hg = targetCtx.createLinearGradient(0, -s*0.1, 0, s*0.4);
+    hg.addColorStop(0, '#ff3300'); hg.addColorStop(1, '#990000');
     
-    // Eyes (Red pupil)
-    targetCtx.fillStyle = '#fff';
-    targetCtx.beginPath(); targetCtx.arc(s*0.15, s*0.38, s*0.06, 0, Math.PI*2); targetCtx.fill();
-    targetCtx.fillStyle = '#b91c1c';
-    targetCtx.beginPath(); targetCtx.arc(s*0.15, s*0.38, s*0.03, 0, Math.PI*2); targetCtx.fill();
-
-    // Toothy Smile
-    targetCtx.fillStyle = '#111';
+    // Head Base (Pointy top)
+    targetCtx.fillStyle = hg;
     targetCtx.beginPath();
-    targetCtx.moveTo(s*0.05, s*0.45);
-    targetCtx.quadraticCurveTo(s*0.15, s*0.55, s*0.25, s*0.45);
-    targetCtx.quadraticCurveTo(s*0.15, s*0.5, s*0.05, s*0.45);
+    targetCtx.moveTo(0, -s*0.2); // Pointy top
+    targetCtx.quadraticCurveTo(-s*0.25, s*0.1, -s*0.2, s*0.4); // Left cheek
+    targetCtx.quadraticCurveTo(0, s*0.5, s*0.2, s*0.4); // Chin
+    targetCtx.quadraticCurveTo(s*0.25, s*0.1, 0, -s*0.2); // Right cheek
     targetCtx.fill();
-    // Teeth (Zigzag)
-    targetCtx.strokeStyle = '#fff'; targetCtx.lineWidth = Math.max(1, s*0.02); targetCtx.lineJoin = 'miter';
+
+    // Horns / Pointy Ears
+    targetCtx.fillStyle = '#ff3300';
+    // Left ear/horn
+    targetCtx.beginPath(); targetCtx.moveTo(-s*0.15, s*0.1); targetCtx.lineTo(-s*0.4, -s*0.1); targetCtx.lineTo(-s*0.2, s*0.2); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.moveTo(-s*0.15, s*0.1); targetCtx.lineTo(-s*0.4, -s*0.1); targetCtx.lineTo(-s*0.2, s*0.2); targetCtx.stroke();
+    // Right ear/horn
+    targetCtx.beginPath(); targetCtx.moveTo(s*0.15, s*0.1); targetCtx.lineTo(s*0.4, -s*0.1); targetCtx.lineTo(s*0.2, s*0.2); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.moveTo(s*0.15, s*0.1); targetCtx.lineTo(s*0.4, -s*0.1); targetCtx.lineTo(s*0.2, s*0.2); targetCtx.stroke();
+
+    // Angry Blank White Eyes
+    targetCtx.fillStyle = '#ffffff';
     targetCtx.beginPath();
-    targetCtx.moveTo(s*0.07, s*0.47); targetCtx.lineTo(s*0.1, s*0.5); targetCtx.lineTo(s*0.13, s*0.47); targetCtx.lineTo(s*0.16, s*0.51); targetCtx.lineTo(s*0.2, s*0.47); targetCtx.lineTo(s*0.23, s*0.49); targetCtx.stroke();
+    targetCtx.moveTo(-s*0.02, s*0.2); targetCtx.lineTo(-s*0.15, s*0.15); targetCtx.lineTo(-s*0.15, s*0.22); targetCtx.lineTo(-s*0.05, s*0.25); targetCtx.fill();
+    
+    targetCtx.beginPath();
+    targetCtx.moveTo(s*0.02, s*0.2); targetCtx.lineTo(s*0.15, s*0.15); targetCtx.lineTo(s*0.15, s*0.22); targetCtx.lineTo(s*0.05, s*0.25); targetCtx.fill();
+
+    // Fang Mouth
+    targetCtx.fillStyle = '#111';
+    targetCtx.beginPath(); targetCtx.moveTo(-s*0.1, s*0.35); targetCtx.quadraticCurveTo(0, s*0.45, s*0.1, s*0.35); targetCtx.quadraticCurveTo(0, s*0.4, -s*0.1, s*0.35); targetCtx.fill();
+    // Fangs
+    targetCtx.fillStyle = '#fff';
+    targetCtx.beginPath(); targetCtx.moveTo(-s*0.05, s*0.37); targetCtx.lineTo(-s*0.02, s*0.42); targetCtx.lineTo(0, s*0.38); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.moveTo(s*0.05, s*0.37); targetCtx.lineTo(s*0.02, s*0.42); targetCtx.lineTo(0, s*0.38); targetCtx.fill();
+    targetCtx.restore();
 
   } else if (id === 'wizard') {
     // Face Skin area

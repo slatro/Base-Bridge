@@ -344,7 +344,7 @@ const SVG_ICONS = {
   wpn_sword: `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect x="45" y="10" width="10" height="60" fill="%23e2e8f0"/><polygon points="45,10 50,0 55,10" fill="%23e2e8f0"/><rect x="35" y="65" width="30" height="8" fill="%23ca8a04"/><rect x="45" y="73" width="10" height="20" fill="%23451a03"/><circle cx="50" cy="95" r="6" fill="%23ca8a04"/></svg>`,
   wpn_saber: `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect x="45" y="10" width="10" height="60" rx="5" fill="%23ef4444" filter="drop-shadow(0 0 10px %23ef4444)"/><rect x="42" y="70" width="16" height="25" fill="%2394a3b8"/><rect x="40" y="72" width="20" height="4" fill="%23334155"/><rect x="40" y="78" width="20" height="4" fill="%23334155"/></svg>`,
   wpn_axe: `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect x="45" y="15" width="10" height="80" rx="5" fill="%2378350f" stroke="%23451a03" stroke-width="2"/><path d="M55 20 Q95 20 95 48 Q95 70 55 70 L55 55 Q75 48 55 35 Z" fill="%23f1f5f9" stroke="%23475569" stroke-width="2"/><path d="M45 20 Q5 20 5 48 Q5 70 45 70 L45 55 Q25 48 45 35 Z" fill="%23f1f5f9" stroke="%23475569" stroke-width="2"/><rect x="42" y="32" width="16" height="8" rx="2" fill="%2394a3b8"/></svg>`,
-  wpn_gun: `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M10 35 H75 L85 40 L85 55 L10 60 Z" fill="%23334155" stroke="%230f172a" stroke-width="2"/><rect x="15" y="55" width="20" height="40" rx="5" fill="%23475569" stroke="%230f172a" stroke-width="2"/><path d="M70 38 H95 V52 H70 Z" fill="%2300e5ff" opacity="0.6"/><circle cx="85" cy="45" r="7" fill="%23fff" filter="drop-shadow(0 0 10px %2300e5ff)"/><rect x="30" y="30" width="30" height="5" rx="2" fill="%2364748b"/></svg>`
+  wpn_gun: `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M 90 50 L 60 40 L 60 60 Z" fill="%23ef4444" filter="drop-shadow(0 0 5px %23ef4444)"/><path d="M 80 45 L 60 42 L 60 58 L 80 55 Z" fill="%23f87171"/><path d="M 65 40 Q 40 35 15 45 Q 5 48 5 50 Q 5 52 15 55 Q 40 65 65 60 Z" fill="%23ca8a04"/><ellipse cx="55" cy="50" rx="4" ry="14" fill="%23a16207"/><ellipse cx="45" cy="50" rx="5" ry="16" fill="%23a16207"/><ellipse cx="35" cy="50" rx="5" ry="16" fill="%23a16207"/><ellipse cx="55" cy="50" rx="2" ry="14" fill="%23facc15"/><ellipse cx="45" cy="50" rx="3" ry="16" fill="%23facc15"/><ellipse cx="35" cy="50" rx="3" ry="16" fill="%23facc15"/><path d="M 40 55 Q 30 80 15 90 Q 25 95 35 85 Q 50 65 45 55 Z" fill="%23ca8a04"/><path d="M 35 60 Q 28 80 18 85 Q 25 88 32 80 Q 45 65 40 60 Z" fill="%23facc15"/><path d="M 45 58 Q 50 70 48 80 Q 45 70 40 60 Z" fill="%2394a3b8"/><circle cx="65" cy="50" r="5" fill="%2322c55e" filter="drop-shadow(0 0 4px %234ade80)"/><circle cx="65" cy="50" r="2" fill="%2386efac"/><circle cx="25" cy="48" r="3" fill="%23111"/><circle cx="17" cy="49" r="2.5" fill="%23111"/><circle cx="11" cy="49.5" r="2" fill="%23111"/></svg>`
 };
 let loadedIcons = {};
 for (let k in SVG_ICONS) { const img = new Image(); img.src = SVG_ICONS[k]; loadedIcons[k] = img; }
@@ -835,6 +835,7 @@ function openShopPreview(id) {
         saveEquipmentsToStorage();
         renderSkinsShop();
         openShopPreview(id);
+        previewActiveItem = null; // Fix unequip stuck perception
       };
     } else if (isEq && item.type === 'skin') {
       btn.innerText = "EQUIPPED";
@@ -1899,8 +1900,16 @@ function drawLimbPath(targetCtx, x, y, w, h, angle, color, isBack, wpnId, skinId
 
     if (loadedIcons[iconId]) {
       targetCtx.translate(0, h);
-      targetCtx.rotate(-Math.PI / 6); // Tilt forwards
-      targetCtx.drawImage(loadedIcons[iconId], -w*1.5, -h * 1.3, w * 3, h * 1.5);
+      if (iconId === 'wpn_axe') {
+        targetCtx.rotate(-Math.PI / 6); // Ax stays tilted backwards
+        targetCtx.drawImage(loadedIcons[iconId], -w*1.5, -h * 1.3, w * 3, h * 1.5);
+      } else if (iconId === 'wpn_gun') {
+        targetCtx.rotate(0); // Laser gun points straight
+        targetCtx.drawImage(loadedIcons[iconId], -w*0.8, -h * 1.1, w * 4, h * 2);
+      } else {
+        targetCtx.rotate(Math.PI / 6); // Swords tilt forward
+        targetCtx.drawImage(loadedIcons[iconId], -w*1.5, -h * 1.3, w * 3, h * 1.5);
+      }
     }
   }
 

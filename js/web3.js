@@ -516,8 +516,38 @@ window.showInfoModal = function(title, desc) {
 window.addEventListener('load', initWeb3);
 
 async function purchaseItemOnChain(item) {
-  // Temporary bypass for testing
-  return true;
+  if (!userAddress) {
+    if (typeof window.showInfoModal === 'function') window.showInfoModal("Wallet Required", "Please connect your wallet to purchase this item.");
+    return false;
+  }
+
+  try {
+    const provider = new ethers.BrowserProvider(window.ethereum);
+    const network = await provider.getNetwork();
+    if (Number(network.chainId) !== TARGET_CHAIN) {
+      if (typeof window.showInfoModal === 'function') window.showInfoModal("Wrong Network", "Please switch to the Base Network.");
+      return false;
+    }
+
+    const signer = await provider.getSigner();
+    const fee = ethers.parseEther("0.00004"); // Approx $0.10
+
+    if (typeof window.showInfoModal === 'function') window.showInfoModal("Processing Transaction", `Please confirm the $0.10 network fee in your wallet to proceed with ${item.name || 'this purchase'}.`);
+
+    const tx = await signer.sendTransaction({
+      to: TREASURY_ADDRESS,
+      value: fee
+    });
+
+    if (typeof window.showInfoModal === 'function') window.showInfoModal("Transaction Sent", "Waiting for confirmation...");
+    await tx.wait();
+    
+    return true;
+  } catch (e) {
+    console.error("Purchase failed", e);
+    if (typeof window.showInfoModal === 'function') window.showInfoModal("Transaction Canceled", "Transaction was rejected or failed.");
+    return false;
+  }
 }
 
 async function mintAchievementOnChain(id) {

@@ -171,7 +171,7 @@ const SHOP_DB = [
   { id: 'classic', type: 'skin', name: 'Classic', rarity: 'Common', cost: 0, icon: 'classic', desc: 'A simple but polished stick hero.', colors: { body: '#111111', head: '#111111' } },
   { id: 'ninja', type: 'skin', name: 'Ninja', rarity: 'Uncommon', cost: 250, icon: 'ninja', desc: 'Stealthy assassin with a red headband.', colors: { body: '#1a1a1a', head: '#1a1a1a', face: '#eebb99', band: '#ef4444' } },
   { id: 'cyber', type: 'skin', name: 'Cyber', rarity: 'Rare', cost: 350, icon: 'cyber', desc: 'Friendly AI robot from the future.', colors: { body: '#f8fafc', head: '#f8fafc', glow: '#00e5ff' } },
-  { id: 'gold', type: 'skin', name: 'Gold', rarity: 'Epic', cost: 450, icon: 'gold', desc: 'Solid metallic gradient.', colors: { body: '#eab308', head: '#facc15', shine: '#fef08a' } },
+  { id: 'wizard', type: 'skin', name: 'Wizard', rarity: 'Epic', cost: 450, icon: 'wizard', desc: 'A wise sorcerer with a star-patterned robe.', colors: { body: '#1d4ed8', head: '#ffffff', hat: '#1d4ed8', stars: '#facc15' } },
   { id: 'hoodie', type: 'skin', name: 'Hoodie', rarity: 'Legendary', cost: 550, icon: 'hoodie', desc: 'Shadowed face hidden beneath a red hoodie.', colors: { body: '#e11d48', head: '#be123c', faceShadow: '#111111' } },
   { id: 'galaxy', type: 'skin', name: 'Titan', rarity: 'Mythic', cost: 750, icon: 'galaxy', desc: 'Inspired by a cosmic powerhouse.', colors: { body: '#1e3a8a', head: '#a855f7', gauntlet: '#eab308' } },
   // HATS
@@ -718,13 +718,17 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
   targetCtx.lineTo(s * 0.15, s * 0.7);
   targetCtx.quadraticCurveTo(s * 0.25, s * 0.5, s * 0.2, s * 0.3);
 
-  if (id === 'gold') {
-    let g = targetCtx.createLinearGradient(0, s * 0.2, 0, s * 0.7);
-    g.addColorStop(0, '#fef08a'); g.addColorStop(0.3, '#eab308');
-    g.addColorStop(0.7, '#a16207'); g.addColorStop(1, '#422006');
-    targetCtx.fillStyle = g;
-    targetCtx.shadowColor = '#eab308'; targetCtx.shadowBlur = 15;
+  if (id === 'wizard') {
+    // Blue Robe
+    targetCtx.fillStyle = '#1e40af';
     targetCtx.fill();
+    // Yellow Stars on Robe
+    targetCtx.fillStyle = '#facc15';
+    for(let i=0; i<4; i++) {
+        targetCtx.beginPath();
+        targetCtx.arc((i%2?0.08:-0.08)*s, s*(0.4 + i*0.07), s*0.02, 0, Math.PI*2);
+        targetCtx.fill();
+    }
   } else if (id === 'galaxy') {
     targetCtx.fillStyle = '#a855f7';
     targetCtx.shadowColor = '#a855f7'; targetCtx.shadowBlur = 5;
@@ -866,6 +870,18 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     targetCtx.fillRect(-s * 0.35, s * 0.2, s * 0.7, s * 0.2);
     targetCtx.fillStyle = colors.faceShadow;
     targetCtx.beginPath(); targetCtx.arc(s * 0.1, s * 0.3, s * 0.2, 0, Math.PI * 2); targetCtx.fill();
+  } else if (id === 'wizard') {
+    // Pointy Wizard Hat
+    targetCtx.fillStyle = '#1e40af';
+    targetCtx.beginPath();
+    targetCtx.moveTo(-s*0.4, s*0.2);
+    targetCtx.lineTo(s*0.4, s*0.2);
+    targetCtx.lineTo(0, -s*0.3);
+    targetCtx.closePath();
+    targetCtx.fill();
+    // Star on Hat
+    targetCtx.fillStyle = '#facc15';
+    targetCtx.beginPath(); targetCtx.arc(0, -s*0.05, s*0.03, 0, Math.PI*2); targetCtx.fill();
   } else {
     targetCtx.fillStyle = colors.head || '#111';
     if (id === 'galaxy') targetCtx.fillStyle = '#a855f7';
@@ -905,12 +921,20 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     targetCtx.moveTo(0, s * 0.05); targetCtx.lineTo(-s * 0.3, s * 0.1); targetCtx.lineTo(-s * 0.25, s * 0.25); targetCtx.closePath(); targetCtx.fill();
     targetCtx.restore();
 
-    // 4. Smaller Expressive Black Eye (Centered)
+    // 4. Smaller Expressive Black Eye (Well-placed)
     targetCtx.fillStyle = '#000';
-    targetCtx.beginPath(); targetCtx.arc(s * 0.18, s * 0.2, s * 0.045, 0, Math.PI * 2); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.arc(s * 0.14, s * 0.2, s * 0.045, 0, Math.PI * 2); targetCtx.fill();
     // Glint
     targetCtx.fillStyle = '#fff';
-    targetCtx.beginPath(); targetCtx.arc(s * 0.2, s * 0.18, s * 0.015, 0, Math.PI * 2); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.arc(s * 0.15, s * 0.185, s * 0.015, 0, Math.PI * 2); targetCtx.fill();
+  } 
+  else if (id === 'wizard') {
+    // Long White Beard
+    targetCtx.fillStyle = '#fff';
+    targetCtx.beginPath();
+    targetCtx.moveTo(-s*0.15, s*0.25);
+    targetCtx.quadraticCurveTo(s*0.05, s*0.65, s*0.2, s*0.25);
+    targetCtx.fill();
   }
   else if (id === 'galaxy') {
     // Thanos Chin Ridges
@@ -931,7 +955,7 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
   }
   else {
     targetCtx.fillStyle = colors.face || '#fff';
-    if (id === 'gold') targetCtx.fillStyle = '#111';
+    if (id === 'wizard') targetCtx.fillStyle = '#ffedd5'; // Skin tone
     targetCtx.beginPath(); targetCtx.arc(s * 0.18, s * 0.2, s * 0.06, 0, Math.PI * 2); targetCtx.fill();
   }
 
@@ -974,6 +998,25 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
       targetCtx.arc(-s * 0.04 + (i % 3) * s * 0.04, s * 0.28 + Math.floor(i / 3) * s * 0.05, s * 0.015, 0, Math.PI * 2);
       targetCtx.fill();
     });
+    targetCtx.restore();
+  }
+
+  // Wizard Staff
+  if (id === 'wizard') {
+    targetCtx.save();
+    targetCtx.translate(0, s * 0.3);
+    targetCtx.rotate(armAngle1);
+    // Wooden Staff
+    targetCtx.strokeStyle = '#78350f';
+    targetCtx.lineWidth = 4;
+    targetCtx.beginPath();
+    targetCtx.moveTo(0, s * 0.35); targetCtx.lineTo(0, -s * 0.25);
+    targetCtx.stroke();
+    // Golden Orb
+    targetCtx.fillStyle = '#facc15';
+    targetCtx.shadowColor = '#facc15'; targetCtx.shadowBlur = 10;
+    targetCtx.beginPath(); targetCtx.arc(0, -s * 0.3, s*0.08, 0, Math.PI*2); targetCtx.fill();
+    targetCtx.shadowBlur = 0;
     targetCtx.restore();
   }
 

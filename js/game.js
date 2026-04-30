@@ -952,46 +952,45 @@ function renderSkeleton(targetCtx, skinId, hatId, capeId, wpnId, faceId, s, stat
       targetCtx.translate(-s * 0.1, s * 0.3);
       targetCtx.rotate(state === 'WALK' ? Math.sin(time * 15) * 0.2 : Math.sin(time * 3) * 0.05);
       targetCtx.drawImage(loadedIcons['hat_cape'], -s * 0.2, 0, s * 0.5, s * 0.6);
-      targetCtx.restore();
-    }
-  }
-
-  // Demon Wings (Behind body and limbs)
+      targetCtx.restore();  // Demon Wings (Behind body and limbs)
   if (id === 'demon') {
-    let flap = Math.sin(time * (state === 'WALK' ? 15 : 5)) * s * 0.15;
+    let flap = Math.sin(time * (state === 'WALK' ? 15 : 5)) * 0.1; // Gentle flap
     
-    // Back Wing (Left)
+    // Back Wing (Left) - behind body, slightly smaller/darker
     targetCtx.save();
     targetCtx.translate(0, s*0.3); // Wing root
-    targetCtx.rotate(Math.PI/5 + flap*0.5);
+    targetCtx.rotate( flap * 0.8 );
     targetCtx.fillStyle = '#1e3a8a'; // Blue inner
-    targetCtx.strokeStyle = '#e2e8f0'; // White/gray bone
-    targetCtx.lineWidth = Math.max(3, s*0.04);
+    targetCtx.strokeStyle = '#94a3b8'; // Darker bone
+    targetCtx.lineWidth = Math.max(2, s*0.03);
     targetCtx.beginPath();
+    // Wing pointing left and up
     targetCtx.moveTo(0,0);
-    targetCtx.quadraticCurveTo(-s, -s*0.9, -s*1.2, -s*0.1); // Top edge to tip
-    targetCtx.quadraticCurveTo(-s*0.8, -s*0.1, -s*0.6, s*0.4); // Webbing
-    targetCtx.quadraticCurveTo(-s*0.3, s*0.2, 0, 0); // Webbing back to root
+    targetCtx.quadraticCurveTo(-s*0.8, -s*0.8, -s*1.0, -s*0.4); 
+    targetCtx.quadraticCurveTo(-s*0.6, -s*0.2, -s*0.8, s*0.2); 
+    targetCtx.quadraticCurveTo(-s*0.3, s*0.1, 0, 0); 
     targetCtx.fill(); targetCtx.stroke();
     // Internal wing bone
-    targetCtx.beginPath(); targetCtx.moveTo(0,0); targetCtx.quadraticCurveTo(-s*0.5, -s*0.4, -s*0.6, s*0.4); targetCtx.stroke();
+    targetCtx.beginPath(); targetCtx.moveTo(0,0); targetCtx.quadraticCurveTo(-s*0.4, -s*0.3, -s*0.8, s*0.2); targetCtx.stroke();
     targetCtx.restore();
 
-    // Front Wing (Right)
+    // Front Wing (Right) - closer to camera, overlaps the back wing
     targetCtx.save();
     targetCtx.translate(0, s*0.3);
-    targetCtx.rotate(-Math.PI/6 - flap);
+    targetCtx.rotate( flap );
     targetCtx.fillStyle = '#1e3a8a';
-    targetCtx.strokeStyle = '#e2e8f0';
+    targetCtx.strokeStyle = '#e2e8f0'; // Brighter bone
     targetCtx.lineWidth = Math.max(3, s*0.04);
     targetCtx.beginPath();
     targetCtx.moveTo(0,0);
-    targetCtx.quadraticCurveTo(s*0.8, -s*1.0, s*1.3, -s*0.2);
-    targetCtx.quadraticCurveTo(s*0.9, -s*0.2, s*0.7, s*0.5);
-    targetCtx.quadraticCurveTo(s*0.4, s*0.2, 0, 0);
+    targetCtx.quadraticCurveTo(-s*1.0, -s*1.0, -s*1.3, -s*0.5);
+    targetCtx.quadraticCurveTo(-s*0.8, -s*0.3, -s*1.0, s*0.3);
+    targetCtx.quadraticCurveTo(-s*0.4, s*0.2, 0, 0);
     targetCtx.fill(); targetCtx.stroke();
-    targetCtx.beginPath(); targetCtx.moveTo(0,0); targetCtx.quadraticCurveTo(s*0.5, -s*0.4, s*0.7, s*0.5); targetCtx.stroke();
+    // Internal wing bone
+    targetCtx.beginPath(); targetCtx.moveTo(0,0); targetCtx.quadraticCurveTo(-s*0.5, -s*0.4, -s*1.0, s*0.3); targetCtx.stroke();
     targetCtx.restore();
+  }store();
   }
 
   // 2. Legs (Both drawn behind body for Pika/Mini/Wizard/Demon)
@@ -1470,28 +1469,34 @@ function renderSkeleton(targetCtx, skinId, hatId, capeId, wpnId, faceId, s, stat
 
     // Horns / Pointy Ears
     targetCtx.fillStyle = '#ff3300';
-    // Left ear/horn
-    targetCtx.beginPath(); targetCtx.moveTo(-s*0.15, s*0.1); targetCtx.lineTo(-s*0.4, -s*0.1); targetCtx.lineTo(-s*0.2, s*0.2); targetCtx.fill();
-    targetCtx.beginPath(); targetCtx.moveTo(-s*0.15, s*0.1); targetCtx.lineTo(-s*0.4, -s*0.1); targetCtx.lineTo(-s*0.2, s*0.2); targetCtx.stroke();
-    // Right ear/horn
+    // Left ear/horn (partially hidden)
+    targetCtx.beginPath(); targetCtx.moveTo(-s*0.05, s*0.1); targetCtx.lineTo(-s*0.3, -s*0.05); targetCtx.lineTo(-s*0.1, s*0.2); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.moveTo(-s*0.05, s*0.1); targetCtx.lineTo(-s*0.3, -s*0.05); targetCtx.lineTo(-s*0.1, s*0.2); targetCtx.stroke();
+    // Right ear/horn (fully visible)
     targetCtx.beginPath(); targetCtx.moveTo(s*0.15, s*0.1); targetCtx.lineTo(s*0.4, -s*0.1); targetCtx.lineTo(s*0.2, s*0.2); targetCtx.fill();
     targetCtx.beginPath(); targetCtx.moveTo(s*0.15, s*0.1); targetCtx.lineTo(s*0.4, -s*0.1); targetCtx.lineTo(s*0.2, s*0.2); targetCtx.stroke();
 
-    // Angry Blank White Eyes
+    // Angry Blank White Eye (Facing Right)
     targetCtx.fillStyle = '#ffffff';
     targetCtx.beginPath();
-    targetCtx.moveTo(-s*0.02, s*0.2); targetCtx.lineTo(-s*0.15, s*0.15); targetCtx.lineTo(-s*0.15, s*0.22); targetCtx.lineTo(-s*0.05, s*0.25); targetCtx.fill();
-    
-    targetCtx.beginPath();
-    targetCtx.moveTo(s*0.02, s*0.2); targetCtx.lineTo(s*0.15, s*0.15); targetCtx.lineTo(s*0.15, s*0.22); targetCtx.lineTo(s*0.05, s*0.25); targetCtx.fill();
+    targetCtx.moveTo(s*0.05, s*0.2); 
+    targetCtx.lineTo(s*0.25, s*0.15); 
+    targetCtx.lineTo(s*0.25, s*0.22); 
+    targetCtx.lineTo(s*0.15, s*0.25); 
+    targetCtx.fill();
 
-    // Fang Mouth
+    // Fang Mouth (Facing Right)
     targetCtx.fillStyle = '#111';
-    targetCtx.beginPath(); targetCtx.moveTo(-s*0.1, s*0.35); targetCtx.quadraticCurveTo(0, s*0.45, s*0.1, s*0.35); targetCtx.quadraticCurveTo(0, s*0.4, -s*0.1, s*0.35); targetCtx.fill();
+    targetCtx.beginPath(); 
+    targetCtx.moveTo(0, s*0.35); 
+    targetCtx.quadraticCurveTo(s*0.15, s*0.45, s*0.25, s*0.35); 
+    targetCtx.quadraticCurveTo(s*0.15, s*0.4, 0, s*0.35); 
+    targetCtx.fill();
+    
     // Fangs
     targetCtx.fillStyle = '#fff';
-    targetCtx.beginPath(); targetCtx.moveTo(-s*0.05, s*0.37); targetCtx.lineTo(-s*0.02, s*0.42); targetCtx.lineTo(0, s*0.38); targetCtx.fill();
-    targetCtx.beginPath(); targetCtx.moveTo(s*0.05, s*0.37); targetCtx.lineTo(s*0.02, s*0.42); targetCtx.lineTo(0, s*0.38); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.moveTo(s*0.05, s*0.37); targetCtx.lineTo(s*0.08, s*0.42); targetCtx.lineTo(s*0.1, s*0.38); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.moveTo(s*0.15, s*0.37); targetCtx.lineTo(s*0.18, s*0.42); targetCtx.lineTo(s*0.2, s*0.38); targetCtx.fill();
     targetCtx.restore();
 
   } else if (id === 'wizard') {
@@ -1763,7 +1768,7 @@ function renderSkeleton(targetCtx, skinId, hatId, capeId, wpnId, faceId, s, stat
     targetCtx.rotate(armAngle1);
     
     targetCtx.translate(0, s * 0.3); // Translate to hand center
-    targetCtx.rotate(-Math.PI / 6); // Tilt forward
+    targetCtx.rotate(Math.PI / 6); // Tilt forward like other swords
     
     // Lightsaber Handle
     targetCtx.fillStyle = '#cbd5e1';
@@ -1905,7 +1910,7 @@ function drawLimbPath(targetCtx, x, y, w, h, angle, color, isBack, wpnId, skinId
         targetCtx.drawImage(loadedIcons[iconId], -w*1.5, -h * 1.3, w * 3, h * 1.5);
       } else if (iconId === 'wpn_gun') {
         targetCtx.rotate(0); // Laser gun points straight
-        targetCtx.drawImage(loadedIcons[iconId], -w*0.8, -h * 1.1, w * 4, h * 2);
+        targetCtx.drawImage(loadedIcons[iconId], -w*1.0, -h * 1.3, w * 4, h * 2);
       } else {
         targetCtx.rotate(Math.PI / 6); // Swords tilt forward
         targetCtx.drawImage(loadedIcons[iconId], -w*1.5, -h * 1.3, w * 3, h * 1.5);

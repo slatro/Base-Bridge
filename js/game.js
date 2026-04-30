@@ -1,4 +1,22 @@
 // js/game.js
+// Polyfill for CanvasRenderingContext2D.prototype.roundRect
+if (!CanvasRenderingContext2D.prototype.roundRect) {
+  CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, radii) {
+    let r = 0;
+    if (typeof radii === "number") r = radii;
+    else if (Array.isArray(radii) && radii.length > 0) r = radii[0];
+    if (w < 2 * r) r = w / 2;
+    if (h < 2 * r) r = h / 2;
+    this.moveTo(x + r, y);
+    this.arcTo(x + w, y, x + w, y + h, r);
+    this.arcTo(x + w, y + h, x, y + h, r);
+    this.arcTo(x, y + h, x, y, r);
+    this.arcTo(x, y, x + w, y, r);
+    this.closePath();
+    return this;
+  };
+}
+
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const prevCanvas = document.getElementById('previewCanvas');
@@ -1137,7 +1155,6 @@ function drawLimbPath(targetCtx, x, y, w, h, angle, color, isBack, wpnId, skinId
     targetCtx.strokeStyle = 'rgba(0,0,0,0.2)';
     targetCtx.lineWidth = 1;
     targetCtx.stroke();
-  }
 
   if (!isBack && wpnId) {
     let iconId = 'wpn_sword';
@@ -1460,7 +1477,7 @@ function triggerGameOver() {
     </div>
   `;
 
-  const statsContainer = document.querySelector('.go-stats-grid');
+  const statsContainer = document.querySelector('.game-over-stats');
   if (statsContainer) {
     let existingBreakdown = statsContainer.parentElement.querySelector('.breakdown-box');
     if (existingBreakdown) existingBreakdown.remove();

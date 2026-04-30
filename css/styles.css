@@ -55,6 +55,38 @@ h1, h2, h3, h4 { font-family: 'Fredoka One', cursive; font-weight: normal; }
   display: block;
 }
 
+.floating-text {
+  position: absolute;
+  pointer-events: none;
+  font-family: 'Fredoka One', cursive;
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: #facc15;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  animation: floatUpFade 1s ease-out forwards;
+  z-index: 1000;
+}
+
+@keyframes floatUpFade {
+  0% { transform: translateY(0); opacity: 0; }
+  20% { transform: translateY(-20px); opacity: 1; }
+  100% { transform: translateY(-60px); opacity: 0; }
+}
+
+.hot-streak {
+  color: #ff2a7a !important;
+  text-shadow: 0 0 15px #ff2a7a !important;
+  font-size: 1.5rem !important;
+  animation: pulseShake 0.5s infinite !important;
+}
+
+@keyframes pulseShake {
+  0% { transform: scale(1); }
+  25% { transform: scale(1.1) rotate(2deg); }
+  50% { transform: scale(1); }
+  75% { transform: scale(1.1) rotate(-2deg); }
+}
+
 /* Redesigned 3D Squircle BB Token */
 .bb-token-small { 
   display: inline-block; width: 24px; height: 24px; 

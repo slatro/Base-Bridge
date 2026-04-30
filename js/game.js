@@ -21,7 +21,9 @@ let sessionPerfectBonus = 0;
 let sessionComboBonus = 0;
 let slowMoTimer = 0;
 let missionProgress = { perfects: 0, score: 0, combo: 0 };
-let currentGapWidth = 0; // Track for risk/reward
+let currentGapWidth = 0; 
+let bridgesCrossed = 0;
+let currentSessionGoal = "";
 
 // Update UI top bar color
 function updateBiomeUI(currentBiome) {
@@ -121,15 +123,17 @@ function notifyMission(text) {
 function trackMission(type, val) {
   if (type === 'perfect') {
     missionProgress.perfects += val;
-    if (missionProgress.perfects % 5 === 0) notifyMission("+1 Mission Progress (Perfects)");
+    if (missionProgress.perfects % 3 === 0) notifyMission(`Mission: ${missionProgress.perfects} Perfects reached!`);
   }
   if (type === 'score' && val > missionProgress.score) {
     missionProgress.score = val;
+    if (val % 10 === 0) notifyMission(`Mission: Score ${val} reached!`);
     if (val === 20) notifyMission("Mission Complete: Reach 20 Score! +50 BB");
   }
   if (type === 'combo' && val > missionProgress.combo) {
     missionProgress.combo = val;
     if (val === 3) notifyMission("Mission Complete: Get 3x Combo! +30 BB");
+    if (val >= 5) notifyMission("EPIC STREAK! Mission +50 BB");
   }
 }
 
@@ -909,6 +913,8 @@ function startGame() {
   window.newRecordReached = false;
   scoreEl.innerText = score;
   cameraX = 0; targetCameraX = 0; currentPlatformIndex = 0; particles = []; scaleAmount = 1.0; shakeAmount = 0;
+  reviveUsed = false; bridgesCrossed = 0; sessionCoins = 0; sessionPerfects = 0; sessionBestCombo = 0;
+  setupSessionGoal();
   setupInitialState();
   gameState = STATES.PLAYING;
   document.querySelector('.gh-center').style.opacity = '1';
@@ -926,8 +932,10 @@ function startGame() {
 }
 
 function reviveGame() {
-  if (coins >= 50) {
-    coins -= 50; localStorage.setItem('bb_v1_coins', coins); uiCoinsEl.innerText = coins;
+  if (coins >= 25 && !reviveUsed) {
+    addCoins(-25);
+    reviveUsed = true;
+    gameOverOverlay.classList.add('hidden');
     gameState = STATES.PLAYING;
     
     // Reset to current platform safely
@@ -938,8 +946,8 @@ function reviveGame() {
     
     resetBridge();
     document.querySelector('.gh-center').style.opacity = '1';
-  gameOverOverlay.classList.add('hidden');
     btnRevive.classList.add('hidden');
+    playSound('perfect');
   }
 }
 
@@ -988,12 +996,41 @@ function spawnSparks(x, y) {
   }
 }
 
-function addCoins(amount) { 
+function addCoins(amount, x, y) { 
   coins += amount; 
   uiCoinsEl.innerText = coins; 
   localStorage.setItem('bb_v1_coins', coins); 
-  playSound('coin');
-  incMetric('bb_v1_total_score', amount); 
+  if (amount > 0) {
+    playSound('coin');
+    incMetric('bb_v1_total_score', amount); 
+    if (x && y) spawnFloatingText(`+${amount} BB`, x, y);
+  }
+}
+
+function spawnFloatingText(text, x, y, isSpecial = false) {
+  const el = document.createElement('div');
+  el.className = 'floating-text';
+  if (isSpecial) el.classList.add('hot-streak');
+  el.innerText = text;
+  // Convert world x to screen x
+  const screenX = (x - cameraX) * (canvas.offsetWidth / W);
+  const screenY = y * (canvas.offsetHeight / H);
+  el.style.left = `${screenX}px`;
+  el.style.top = `${screenY}px`;
+  document.getElementById('game-container').appendChild(el);
+  setTimeout(() => el.remove(), 1000);
+}
+
+function setupSessionGoal() {
+  const goals = [
+    { text: "Reach 20 score", target: 20, type: 'score' },
+    { text: "Hit 3 perfects", target: 3, type: 'perfect' },
+    { text: "Earn 50 BB", target: 50, type: 'coins' },
+    { text: "Beat your best", target: bestScore + 1, type: 'score' }
+  ];
+  const g = goals[Math.floor(Math.random() * goals.length)];
+  currentSessionGoal = g.text;
+  notifyMission("Session Goal: " + g.text);
 }
 
 function checkLanding() {
@@ -1005,6 +1042,7 @@ function checkLanding() {
   // 1. SUCCESS CHECK
   if (bridgeTip >= nextP.x && bridgeTip <= nextP.x + nextP.w) {
     success = true; platforms[currentPlatformIndex].bridgeL = bridge.length; 
+    bridgesCrossed++;
     
     // Perfect Zone Logic
     let basePerfectRatio = 0.20;
@@ -1012,68 +1050,64 @@ function checkLanding() {
     const perfectW = Math.max(10, nextP.w * shrinkFactor);
     const perfectX = nextP.x + (nextP.w / 2) - (perfectW / 2);
     
+    let isRisky = (bridgeTip < nextP.x + 10) || (bridgeTip > nextP.x + nextP.w - 10);
+
     if (bridgeTip >= perfectX && bridgeTip <= perfectX + perfectW) {
-      // SYSTEM 1 & 2: PERFECT & COMBO
       perfectStreak++;
       sessionPerfects++;
       if (perfectStreak > sessionBestCombo) sessionBestCombo = perfectStreak;
       
-      // Combo Rewards: 1->2, 2->4, 3->8, 4->16+
-      let comboBB = Math.min(16, Math.pow(2, perfectStreak));
+      let comboBB = Math.min(32, Math.pow(2, perfectStreak));
       sessionComboBonus += comboBB;
       
-      score += 2; addCoins(comboBB); sessionCoins += comboBB; 
-      shakeAmount = 15; scaleAmount = 1.05; // Feedback
+      score += 2; addCoins(comboBB, bridgeTip, H - platformHeight - 50); 
+      shakeAmount = 15; scaleAmount = 1.05;
       incMetric('bb_v1_total_perfects', 1);
       trackMission('perfect', 1); trackMission('combo', perfectStreak);
       spawnSparks(bridgeTip, H - platformHeight); 
       
-      let msg = `PERFECT x${perfectStreak}! +${comboBB} BB`;
+      let msg = `PERFECT x${perfectStreak}!`;
+      if (perfectStreak === 5) msg = "HOT STREAK! 🔥";
+      if (perfectStreak === 10) msg = "LEGENDARY!! 👑";
+      
       perfectEl.innerText = msg; 
       perfectEl.classList.add('show'); 
       setTimeout(() => perfectEl.classList.remove('show'), 1200);
       playSound('perfect');
+      if (perfectStreak >= 5) spawnFloatingText(msg, bridgeTip, H - platformHeight - 100, true);
     } else {
-      // Normal Landing
       perfectStreak = 0;
-      score += 1; addCoins(1); sessionCoins += 1;
+      let reward = isRisky ? 5 : 1;
+      score += 1; addCoins(reward, bridgeTip, H - platformHeight - 50); 
+      sessionCoins += reward;
+      if (isRisky) {
+        spawnFloatingText("RISKY SAVE! +5", bridgeTip, H - platformHeight - 80);
+        playSound('success');
+      }
     }
 
     // SYSTEM 5: RISK / REWARD (Longer bridge = higher reward)
-    let gapRatio = bridge.length / (W * 0.5); // Normalized gap difficulty
+    let gapRatio = bridge.length / (W * 0.5); 
     if (gapRatio > 0.6) {
-      let riskBonus = Math.floor(gapRatio * 5);
-      if (riskBonus > 0) {
-        addCoins(riskBonus); sessionCoins += riskBonus;
-        console.log("Risk Bonus:", riskBonus);
-      }
+      let riskBonus = Math.floor(gapRatio * 10);
+      if (riskBonus > 0) { addCoins(riskBonus, bridgeTip, H - platformHeight - 120); sessionCoins += riskBonus; }
     }
 
     scoreEl.innerText = score;
     trackMission('score', score);
-    
-    if (score > bestScore && bestScore > 0 && !window.newRecordReached) {
-      window.newRecordReached = true;
-      spawnConfetti(cameraX + W/2, H/2);
-      perfectEl.innerText = "NEW RECORD!"; perfectEl.style.color = '#facc15';
-      perfectEl.classList.add('show'); 
-      setTimeout(() => { perfectEl.classList.remove('show'); perfectEl.style.color = ''; }, 2000);
-      playSound('perfect');
-    }
-
     updateLevelUI();
-    character.squash = 0.55; // Landing squash feedback
+    character.squash = 0.55; 
   } 
   else {
-    // 2. NEAR MISS CHECK (SYSTEM 4)
+    // 2. NEAR MISS CHECK
     let distFromEdge = Math.min(Math.abs(bridgeTip - nextP.x), Math.abs(bridgeTip - (nextP.x + nextP.w)));
     if (distFromEdge < 15) {
-      slowMoTimer = 0.35; // Trigger 0.35s slow-mo
+      slowMoTimer = 0.4;
+      shakeAmount = 10;
       perfectEl.innerText = "ALMOST!";
       perfectEl.classList.add('show');
       setTimeout(() => perfectEl.classList.remove('show'), 1000);
     }
-
     success = false; 
     perfectStreak = 0; 
   }
@@ -1090,27 +1124,28 @@ function triggerGameOver() {
     isNewBest = true; 
   }
   
-  // SYSTEM 10: END SCREEN PSYCHOLOGY
   let psychologyMsg = "";
-  if (!isNewBest) {
-    let diff = bestScore - score;
-    psychologyMsg = `You were just ${diff} points away from your best! Next run can beat it!`;
+  if (score < 3) {
+    psychologyMsg = "Just a warm up! Let's go again!";
+  } else if (isNewBest) {
+    psychologyMsg = "UNBELIEVABLE! New Personal Record! 🏆";
   } else {
-    psychologyMsg = "UNBELIEVABLE! New Personal Record!";
+    let diff = bestScore - score;
+    if (diff <= 5) psychologyMsg = `So close! Only ${diff} away from your best!`;
+    else psychologyMsg = "Great effort! One more run for the win?";
   }
   
-  // SYSTEM 3: SCORE BREAKDOWN
   document.getElementById('go-score').innerText = score;
   document.getElementById('go-best').innerText = bestScore;
   document.getElementById('go-bb').innerText = sessionCoins;
   
-  // Breakdown elements (Injecting into overlay)
   const breakdownHTML = `
     <div class="breakdown-box" style="margin-top:1rem; padding:1rem; background:rgba(255,255,255,0.05); border-radius:12px; font-size:0.9rem;">
-      <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;"><span>Perfects:</span> <span>${sessionPerfects}</span></div>
-      <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;"><span>Combo Bonus:</span> <span>${sessionComboBonus} BB</span></div>
+      <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;"><span>Bridges Crossed:</span> <span>${bridgesCrossed}</span></div>
+      <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;"><span>Perfect Landings:</span> <span>${sessionPerfects}</span></div>
+      <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;"><span>Best Combo:</span> <span>x${sessionBestCombo}</span></div>
       <div style="display:flex; justify-content:space-between; color:#facc15;"><span>Total Earned:</span> <span>${sessionCoins} BB</span></div>
-      <p style="margin-top:1rem; font-style:italic; font-size:0.8rem; color:#94a3b8;">${psychologyMsg}</p>
+      <p style="margin-top:1rem; font-style:italic; font-size:0.85rem; color:#94a3b8; text-align:center;">${psychologyMsg}</p>
     </div>
   `;
   
@@ -1124,30 +1159,16 @@ function triggerGameOver() {
     statsContainer.parentElement.insertBefore(box, statsContainer.nextSibling);
   }
 
-  // SYSTEM 6: REVIVE SYSTEM (Once per run)
-  if (coins >= 50 && !reviveUsed) {
+  if (coins >= 25 && !reviveUsed && score > 0) {
     btnRevive.classList.remove('hidden');
-    btnRevive.onclick = () => {
-      addCoins(-50);
-      reviveUsed = true;
-      revivePlayer();
-    };
+    btnRevive.innerText = "REVIVE (25 BB)";
+    btnRevive.onclick = reviveGame;
   } else {
     btnRevive.classList.add('hidden');
   }
   
   document.querySelector('.gh-center').style.opacity = '0';
   setTimeout(() => gameOverOverlay.classList.remove('hidden'), 800);
-}
-
-function revivePlayer() {
-  gameOverOverlay.classList.add('hidden');
-  gameState = STATES.PLAYING;
-  character.y = H - platformHeight;
-  character.rotation = 0;
-  cameraX = platforms[currentPlatformIndex].x - W * 0.1;
-  resetBridge();
-  playSound('perfect');
 }
 
 function triggerGameWon() {

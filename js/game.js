@@ -948,6 +948,9 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
 
   // Body Path Details
   if (id === 'dino') {
+    // Draw front leg behind the body
+    drawLimbPath(targetCtx, s * 0.1, s * 0.6, s * 0.15, s * 0.4, legAngle1, colors.body || '#111', false, null, id);
+
     // Single Continuous Body Path for Dino
     targetCtx.fillStyle = '#65a30d'; // main green
     targetCtx.strokeStyle = '#14532d'; // outline green
@@ -955,59 +958,60 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     targetCtx.lineJoin = 'round';
     
     targetCtx.beginPath();
-    // Top of head
-    targetCtx.moveTo(-s*0.15, s*0.05);
-    targetCtx.lineTo(s*0.25, s*0.05);
-    // Snout
-    targetCtx.quadraticCurveTo(s*0.4, s*0.05, s*0.4, s*0.2);
+    // Top of head (shifted up)
+    targetCtx.moveTo(-s*0.15, -s*0.25);
+    targetCtx.lineTo(s*0.25, -s*0.25);
+    // Snout curve
+    targetCtx.quadraticCurveTo(s*0.45, -s*0.25, s*0.45, -s*0.05);
     // Front Jaw
-    targetCtx.lineTo(s*0.4, s*0.35);
+    targetCtx.lineTo(s*0.45, s*0.15);
     // Bottom Jaw
-    targetCtx.lineTo(s*0.1, s*0.35);
-    // Belly down to legs
-    targetCtx.quadraticCurveTo(s*0.25, s*0.6, s*0.15, s*0.7);
+    targetCtx.lineTo(s*0.05, s*0.15);
+    // Belly curving down to legs
+    targetCtx.quadraticCurveTo(s*0.25, s*0.5, s*0.15, s*0.7);
     // Leg base
     targetCtx.lineTo(-s*0.15, s*0.7);
-    // Tail curve up
-    targetCtx.quadraticCurveTo(-s*0.3, s*0.6, -s*0.8, s*0.4);
-    // Top of back/tail curve to head
-    targetCtx.quadraticCurveTo(-s*0.3, s*0.35, -s*0.15, s*0.05);
+    // Tail curving out and up
+    targetCtx.quadraticCurveTo(-s*0.2, s*0.5, -s*0.8, s*0.2);
+    // Back curving up to head (smoother, no hump)
+    targetCtx.quadraticCurveTo(-s*0.4, -s*0.05, -s*0.15, -s*0.25);
     targetCtx.fill();
     targetCtx.stroke();
 
     // Belly light green shade
     targetCtx.fillStyle = '#bef264';
     targetCtx.beginPath();
-    targetCtx.moveTo(s*0.1, s*0.35);
-    targetCtx.quadraticCurveTo(s*0.25, s*0.6, s*0.15, s*0.7);
+    targetCtx.moveTo(s*0.05, s*0.15);
+    targetCtx.quadraticCurveTo(s*0.25, s*0.5, s*0.15, s*0.7);
     targetCtx.lineTo(0, s*0.7);
-    targetCtx.quadraticCurveTo(s*0.15, s*0.5, 0, s*0.35);
+    targetCtx.quadraticCurveTo(s*0.1, s*0.45, -s*0.05, s*0.15);
     targetCtx.fill();
 
     // Dark green back stripes/triangles
     targetCtx.fillStyle = '#14532d';
-    targetCtx.beginPath(); targetCtx.moveTo(-s*0.1, s*0.15); targetCtx.lineTo(0, s*0.15); targetCtx.lineTo(-s*0.05, s*0.25); targetCtx.fill();
-    targetCtx.beginPath(); targetCtx.moveTo(-s*0.2, s*0.25); targetCtx.lineTo(-s*0.1, s*0.25); targetCtx.lineTo(-s*0.15, s*0.35); targetCtx.fill();
-    targetCtx.beginPath(); targetCtx.moveTo(-s*0.35, s*0.35); targetCtx.lineTo(-s*0.25, s*0.35); targetCtx.lineTo(-s*0.3, s*0.45); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.moveTo(-s*0.1, -s*0.1); targetCtx.lineTo(0, -s*0.1); targetCtx.lineTo(-s*0.05, 0); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.moveTo(-s*0.25, 0.0); targetCtx.lineTo(-s*0.15, 0.0); targetCtx.lineTo(-s*0.2, s*0.1); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.moveTo(-s*0.4, s*0.15); targetCtx.lineTo(-s*0.3, s*0.15); targetCtx.lineTo(-s*0.35, s*0.25); targetCtx.fill();
 
-    // Dark green spots
-    targetCtx.beginPath(); targetCtx.arc(-s*0.1, s*0.5, s*0.04, 0, Math.PI*2); targetCtx.fill();
-    targetCtx.beginPath(); targetCtx.arc(-s*0.3, s*0.5, s*0.025, 0, Math.PI*2); targetCtx.fill();
-    targetCtx.beginPath(); targetCtx.arc(s*0.05, s*0.6, s*0.03, 0, Math.PI*2); targetCtx.fill();
+    // Dark green spots scattered
+    targetCtx.beginPath(); targetCtx.arc(s*0.05, s*0.3, s*0.03, 0, Math.PI*2); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.arc(-s*0.15, s*0.35, s*0.04, 0, Math.PI*2); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.arc(-s*0.35, s*0.3, s*0.025, 0, Math.PI*2); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.arc(-s*0.5, s*0.25, s*0.02, 0, Math.PI*2); targetCtx.fill();
 
     // Tiny T-Rex Front Arm
     targetCtx.save();
-    targetCtx.translate(s*0.1, s*0.45);
+    targetCtx.translate(s*0.15, s*0.3); // Attachment point shifted
     targetCtx.rotate(armAngle1);
     targetCtx.fillStyle = '#65a30d';
     targetCtx.strokeStyle = '#14532d';
     targetCtx.lineWidth = Math.max(1, s*0.015);
     targetCtx.beginPath();
-    targetCtx.roundRect(-s*0.02, 0, s*0.06, s*0.15, s*0.03);
+    targetCtx.roundRect(-s*0.02, 0, s*0.05, s*0.15, s*0.03);
     targetCtx.fill(); targetCtx.stroke();
-    // Two little claws
-    targetCtx.beginPath(); targetCtx.moveTo(0, s*0.15); targetCtx.lineTo(-s*0.05, s*0.2); targetCtx.stroke();
-    targetCtx.beginPath(); targetCtx.moveTo(s*0.04, s*0.15); targetCtx.lineTo(s*0.09, s*0.2); targetCtx.stroke();
+    // Claws
+    targetCtx.beginPath(); targetCtx.moveTo(0, s*0.15); targetCtx.lineTo(-s*0.04, s*0.2); targetCtx.stroke();
+    targetCtx.beginPath(); targetCtx.moveTo(s*0.03, s*0.15); targetCtx.lineTo(s*0.07, s*0.2); targetCtx.stroke();
     targetCtx.restore();
   } else if (id === 'pika') {
     // Pika Custom Fat Body
@@ -1326,19 +1330,20 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     targetCtx.strokeStyle = '#14532d';
     targetCtx.lineWidth = Math.max(2, s*0.02);
     targetCtx.beginPath();
-    targetCtx.moveTo(s*0.4, s*0.25);
-    targetCtx.lineTo(s*0.35, s*0.22); targetCtx.lineTo(s*0.3, s*0.26);
-    targetCtx.lineTo(s*0.25, s*0.22); targetCtx.lineTo(s*0.2, s*0.26);
-    targetCtx.lineTo(s*0.15, s*0.22); targetCtx.lineTo(s*0.1, s*0.26);
+    targetCtx.moveTo(s*0.45, -s*0.05);
+    targetCtx.lineTo(s*0.4, -s*0.1); targetCtx.lineTo(s*0.35, -s*0.05);
+    targetCtx.lineTo(s*0.3, -s*0.1); targetCtx.lineTo(s*0.25, -s*0.05);
+    targetCtx.lineTo(s*0.2, -s*0.1); targetCtx.lineTo(s*0.15, -s*0.05);
+    targetCtx.lineTo(s*0.1, -s*0.1); targetCtx.lineTo(s*0.05, -s*0.05);
     targetCtx.stroke();
 
     // Giant Eye
     targetCtx.fillStyle = '#fff';
-    targetCtx.beginPath(); targetCtx.arc(s*0.18, s*0.15, s*0.08, 0, Math.PI*2); targetCtx.fill(); targetCtx.stroke();
+    targetCtx.beginPath(); targetCtx.arc(s*0.15, -s*0.15, s*0.08, 0, Math.PI*2); targetCtx.fill(); targetCtx.stroke();
     targetCtx.fillStyle = '#111';
-    targetCtx.beginPath(); targetCtx.arc(s*0.22, s*0.16, s*0.03, 0, Math.PI*2); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.arc(s*0.19, -s*0.13, s*0.03, 0, Math.PI*2); targetCtx.fill();
     targetCtx.fillStyle = '#fff';
-    targetCtx.beginPath(); targetCtx.arc(s*0.23, s*0.15, s*0.01, 0, Math.PI*2); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.arc(s*0.2, -s*0.14, s*0.01, 0, Math.PI*2); targetCtx.fill();
   } else if (id === 'ninja') {
     // 1. Sleeker Face Skin Area (Exposed eyes slit)
     targetCtx.fillStyle = '#ffedd5';

@@ -335,7 +335,7 @@ function updateDailyBestScore(s) {
 const SVG_ICONS = {
   hat_cap: `data:image/svg+xml;utf8,<svg viewBox="-20 0 120 100" xmlns="http://www.w3.org/2000/svg"><path d="M -15 70 Q 5 55 65 65 L 65 75 Q 5 65 -15 75 Z" fill="%23000"/><path d="M -15 70 C -15 20, 60 20, 65 60 L 65 65 Q 25 55 -15 70" fill="%23d90000" stroke="%23000" stroke-width="4"/><path d="M 20 28 C 20 24, 30 24, 30 28" fill="%23d90000" stroke="%23000" stroke-width="4" stroke-linecap="round"/><path d="M 25 28 C 22 40, 20 50, 20 63" fill="none" stroke="%23000" stroke-width="2"/><path d="M 20 66 C 50 50, 95 65, 95 72 C 70 75, 40 70, 20 72 Z" fill="%23000" stroke="%23000" stroke-width="3" stroke-linejoin="round"/><path d="M 25 65 C 50 53, 90 66, 90 69 C 70 70, 40 66, 25 69 Z" fill="%23d90000"/></svg>`,
   hat_cape: `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M20 20 L80 20 L95 100 L5 100 Z" fill="%23ef4444" stroke="%23b91c1c" stroke-width="2"/><path d="M20 20 L50 40 L80 20" fill="none" stroke="%23b91c1c" stroke-width="3"/></svg>`,
-  hat_halo: `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><defs><filter id="glow"><feGaussianBlur stdDeviation="5" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><circle cx="50" cy="50" r="35" fill="none" stroke="%23ffffff" stroke-width="8" filter="url(%23glow)"/></svg>`,
+  hat_halo: `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><ellipse cx="50" cy="50" rx="40" ry="15" fill="none" stroke="%23fef08a" stroke-width="6" filter="drop-shadow(0 0 8px %23facc15)"/></svg>`,
   face_visor: `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M10 40 L90 40 L75 60 L25 60 Z" fill="%230a192f" stroke="%2300e5ff" stroke-width="6"/><path d="M20 50 L80 50" stroke="%2300e5ff" stroke-width="6" opacity="0.8"/></svg>`,
   face_mask: `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M10 40 L90 40 L80 100 Q50 110 20 100 Z" fill="%23111"/><path d="M10 40 L90 40" stroke="%23333" stroke-width="4"/><path d="M30 40 L30 100 M50 40 L50 100 M70 40 L70 100" stroke="%23222" stroke-width="2"/></svg>`,
   face_cigar: `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect x="30" y="45" width="40" height="10" rx="3" fill="%2378350f"/><rect x="70" y="45" width="10" height="10" fill="%23f97316"/><path d="M75 45 Q80 30 90 20" fill="none" stroke="%23cbd5e1" stroke-width="4" opacity="0.7"/></svg>`,
@@ -834,7 +834,7 @@ function openShopPreview(id) {
         if (item.type === 'face') equippedFace = null;
         saveEquipmentsToStorage();
         renderSkinsShop();
-        if (item.type === 'skin') openShopPreview(id); else backToShop();
+        openShopPreview(id);
       };
     } else if (isEq && item.type === 'skin') {
       btn.innerText = "EQUIPPED";
@@ -854,7 +854,7 @@ function openShopPreview(id) {
         if (item.type === 'face') equippedFace = id;
         saveEquipmentsToStorage();
         renderSkinsShop();
-        if (item.type === 'skin') openShopPreview(id); else backToShop();
+        openShopPreview(id);
       };
     }
   } else {
@@ -938,23 +938,6 @@ function renderSkeleton(targetCtx, skinId, hatId, capeId, wpnId, faceId, s, stat
   targetCtx.scale(1.0 + (1.0 - character.squash) * 0.5, character.squash);
   const colors = skinData.colors;
 
-  // Wizard Aura
-  if (id === 'wizard') {
-    targetCtx.save();
-    targetCtx.shadowColor = '#c084fc'; targetCtx.shadowBlur = 25;
-    targetCtx.fillStyle = 'rgba(168, 85, 247, 0.15)';
-    let wave1 = Math.sin(time * 3) * s * 0.1;
-    let wave2 = Math.cos(time * 2.5) * s * 0.15;
-    targetCtx.beginPath();
-    targetCtx.ellipse(0, s * 0.4, s * 0.45 + wave1, s * 0.55 + wave2, 0, 0, Math.PI * 2);
-    targetCtx.fill();
-    targetCtx.shadowBlur = 15;
-    targetCtx.fillStyle = 'rgba(192, 132, 252, 0.2)';
-    targetCtx.beginPath();
-    targetCtx.ellipse(0, s * 0.4, s * 0.35 + wave2, s * 0.45 + wave1, 0, 0, Math.PI * 2);
-    targetCtx.fill();
-    targetCtx.restore();
-  }
 
   // Cape Rendering (Behind body)
   if (capeId === 'cape' && loadedIcons['hat_cape']) {
@@ -988,9 +971,9 @@ function renderSkeleton(targetCtx, skinId, hatId, capeId, wpnId, faceId, s, stat
   // Body Path Details
   if (id === 'dino') {
     targetCtx.save();
-    targetCtx.translate(0, s * 0.05); // Lower body
-    // Draw front leg behind the body
+    // Draw front leg behind the body BEFORE translating
     drawLimbPath(targetCtx, s * 0.1, s * 0.6, s * 0.15, s * 0.4, legAngle1, colors.body || '#111', false, null, id);
+    targetCtx.translate(0, s * 0.05); // Lower body
 
     // Single Continuous Body Path for Dino
     targetCtx.fillStyle = '#65a30d'; // main green
@@ -1100,9 +1083,9 @@ function renderSkeleton(targetCtx, skinId, hatId, capeId, wpnId, faceId, s, stat
     targetCtx.fillStyle = '#1e40af';
     targetCtx.beginPath(); 
     targetCtx.roundRect(-s*0.35, s*0.55, s*0.7, s*0.35, [0, 0, s*0.35, s*0.35]); targetCtx.fill();
-    // Strap (Vertical)
+    // Strap (Vertical, shifted left)
     targetCtx.strokeStyle = '#1e40af'; targetCtx.lineWidth = Math.max(2, s*0.1);
-    targetCtx.beginPath(); targetCtx.moveTo(-s*0.05, s*0.55); targetCtx.lineTo(-s*0.05, s*0.28); targetCtx.stroke();
+    targetCtx.beginPath(); targetCtx.moveTo(-s*0.12, s*0.55); targetCtx.lineTo(-s*0.12, s*0.28); targetCtx.stroke();
   } else if (id === 'demon') {
     // Demon Body (Pill shaped, red gradient)
     let dg = targetCtx.createLinearGradient(0, s*0.2, 0, s*0.8);
@@ -1635,7 +1618,7 @@ function renderSkeleton(targetCtx, skinId, hatId, capeId, wpnId, faceId, s, stat
   // Draw Equipment
   if (id === 'classic' || id === 'ninja') {
     if (hatId === 'cap' && loadedIcons['hat_cap']) targetCtx.drawImage(loadedIcons['hat_cap'], -s * 0.32, -s * 0.30, s * 0.8, s * 0.45);
-    if (hatId === 'halo' && loadedIcons['hat_halo']) targetCtx.drawImage(loadedIcons['hat_halo'], -s * 0.3, -s * 0.4, s * 0.6, s * 0.6);
+    if (hatId === 'halo' && loadedIcons['hat_halo']) targetCtx.drawImage(loadedIcons['hat_halo'], -s * 0.5, -s * 0.4, s * 1.0, s * 0.4);
 
     if (faceId === 'glasses' && loadedIcons['face_glasses']) targetCtx.drawImage(loadedIcons['face_glasses'], -s * 0.15, s * 0.1, s * 0.6, s * 0.25);
     if (faceId === 'bandana' && loadedIcons['face_bandana']) targetCtx.drawImage(loadedIcons['face_bandana'], -s * 0.2, s * 0.2, s * 0.6, s * 0.4);

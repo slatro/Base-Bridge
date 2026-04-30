@@ -719,14 +719,20 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
   targetCtx.quadraticCurveTo(s * 0.25, s * 0.5, s * 0.2, s * 0.3);
 
   if (id === 'wizard') {
-    // Blue Robe
+    // Long Mystic Robe/Coat
     targetCtx.fillStyle = '#1e40af';
+    targetCtx.beginPath();
+    targetCtx.moveTo(-s*0.25, s*0.3);
+    targetCtx.lineTo(s*0.25, s*0.3);
+    targetCtx.lineTo(s*0.35, s*0.9);
+    targetCtx.lineTo(-s*0.35, s*0.9);
+    targetCtx.closePath();
     targetCtx.fill();
     // Yellow Stars on Robe
     targetCtx.fillStyle = '#facc15';
-    for(let i=0; i<4; i++) {
+    for(let i=0; i<5; i++) {
         targetCtx.beginPath();
-        targetCtx.arc((i%2?0.08:-0.08)*s, s*(0.4 + i*0.07), s*0.02, 0, Math.PI*2);
+        targetCtx.arc((i%2?0.1:-0.1)*s, s*(0.45 + i*0.08), s*0.02, 0, Math.PI*2);
         targetCtx.fill();
     }
   } else if (id === 'galaxy') {
@@ -844,6 +850,14 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     targetCtx.beginPath(); targetCtx.arc(s*0.17, s*0.18, s*0.02, 0, Math.PI*2); targetCtx.fill();
     targetCtx.shadowBlur = 0;
 
+    // Signal Antenna (Black rod)
+    targetCtx.strokeStyle = '#111';
+    targetCtx.lineWidth = 3;
+    targetCtx.beginPath();
+    targetCtx.moveTo(-s * 0.1, -s * 0.05);
+    targetCtx.lineTo(-s * 0.15, -s * 0.25);
+    targetCtx.stroke();
+
     // Signal Waves (Glowing Cyan)
     targetCtx.strokeStyle = '#00e5ff';
     targetCtx.lineWidth = 2;
@@ -869,6 +883,12 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     targetCtx.fillRect(-s * 0.35, s * 0.2, s * 0.7, s * 0.2);
     targetCtx.fillStyle = colors.faceShadow;
     targetCtx.beginPath(); targetCtx.arc(s * 0.1, s * 0.3, s * 0.2, 0, Math.PI * 2); targetCtx.fill();
+  } else if (id === 'galaxy') {
+    // Square Head for Titan
+    targetCtx.fillStyle = '#a855f7';
+    targetCtx.beginPath();
+    targetCtx.roundRect(-s*0.3, -s*0.1, s*0.6, s*0.6, s*0.08);
+    targetCtx.fill();
   } else if (id === 'wizard') {
     // Face Skin area
     targetCtx.fillStyle = '#ffedd5';
@@ -934,12 +954,12 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     targetCtx.moveTo(0, s * 0.05); targetCtx.lineTo(-s * 0.3, s * 0.1); targetCtx.lineTo(-s * 0.25, s * 0.25); targetCtx.closePath(); targetCtx.fill();
     targetCtx.restore();
 
-    // 4. Smaller Expressive Black Eye (Shifted right, lower, smaller)
+    // 4. Smaller Expressive Black Eye (Shifted up)
     targetCtx.fillStyle = '#000';
-    targetCtx.beginPath(); targetCtx.arc(s * 0.21, s * 0.24, s * 0.025, 0, Math.PI * 2); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.arc(s * 0.21, s * 0.2, s * 0.025, 0, Math.PI * 2); targetCtx.fill();
     // Glint
     targetCtx.fillStyle = '#fff';
-    targetCtx.beginPath(); targetCtx.arc(s * 0.22, s * 0.23, s * 0.01, 0, Math.PI * 2); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.arc(s * 0.22, s * 0.19, s * 0.01, 0, Math.PI * 2); targetCtx.fill();
   } 
   else if (id === 'wizard') {
     // Beard handled in head path
@@ -984,7 +1004,11 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
 
   // Front Arm & Leg
   drawLimbPath(targetCtx, s * 0.1, s * 0.6, s * 0.15, s * 0.4, legAngle1, colors.body || '#111', false);
-  drawLimbPath(targetCtx, 0, s * 0.3, s * 0.12, s * 0.35, armAngle1, colors.body || '#111', false, wpnId);
+  
+  // Hoodie Arm alignment fix
+  let armX = 0;
+  if (id === 'hoodie') armX = s * 0.1;
+  drawLimbPath(targetCtx, armX, s * 0.3, s * 0.12, s * 0.35, armAngle1, colors.body || '#111', false, wpnId);
 
   // Infinity Gauntlet for Galaxy Skin
   if (id === 'galaxy') {

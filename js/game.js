@@ -711,6 +711,11 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
   drawLimbPath(targetCtx, -s * 0.1, s * 0.6, s * 0.15, s * 0.4, legAngle2, colors.body || '#222', true);
   drawLimbPath(targetCtx, 0, s * 0.3, s * 0.12, s * 0.35, armAngle2, colors.body || '#222', true, null);
 
+  // Wizard Front Leg (Drawn behind robe)
+  if (id === 'wizard') {
+    drawLimbPath(targetCtx, s * 0.1, s * 0.6, s * 0.15, s * 0.4, legAngle1, colors.body || '#111', false);
+  }
+
   // Body Path Details
   targetCtx.beginPath();
   targetCtx.moveTo(-s * 0.2, s * 0.3);
@@ -1003,7 +1008,9 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
   targetCtx.restore();
 
   // Front Arm & Leg
-  drawLimbPath(targetCtx, s * 0.1, s * 0.6, s * 0.15, s * 0.4, legAngle1, colors.body || '#111', false);
+  if (id !== 'wizard') {
+    drawLimbPath(targetCtx, s * 0.1, s * 0.6, s * 0.15, s * 0.4, legAngle1, colors.body || '#111', false);
+  }
   
   // Hoodie Arm alignment fix
   let armX = 0;
@@ -1063,7 +1070,8 @@ function drawLimbPath(targetCtx, x, y, w, h, angle, color, isBack, wpnId) {
   let drawStroke = false;
   if (color === '#e11d48') drawStroke = true;
 
-  targetCtx.fillStyle = isBack ? shadeColor(color, -20) : color;
+  const baseColor = isBack ? shadeColor(color, -20) : color;
+  targetCtx.fillStyle = baseColor;
   targetCtx.beginPath(); targetCtx.roundRect(-w / 2, 0, w, h, w / 2);
   targetCtx.fill();
   if (drawStroke) {
@@ -1072,16 +1080,28 @@ function drawLimbPath(targetCtx, x, y, w, h, angle, color, isBack, wpnId) {
     targetCtx.stroke();
   }
 
-  // Universal Feet (for legs)
+  // Universal Feet (for legs) - Contrasting Color
   if (h > w * 1.5 && !wpnId) {
-    targetCtx.fillStyle = (color === '#111') ? '#ef4444' : (isBack ? shadeColor(color, -30) : shadeColor(color, -10));
+    let footColor = (color === '#111' || color === '#222') ? '#334155' : shadeColor(color, -30);
+    if (color === '#111' && !isBack) footColor = '#ef4444'; // Ninja boots
+    
+    targetCtx.fillStyle = footColor;
     targetCtx.beginPath(); targetCtx.arc(0, h, w*0.6, 0, Math.PI*2); targetCtx.fill();
+    // Subtle outline for foot
+    targetCtx.strokeStyle = 'rgba(0,0,0,0.2)';
+    targetCtx.lineWidth = 1;
+    targetCtx.stroke();
   }
   
-  // Universal Hands (for arms)
+  // Universal Hands (for arms) - Contrasting Color
   if (h < w * 2 || wpnId) {
-    targetCtx.fillStyle = isBack ? shadeColor(color, -30) : shadeColor(color, -10);
+    let handColor = (color === '#111' || color === '#222') ? '#475569' : shadeColor(color, -40);
+    targetCtx.fillStyle = handColor;
     targetCtx.beginPath(); targetCtx.arc(0, h, w*0.5, 0, Math.PI*2); targetCtx.fill();
+    // Subtle outline for hand
+    targetCtx.strokeStyle = 'rgba(0,0,0,0.2)';
+    targetCtx.lineWidth = 1;
+    targetCtx.stroke();
   }
 
   if (!isBack && wpnId) {

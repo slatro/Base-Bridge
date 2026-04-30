@@ -35,13 +35,13 @@ const btnRevive = document.getElementById('btn-revive');
 
 // --- DAILY CHECK-IN SYSTEM (7-DAY PROGRESSION) ---
 document.getElementById('fc-daily')?.addEventListener('click', () => {
-  const section = document.getElementById('daily-checkin-section');
-  if (section) section.scrollIntoView({ behavior: 'smooth' });
+  document.getElementById('modal-daily-calendar')?.classList.remove('hidden');
 });
 
 function renderDailyCheckinPanel() {
   const cardsContainer = document.getElementById('neon-cards-container');
   const nodesContainer = document.getElementById('neon-timeline-nodes');
+  const dashboardGrid = document.getElementById('dashboard-daily-grid');
   const openBtn = document.getElementById('btn-open-daily-modal');
   const claimBtn = document.getElementById('btn-claim-daily');
   
@@ -57,42 +57,62 @@ function renderDailyCheckinPanel() {
     currentDayInWeek = ((streak - 1) % 7) + 1;
   }
 
-  // Custom SVG icons matching the reference image
-  const icons = [
-    `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="30" fill="#facc15" stroke="#ca8a04" stroke-width="4"/><text x="50" y="60" font-size="30" fill="#ca8a04" text-anchor="middle" font-family="sans-serif" font-weight="bold">$</text></svg>`, // Day 1: Coin
-    `<svg viewBox="0 0 100 100"><polygon points="30,70 50,30 70,70" fill="#00e5ff"/><polygon points="20,50 35,20 50,50" fill="#00e5ff" opacity="0.8"/><polygon points="50,50 65,20 80,50" fill="#00e5ff" opacity="0.8"/></svg>`, // Day 2: Gems
-    `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="30" fill="#e2e8f0" stroke="#94a3b8" stroke-width="4"/><text x="50" y="60" font-size="30" fill="#94a3b8" text-anchor="middle" font-family="sans-serif" font-weight="bold">$</text></svg>`, // Day 3: Silver
-    `<svg viewBox="0 0 100 100"><polygon points="50,20 80,40 80,70 50,90 20,70 20,40" fill="#ff0055" stroke="#ff80ab" stroke-width="3"/><polygon points="50,50 80,40 50,20 20,40" fill="#ff80ab" opacity="0.8"/><polygon points="50,50 80,40 80,70 50,90" fill="#c5003e" opacity="0.6"/></svg>`, // Day 4: Pink Cube
-    `<svg viewBox="0 0 100 100"><rect x="20" y="30" width="60" height="50" fill="#ca8a04" stroke="#854d0e" stroke-width="3"/><text x="50" y="65" font-size="35" fill="#fff" text-anchor="middle" font-family="sans-serif" font-weight="bold">?</text></svg>`, // Day 5: Mystery Box
-    `<svg viewBox="0 0 100 100"><circle cx="40" cy="40" r="25" fill="#facc15" stroke="#ca8a04" stroke-width="3"/><text x="40" y="50" font-size="25" fill="#ca8a04" text-anchor="middle" font-family="sans-serif" font-weight="bold">$</text><circle cx="65" cy="65" r="20" fill="#e2e8f0" stroke="#94a3b8" stroke-width="3"/><text x="65" y="72" font-size="20" fill="#94a3b8" text-anchor="middle" font-family="sans-serif" font-weight="bold">$</text></svg>`, // Day 6: Multiple Coins
-    `<svg viewBox="0 0 100 100"><rect x="25" y="40" width="50" height="50" fill="#ef4444"/><rect x="45" y="40" width="10" height="50" fill="#facc15"/><rect x="20" y="30" width="60" height="15" fill="#ef4444"/><path d="M 50 30 C 30 10 20 30 45 30 M 50 30 C 70 10 80 30 55 30" fill="none" stroke="#facc15" stroke-width="4"/></svg>` // Day 7: Gift Box
-  ];
+  // Same BB Coin Icon for all 7 days
+  const bbCoinSVG = `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="30" fill="#facc15" stroke="#ca8a04" stroke-width="4"/><text x="50" y="60" font-size="30" fill="#ca8a04" text-anchor="middle" font-family="sans-serif" font-weight="bold">$</text></svg>`;
+  
+  // 7 Different Neon Glow Colors
+  const neonColors = ['#ef4444', '#f97316', '#facc15', '#4ade80', '#00e5ff', '#3b82f6', '#d946ef'];
 
   cardsContainer.innerHTML = '';
   nodesContainer.innerHTML = '';
+  if (dashboardGrid) dashboardGrid.innerHTML = '';
 
   for (let i = 1; i <= 7; i++) {
     const isClaimed = i < currentDayInWeek || (i === currentDayInWeek && lastCheckinDate === today);
     const isActive = i === currentDayInWeek && lastCheckinDate !== today;
+    const reward = 50 + ((i - 1) * 25);
 
-    // Card
+    // --- Modal Neon Card ---
     const card = document.createElement('div');
     card.className = `neon-card ${isActive ? 'active' : ''} ${isClaimed ? 'claimed' : ''}`;
-    card.innerHTML = `<div class="neon-card-icon">${icons[i-1]}</div>`;
+    // Apply dynamic neon border/shadow if active
+    if (isActive) {
+      card.style.borderColor = neonColors[i-1];
+      card.style.boxShadow = `0 0 15px ${neonColors[i-1]}, inset 0 0 10px ${neonColors[i-1]}`;
+    }
+    card.innerHTML = `<div class="neon-card-icon">${bbCoinSVG}</div>`;
     cardsContainer.appendChild(card);
 
-    // Timeline Node
+    // --- Modal Timeline Node ---
     const node = document.createElement('div');
     node.className = `neon-node ${isActive ? 'active' : ''}`;
+    if (isActive) {
+      node.style.backgroundColor = '#fff';
+      node.style.boxShadow = `0 0 15px #fff, 0 0 20px ${neonColors[i-1]}`;
+    }
     node.innerHTML = `<div class="neon-node-label">DAY ${i}</div>`;
     nodesContainer.appendChild(node);
+    
+    // --- Dashboard Visual Grid Card ---
+    if (dashboardGrid) {
+      const dashCard = document.createElement('div');
+      dashCard.className = 'checkin-day-card';
+      if (isClaimed) dashCard.classList.add('claimed');
+      else if (isActive) dashCard.classList.add('current');
+      
+      let tickHTML = isClaimed ? `<span style='color:#00ff88; font-size:1.2rem; line-height:1;'>✓</span>` : `<span class="reward-amt">${reward}</span>`;
+      
+      dashCard.innerHTML = `<span class="day-title">Day ${i}</span>${tickHTML}`;
+      dashboardGrid.appendChild(dashCard);
+    }
   }
 
   // Update Buttons
   if (lastCheckinDate === today) {
     if (openBtn) {
       openBtn.innerHTML = "CHECKED IN <span style='color:#00ff88;'>✓</span>";
-      openBtn.disabled = true;
+      // Keeping it clickable so user can open modal to see their progress as requested!
+      openBtn.disabled = false;
       openBtn.classList.replace('btn-green', 'btn-gray');
     }
     if (claimBtn) {
@@ -140,6 +160,9 @@ async function doDailyCheckin() {
     uiCoinsEl.innerText = coins;
 
     renderDailyCheckinPanel();
+    
+    // Auto hide the daily modal so the success modal is clearly visible
+    document.getElementById('modal-daily-calendar')?.classList.add('hidden');
     if (typeof window.showInfoModal === 'function') window.showInfoModal("Check-in Successful!", `You checked in and earned ${reward} BB Tokens!`);
   } else {
     claimBtn.innerText = "CHECK IN";
@@ -1773,11 +1796,7 @@ document.getElementById('fc-skill')?.addEventListener('click', () => {
     showInfoModal('Skill Based Gameplay', 'Hold to grow the bridge. Release to cross. Perfect landing gives bonus points and combo multiplier. Levels get harder dynamically!');
   }
 });
-document.getElementById('fc-daily')?.addEventListener('click', () => {
-  document.getElementById('btn-achievements')?.click();
-  const dailyTab = document.querySelector('.ach-tab[data-tab="daily"]');
-  if (dailyTab) dailyTab.click();
-});
+// Duplicate fc-daily listener removed
 document.getElementById('fc-compete')?.addEventListener('click', () => {
   document.getElementById('btn-leaderboard')?.click();
 });

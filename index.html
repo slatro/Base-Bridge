@@ -186,7 +186,10 @@
       <div class="panel-card glass-panel daily-checkin-panel" id="daily-checkin-section">
         <h3 class="panel-title">DAILY CHECK-IN</h3>
         <p class="panel-subtitle">Come back every day to get better rewards!</p>
-        <div class="dr-btn-wrapper" style="margin-top: 15px;">
+        <div class="dashboard-daily-grid" id="dashboard-daily-grid" style="display: flex; gap: 8px; margin: 15px 0; justify-content: space-between; padding: 5px;">
+          <!-- 7 visual days injected via JS -->
+        </div>
+        <div class="dr-btn-wrapper" style="margin-top: 25px;">
           <button class="btn btn-aaa btn-green" id="btn-open-daily-modal" onclick="document.getElementById('modal-daily-calendar').classList.remove('hidden')">CHECK IN</button>
         </div>
       </div>

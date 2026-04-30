@@ -821,22 +821,29 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     targetCtx.ellipse(s*0.12, s*0.2, s*0.22, s*0.18, 0, 0, Math.PI*2);
     targetCtx.fill();
 
-    // Friendly Glowing Eye (Cyan)
+    // Detailed Robotic Eye (Cyan)
     targetCtx.strokeStyle = '#00e5ff';
-    targetCtx.lineWidth = 3;
-    targetCtx.shadowColor = '#00e5ff'; targetCtx.shadowBlur = 8;
+    targetCtx.lineWidth = 2;
+    targetCtx.shadowColor = '#00e5ff'; targetCtx.shadowBlur = 10;
     targetCtx.beginPath(); 
-    targetCtx.arc(s*0.18, s*0.22, s*0.06, -Math.PI*0.8, -Math.PI*0.2); 
+    targetCtx.arc(s*0.18, s*0.2, s*0.06, 0, Math.PI*2); 
     targetCtx.stroke();
+    targetCtx.fillStyle = '#00e5ff';
+    targetCtx.beginPath(); targetCtx.arc(s*0.18, s*0.2, s*0.02, 0, Math.PI*2); targetCtx.fill();
     targetCtx.shadowBlur = 0;
 
-    // Antenna
+    // Robot Antenna with Glowing Tip
     targetCtx.strokeStyle = '#f8fafc';
-    targetCtx.lineWidth = 4;
+    targetCtx.lineWidth = 5;
     targetCtx.beginPath();
     targetCtx.moveTo(-s*0.1, -s*0.05);
-    targetCtx.lineTo(-s*0.15, -s*0.2);
+    targetCtx.lineTo(-s*0.15, -s*0.3);
     targetCtx.stroke();
+    // Glowing Tip
+    targetCtx.fillStyle = '#00e5ff';
+    targetCtx.shadowColor = '#00e5ff'; targetCtx.shadowBlur = 8;
+    targetCtx.beginPath(); targetCtx.arc(-s*0.15, -s*0.32, s*0.04, 0, Math.PI*2); targetCtx.fill();
+    targetCtx.shadowBlur = 0;
   }
   
   if (id === 'hoodie') {

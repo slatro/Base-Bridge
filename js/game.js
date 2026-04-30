@@ -860,26 +860,26 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
 
   // Eyes & Details
   if (id === 'ninja') {
-    // 1. Face Skin Area (Exposed eyes)
+    // 1. Larger Face Skin Area (Exposed eyes)
     targetCtx.fillStyle = '#ffedd5';
     targetCtx.beginPath();
-    targetCtx.ellipse(s*0.12, s*0.18, s*0.16, s*0.08, 0, 0, Math.PI*2);
+    targetCtx.ellipse(s*0.15, s*0.2, s*0.2, s*0.1, 0, 0, Math.PI*2);
     targetCtx.fill();
 
     // 2. Ninja Mask / Hood (Black)
     targetCtx.fillStyle = '#111';
-    // Mask covering lower face
+    // Mask covering lower face - adjusted to give more room to eyes
     targetCtx.beginPath();
-    targetCtx.moveTo(-s*0.1, s*0.22);
-    targetCtx.lineTo(s*0.3, s*0.22);
-    targetCtx.lineTo(s*0.2, s*0.4);
-    targetCtx.lineTo(-s*0.1, s*0.4);
+    targetCtx.moveTo(-s*0.05, s*0.26);
+    targetCtx.lineTo(s*0.35, s*0.26);
+    targetCtx.lineTo(s*0.25, s*0.45);
+    targetCtx.lineTo(-s*0.05, s*0.45);
     targetCtx.closePath();
     targetCtx.fill();
 
     // 3. Thick Red Bandana
     targetCtx.fillStyle = '#ef4444';
-    targetCtx.fillRect(-s*0.3, s*0.05, s*0.6, s*0.12);
+    targetCtx.fillRect(-s*0.32, s*0.05, s*0.65, s*0.12);
     
     // Bandana Tails
     targetCtx.save();
@@ -891,12 +891,12 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     targetCtx.moveTo(0,s*0.05); targetCtx.lineTo(-s*0.3, s*0.1); targetCtx.lineTo(-s*0.25, s*0.25); targetCtx.closePath(); targetCtx.fill();
     targetCtx.restore();
 
-    // 4. Expressive Black Eye (Side Profile)
+    // 4. Smaller Expressive Black Eye (Centered)
     targetCtx.fillStyle = '#000';
-    targetCtx.beginPath(); targetCtx.arc(s*0.15, s*0.18, s*0.06, 0, Math.PI*2); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.arc(s*0.18, s*0.2, s*0.045, 0, Math.PI*2); targetCtx.fill();
     // Glint
     targetCtx.fillStyle = '#fff';
-    targetCtx.beginPath(); targetCtx.arc(s*0.17, s*0.16, s*0.02, 0, Math.PI*2); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.arc(s*0.2, s*0.18, s*0.015, 0, Math.PI*2); targetCtx.fill();
   } 
   else if (id === 'galaxy') {
     // Thanos Chin Ridges

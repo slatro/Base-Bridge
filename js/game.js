@@ -912,9 +912,7 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
 
   // Translate up so feet touch 0, apply squash
   const id = skinData.id;
-  let yOffset = -s;
-  if (id === 'pika') yOffset = -s * 0.85; // Lowered body to align with legs better
-  if (id === 'mini') yOffset = -s * 0.8; // Lowered body to align with legs better
+  // Removed manual yOffsets so Pika and Mini match Titan's vertical alignment
   targetCtx.translate(0, yOffset + bounceY);
   targetCtx.scale(1.0 + (1.0 - character.squash) * 0.5, character.squash);
   const colors = skinData.colors;
@@ -948,25 +946,25 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
   if (id === 'pika') {
     // Pika Custom Fat Body
     // Zigzag tail - Better body connection
-    targetCtx.beginPath(); targetCtx.moveTo(-s*0.1, s*0.4); targetCtx.lineTo(-s*0.3, s*0.45); targetCtx.lineTo(-s*0.55, s*0.5); targetCtx.lineTo(-s*0.45, s*0.35); targetCtx.lineTo(-s*0.65, s*0.25); targetCtx.lineTo(-s*0.55, s*0.1); targetCtx.lineTo(-s*0.8, -s*0.1); targetCtx.lineTo(-s*0.65, -s*0.2); targetCtx.lineWidth = Math.max(3, s*0.12); targetCtx.strokeStyle = '#facc15'; targetCtx.lineJoin = 'miter'; targetCtx.stroke();
-    targetCtx.beginPath(); targetCtx.moveTo(-s*0.1, s*0.4); targetCtx.lineTo(-s*0.28, s*0.42); targetCtx.strokeStyle = '#854d0e'; targetCtx.stroke();
+    targetCtx.beginPath(); targetCtx.moveTo(-s*0.2, s*0.4); targetCtx.lineTo(-s*0.4, s*0.45); targetCtx.lineTo(-s*0.65, s*0.5); targetCtx.lineTo(-s*0.55, s*0.35); targetCtx.lineTo(-s*0.75, s*0.25); targetCtx.lineTo(-s*0.65, s*0.1); targetCtx.lineTo(-s*0.9, -s*0.1); targetCtx.lineTo(-s*0.75, -s*0.2); targetCtx.lineWidth = Math.max(3, s*0.12); targetCtx.strokeStyle = '#facc15'; targetCtx.lineJoin = 'miter'; targetCtx.stroke();
+    targetCtx.beginPath(); targetCtx.moveTo(-s*0.2, s*0.4); targetCtx.lineTo(-s*0.35, s*0.42); targetCtx.strokeStyle = '#854d0e'; targetCtx.stroke();
     
-    // Fat Body - Shifted right to contain face
+    // Fat Body - Shifted LEFT to center the legs
     targetCtx.fillStyle = '#facc15';
     targetCtx.beginPath();
-    targetCtx.moveTo(-s * 0.1, s * 0.1);
-    targetCtx.quadraticCurveTo(-s * 0.3, s * 0.5, -s * 0.05, s * 0.85);
-    targetCtx.lineTo(s * 0.35, s * 0.85);
-    targetCtx.quadraticCurveTo(s * 0.55, s * 0.5, s * 0.4, s * 0.1);
+    targetCtx.moveTo(-s * 0.25, s * 0.1);
+    targetCtx.quadraticCurveTo(-s * 0.45, s * 0.5, -s * 0.2, s * 0.85);
+    targetCtx.lineTo(s * 0.2, s * 0.85);
+    targetCtx.quadraticCurveTo(s * 0.4, s * 0.5, s * 0.25, s * 0.1);
     targetCtx.fill();
     
-    // Brown stripes
+    // Brown stripes (shifted left)
     targetCtx.strokeStyle = '#854d0e'; targetCtx.lineWidth = Math.max(2, s*0.06); targetCtx.lineCap = 'round';
-    targetCtx.beginPath(); targetCtx.moveTo(-s*0.2, s*0.35); targetCtx.lineTo(0, s*0.38); targetCtx.stroke();
-    targetCtx.beginPath(); targetCtx.moveTo(-s*0.22, s*0.5); targetCtx.lineTo(-s*0.02, s*0.53); targetCtx.stroke();
+    targetCtx.beginPath(); targetCtx.moveTo(-s*0.35, s*0.35); targetCtx.lineTo(-s*0.15, s*0.38); targetCtx.stroke();
+    targetCtx.beginPath(); targetCtx.moveTo(-s*0.37, s*0.5); targetCtx.lineTo(-s*0.17, s*0.53); targetCtx.stroke();
 
-    // Front Arm (Drawn in front of body) with outline
-    targetCtx.save(); targetCtx.translate(s*0.25, s*0.4); targetCtx.rotate(armAngle1);
+    // Front Arm (Drawn in front of body) with outline (shifted left)
+    targetCtx.save(); targetCtx.translate(s*0.1, s*0.4); targetCtx.rotate(armAngle1);
     targetCtx.fillStyle = '#facc15'; targetCtx.beginPath(); targetCtx.ellipse(0, s*0.1, s*0.06, s*0.15, -Math.PI/6, 0, Math.PI*2); targetCtx.fill();
     targetCtx.strokeStyle = '#111'; targetCtx.lineWidth = 1; targetCtx.stroke();
     targetCtx.restore();
@@ -1214,17 +1212,17 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     targetCtx.beginPath(); targetCtx.arc(s * 0.1, s * 0.3, s * 0.2, 0, Math.PI * 2); targetCtx.fill();
   } else if (id === 'pika') {
     targetCtx.fillStyle = '#facc15';
-    // Head shape - RESTORED and aligned with shifted body
-    targetCtx.beginPath(); targetCtx.arc(s*0.15, s * 0.15, s * 0.32, 0, Math.PI * 2); targetCtx.fill();
-    // Ears - RESTORED
+    // Head shape - Shifted left by 0.15
+    targetCtx.beginPath(); targetCtx.arc(0, s * 0.15, s * 0.32, 0, Math.PI * 2); targetCtx.fill();
+    // Ears - Shifted left by 0.15
     targetCtx.fillStyle = '#eab308';
-    targetCtx.beginPath(); targetCtx.moveTo(0, s*0.05); targetCtx.lineTo(-s*0.3, -s*0.2); targetCtx.lineTo(s*0.15, 0); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.moveTo(-s*0.15, s*0.05); targetCtx.lineTo(-s*0.45, -s*0.2); targetCtx.lineTo(0, 0); targetCtx.fill();
     targetCtx.fillStyle = '#111';
-    targetCtx.beginPath(); targetCtx.moveTo(-s*0.15, -s*0.08); targetCtx.lineTo(-s*0.3, -s*0.2); targetCtx.lineTo(-s*0.05, -s*0.15); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.moveTo(-s*0.3, -s*0.08); targetCtx.lineTo(-s*0.45, -s*0.2); targetCtx.lineTo(-s*0.2, -s*0.15); targetCtx.fill();
     targetCtx.fillStyle = '#facc15';
-    targetCtx.beginPath(); targetCtx.moveTo(s*0.15, 0); targetCtx.lineTo(0, -s*0.35); targetCtx.lineTo(s*0.3, -s*0.05); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.moveTo(0, 0); targetCtx.lineTo(-s*0.15, -s*0.35); targetCtx.lineTo(s*0.15, -s*0.05); targetCtx.fill();
     targetCtx.fillStyle = '#111';
-    targetCtx.beginPath(); targetCtx.moveTo(s*0.08, -s*0.15); targetCtx.lineTo(0, -s*0.35); targetCtx.lineTo(s*0.15, -s*0.2); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.moveTo(-s*0.07, -s*0.15); targetCtx.lineTo(-s*0.15, -s*0.35); targetCtx.lineTo(0, -s*0.2); targetCtx.fill();
   } else if (id === 'mini') {
     // Head integrated into pill, draw goggles (side profile) - BETTER DETAIL
     // Goggle Strap
@@ -1310,21 +1308,21 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     // Beard handled in head path
   }
   else if (id === 'pika') {
-    // Red cheek (right side) - shifted LEFT
+    // Red cheek - Shifted LEFT
     targetCtx.fillStyle = '#ef4444';
-    targetCtx.beginPath(); targetCtx.arc(s*0.28, s*0.25, s*0.08, 0, Math.PI*2); targetCtx.fill();
-    // Eye (right side)
+    targetCtx.beginPath(); targetCtx.arc(s*0.05, s*0.25, s*0.08, 0, Math.PI*2); targetCtx.fill();
+    // Eye - Shifted LEFT
     targetCtx.fillStyle = '#111';
-    targetCtx.beginPath(); targetCtx.arc(s*0.42, s*0.06, s*0.04, 0, Math.PI*2); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.arc(s*0.15, s*0.08, s*0.04, 0, Math.PI*2); targetCtx.fill();
     // White eye reflection
     targetCtx.fillStyle = '#fff';
-    targetCtx.beginPath(); targetCtx.arc(s*0.4, s*0.04, s*0.015, 0, Math.PI*2); targetCtx.fill();
-    // Nose - between eye and mouth on the face
+    targetCtx.beginPath(); targetCtx.arc(s*0.13, s*0.06, s*0.015, 0, Math.PI*2); targetCtx.fill();
+    // Nose - Between eye and mouth
     targetCtx.fillStyle = '#111';
-    targetCtx.beginPath(); targetCtx.arc(s*0.46, s*0.14, s*0.01, 0, Math.PI*2); targetCtx.fill();
-    // Mouth - shifted LEFT
+    targetCtx.beginPath(); targetCtx.arc(s*0.24, s*0.12, s*0.012, 0, Math.PI*2); targetCtx.fill();
+    // Mouth - Shifted LEFT and smaller
     targetCtx.strokeStyle = '#111'; targetCtx.lineWidth = Math.max(1, s*0.015); targetCtx.lineCap = 'round';
-    targetCtx.beginPath(); targetCtx.moveTo(s*0.4, s*0.2); targetCtx.quadraticCurveTo(s*0.35, s*0.23, s*0.3, s*0.2); targetCtx.stroke();
+    targetCtx.beginPath(); targetCtx.moveTo(s*0.2, s*0.18); targetCtx.quadraticCurveTo(s*0.17, s*0.22, s*0.12, s*0.18); targetCtx.stroke();
   }
   else if (id === 'mini') {
     // Lens (Better white highlights)

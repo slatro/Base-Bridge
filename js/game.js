@@ -371,9 +371,9 @@ const SHOP_DB = [
   { id: 'cyber', type: 'skin', name: 'Cyber', rarity: 'Rare', cost: 350, icon: 'cyber', desc: 'Friendly AI robot from the future.', colors: { body: '#f8fafc', head: '#f8fafc', glow: '#00e5ff' } },
   { id: 'wizard', type: 'skin', name: 'Wizard', rarity: 'Epic', cost: 450, icon: 'wizard', desc: 'A wise sorcerer with a star-patterned robe.', colors: { body: '#1d4ed8', head: '#ffffff', hat: '#1d4ed8', stars: '#facc15' } },
   { id: 'troop', type: 'skin', name: 'Troop', rarity: 'Legendary', cost: 550, icon: 'troop', desc: 'Shadowed face hidden beneath a red hood.', colors: { body: '#e11d48', head: '#be123c', faceShadow: '#111111' } },
+  { id: 'mini', type: 'skin', name: 'Mini', rarity: 'Legendary', cost: 550, icon: 'mini', desc: 'A small, yellow, pill-shaped fellow.', colors: { body: '#facc15', head: '#facc15', overalls: '#1e3a8a' } },
   { id: 'galaxy', type: 'skin', name: 'Titan', rarity: 'Mythic', cost: 750, icon: 'galaxy', desc: 'Inspired by a cosmic powerhouse.', colors: { body: '#1e3a8a', head: '#a855f7', gauntlet: '#eab308' } },
   { id: 'pika', type: 'skin', name: 'Pika', rarity: 'Mythic', cost: 750, icon: 'pika', desc: 'An electric mouse with a shocking attitude.', colors: { body: '#facc15', head: '#facc15', cheeks: '#ef4444', ears: '#111111' } },
-  { id: 'bob', type: 'skin', name: 'Bob', rarity: 'Legendary', cost: 550, icon: 'bob', desc: 'A small, yellow, pill-shaped fellow.', colors: { body: '#facc15', head: '#facc15', overalls: '#1e3a8a' } },
   // HATS
   { id: 'cap', type: 'hat', name: 'Baseball Cap', rarity: 'Common', cost: 50, iconId: 'hat_cap', desc: 'Keep the sun out.' },
   { id: 'cape', type: 'hat', name: 'Hero Cape', rarity: 'Epic', cost: 250, iconId: 'hat_cape', desc: 'Flows in the wind.' },
@@ -914,7 +914,7 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
   const id = skinData.id;
   let yOffset = -s;
   if (id === 'pika') yOffset = -s * 0.72; // Lowered Pika to touch ground
-  if (id === 'bob') yOffset = -s * 0.75; // Lowered Bob to touch ground
+  if (id === 'mini') yOffset = -s * 0.75; // Lowered Mini to touch ground
   targetCtx.translate(0, yOffset + bounceY);
   targetCtx.scale(1.0 + (1.0 - character.squash) * 0.5, character.squash);
   const colors = skinData.colors;
@@ -971,8 +971,8 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     // Front Leg
     targetCtx.save(); targetCtx.translate(s*0.2, s*0.65); targetCtx.rotate(legAngle1);
     targetCtx.fillStyle = '#facc15'; targetCtx.beginPath(); targetCtx.ellipse(s*0.05, s*0.05, s*0.12, s*0.08, 0, 0, Math.PI*2); targetCtx.fill(); targetCtx.restore();
-  } else if (id === 'bob') {
-    // Bob (Minion) Custom Pill Body and Limbs - SCALED UP
+  } else if (id === 'mini') {
+    // Mini (formerly Bob) Custom Pill Body and Limbs - SCALED UP
     // Back Arm
     targetCtx.save(); targetCtx.translate(-s*0.1, s*0.45); targetCtx.rotate(armAngle2);
     targetCtx.fillStyle = '#111'; targetCtx.beginPath(); targetCtx.roundRect(-s*0.03, 0, s*0.06, s*0.35, s*0.03); targetCtx.fill(); targetCtx.restore();
@@ -1057,7 +1057,7 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     targetCtx.lineTo(s * 0.05, s * 0.55);
     targetCtx.lineTo(s * 0.1, s * 0.65);
     targetCtx.stroke();
-  } else if (id !== 'ninja' && id !== 'pika' && id !== 'bob') {
+  } else if (id !== 'ninja' && id !== 'pika' && id !== 'mini') {
     targetCtx.fillStyle = colors.body || '#111';
     targetCtx.fill();
   }
@@ -1232,7 +1232,7 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     targetCtx.beginPath(); targetCtx.moveTo(s*0.15, 0); targetCtx.lineTo(0, -s*0.35); targetCtx.lineTo(s*0.3, -s*0.05); targetCtx.fill();
     targetCtx.fillStyle = '#111';
     targetCtx.beginPath(); targetCtx.moveTo(s*0.08, -s*0.15); targetCtx.lineTo(0, -s*0.35); targetCtx.lineTo(s*0.15, -s*0.2); targetCtx.fill();
-  } else if (id === 'bob') {
+  } else if (id === 'mini') {
     // Head integrated into pill, draw goggles (side profile) - BETTER DETAIL
     // Goggle Strap
     targetCtx.fillStyle = '#111';
@@ -1333,7 +1333,7 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     targetCtx.strokeStyle = '#111'; targetCtx.lineWidth = Math.max(1, s*0.015); targetCtx.lineCap = 'round';
     targetCtx.beginPath(); targetCtx.moveTo(s*0.35, s*0.2); targetCtx.quadraticCurveTo(s*0.3, s*0.23, s*0.25, s*0.2); targetCtx.stroke();
   }
-  else if (id === 'bob') {
+  else if (id === 'mini') {
     // Lens (Better white highlights)
     targetCtx.fillStyle = '#fff';
     targetCtx.beginPath(); targetCtx.arc(s*0.3, s*0.24, s*0.08, 0, Math.PI*2); targetCtx.fill();
@@ -1479,7 +1479,7 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
 }
 
 function drawLimbPath(targetCtx, x, y, w, h, angle, color, isBack, wpnId, skinId) {
-  if (skinId === 'pika' || skinId === 'bob') return; // Handled within custom body logic
+  if (skinId === 'pika' || skinId === 'mini') return; // Handled within custom body logic
   targetCtx.save();
   targetCtx.translate(x, y); targetCtx.rotate(angle);
   

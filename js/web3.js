@@ -42,31 +42,29 @@ if (!localStorage.getItem('bb_v1_uuid')) {
 }
 
 let currentUsername = localStorage.getItem('bb_v1_username');
-if (!currentUsername) {
-    currentUsername = "Player";
-    (async () => {
-        try {
-            const countUrl = 'https://kvdb.io/3Bz5so9xQFGY6vAGb68Mfx/player_count';
-            let res = await fetch(`${countUrl}?t=${new Date().getTime()}`, { cache: 'no-store' });
-            let count = 0;
-            if (res.ok) count = parseInt(await res.text()) || 0;
-            count++;
-            await fetch(countUrl, { method: 'POST', body: count.toString() });
+window.assignNewUsername = async function() {
+    if (localStorage.getItem('bb_v1_username')) return;
+    try {
+        const countUrl = 'https://kvdb.io/3Bz5so9xQFGY6vAGb68Mfx/player_count';
+        let res = await fetch(`${countUrl}?t=${new Date().getTime()}`, { cache: 'no-store' });
+        let count = 0;
+        if (res.ok) count = parseInt(await res.text()) || 0;
+        count++;
+        await fetch(countUrl, { method: 'POST', body: count.toString() });
+        
+        if (!localStorage.getItem('bb_v1_username')) {
+            currentUsername = "Player " + count;
+            localStorage.setItem('bb_v1_username', currentUsername);
             
-            if (!localStorage.getItem('bb_v1_username')) {
-                currentUsername = "Player " + count;
-                localStorage.setItem('bb_v1_username', currentUsername);
-                
-                // Reserve this auto-assigned name
-                const myUUID = localStorage.getItem('bb_v1_uuid');
-                const userKey = `u_${currentUsername.toLowerCase().replace(/\s+/g, '')}`;
-                fetch(`https://kvdb.io/3Bz5so9xQFGY6vAGb68Mfx/${userKey}`, { method: 'POST', body: myUUID });
+            // Reserve this auto-assigned name
+            const myUUID = localStorage.getItem('bb_v1_uuid');
+            const userKey = `u_${currentUsername.toLowerCase().replace(/\s+/g, '')}`;
+            fetch(`https://kvdb.io/3Bz5so9xQFGY6vAGb68Mfx/${userKey}`, { method: 'POST', body: myUUID });
 
-                if (typeof updateProfileUI === 'function') updateProfileUI();
-            }
-        } catch (e) { console.error("Could not fetch player count", e); }
-    })();
-}
+            if (typeof updateProfileUI === 'function') updateProfileUI();
+        }
+    } catch (e) { console.error("Could not fetch player count", e); }
+};
 
 let selectedAvatar = localStorage.getItem('bb_v1_avatar') || 'classic';
 
@@ -271,7 +269,13 @@ async function handleConnect(account) {
   refInput.value = `${window.location.origin}${window.location.pathname}?ref=${userAddress}`;
   
   if (typeof window.loadDataFromCloud === 'function') {
-      await window.loadDataFromCloud(userAddress);
+      const hasCloudData = await window.loadDataFromCloud(userAddress);
+      
+      if (!hasCloudData || !localStorage.getItem('bb_v1_username')) {
+          if (typeof window.assignNewUsername === 'function') await window.assignNewUsername();
+          if (typeof window.syncDataToCloud === 'function') window.syncDataToCloud();
+      }
+      
       if (typeof window.reloadGameData === 'function') window.reloadGameData();
       if (typeof updateProfileUI === 'function') {
           currentUsername = localStorage.getItem('bb_v1_username') || "Player";

@@ -1820,7 +1820,10 @@ function handlePointerDown(e) {
   initAudio();
   if (gameState === STATES.PLAYING) {
     gameState = STATES.BRIDGE_GROWING; startGrowSound();
-    if (!localStorage.getItem('bb_v1_tut_done')) { localStorage.setItem('bb_v1_tut_done', 'true'); tutEl.classList.add('hidden'); }
+    if (!tutEl.classList.contains('hidden')) {
+      tutEl.classList.add('hidden');
+      localStorage.setItem('bb_v1_tut_done', 'true');
+    }
   }
 }
 

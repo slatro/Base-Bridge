@@ -30,6 +30,8 @@ const gameOverOverlay = document.getElementById('game-over-overlay');
 const finalScoreEl = document.getElementById('final-score');
 const uiCoinsEl = document.getElementById('ui-coins');
 const levelNameEl = document.getElementById('ui-level-name');
+console.log("%c BASE BRIDGE v17 LOADED %c", "background: #0052ff; color: #fff; font-size: 20px; font-weight: bold; padding: 10px;", "");
+
 const levelFillEl = document.getElementById('ui-level-fill');
 const btnRevive = document.getElementById('btn-revive');
 

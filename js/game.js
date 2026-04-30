@@ -987,6 +987,8 @@ function renderSkeleton(targetCtx, skinId, hatId, capeId, wpnId, faceId, s, stat
 
   // Body Path Details
   if (id === 'dino') {
+    targetCtx.save();
+    targetCtx.translate(0, s * 0.05); // Lower body
     // Draw front leg behind the body
     drawLimbPath(targetCtx, s * 0.1, s * 0.6, s * 0.15, s * 0.4, legAngle1, colors.body || '#111', false, null, id);
 
@@ -1066,6 +1068,7 @@ function renderSkeleton(targetCtx, skinId, hatId, capeId, wpnId, faceId, s, stat
     targetCtx.beginPath(); targetCtx.moveTo(s*0.12, s*0.06); targetCtx.lineTo(s*0.16, s*0.08); targetCtx.stroke();
     targetCtx.beginPath(); targetCtx.moveTo(s*0.13, s*0.08); targetCtx.lineTo(s*0.15, s*0.12); targetCtx.stroke();
     targetCtx.restore();
+    targetCtx.restore();
   } else if (id === 'pika') {
     // Pika Custom Fat Body
     // Zigzag tail - Better body connection
@@ -1106,7 +1109,7 @@ function renderSkeleton(targetCtx, skinId, hatId, capeId, wpnId, faceId, s, stat
     dg.addColorStop(0, '#ef4444'); dg.addColorStop(1, '#991b1b');
     targetCtx.fillStyle = dg;
     targetCtx.beginPath();
-    targetCtx.roundRect(-s*0.25, s*0.2, s*0.5, s*0.5, s*0.2);
+    targetCtx.roundRect(-s*0.25, s*0.2, s*0.5, s*0.75, s*0.2);
     targetCtx.fill();
 
     // Devil Tail
@@ -1701,24 +1704,27 @@ function renderSkeleton(targetCtx, skinId, hatId, capeId, wpnId, faceId, s, stat
     targetCtx.translate(armX, s * 0.3);
     targetCtx.rotate(armAngle1);
     
+    targetCtx.translate(0, s * 0.3); // Translate to hand center
+    targetCtx.rotate(-Math.PI / 6); // Tilt forward
+    
     // Lightsaber Handle
     targetCtx.fillStyle = '#cbd5e1';
-    targetCtx.fillRect(-s*0.03, s*0.25, s*0.06, s*0.15);
+    targetCtx.fillRect(-s*0.03, -s*0.05, s*0.06, s*0.15);
     targetCtx.fillStyle = '#111';
-    targetCtx.fillRect(-s*0.04, s*0.28, s*0.08, s*0.04);
+    targetCtx.fillRect(-s*0.04, -s*0.02, s*0.08, s*0.04);
     
     // Glowing Blue Blade
     targetCtx.shadowColor = '#00e5ff';
     targetCtx.shadowBlur = 20;
     targetCtx.fillStyle = '#ffffff';
     targetCtx.beginPath();
-    targetCtx.roundRect(-s*0.02, -s*0.25, s*0.04, s*0.5, s*0.02);
+    targetCtx.roundRect(-s*0.02, -s*0.55, s*0.04, s*0.5, s*0.02);
     targetCtx.fill();
     targetCtx.shadowBlur = 10;
     targetCtx.fillStyle = '#00e5ff';
     targetCtx.globalAlpha = 0.5;
     targetCtx.beginPath();
-    targetCtx.roundRect(-s*0.03, -s*0.25, s*0.06, s*0.5, s*0.03);
+    targetCtx.roundRect(-s*0.03, -s*0.55, s*0.06, s*0.5, s*0.03);
     targetCtx.fill();
     targetCtx.globalAlpha = 1.0;
     targetCtx.restore();
@@ -1836,7 +1842,8 @@ function drawLimbPath(targetCtx, x, y, w, h, angle, color, isBack, wpnId, skinId
 
     if (loadedIcons[iconId]) {
       targetCtx.translate(0, h);
-      targetCtx.drawImage(loadedIcons[iconId], -w, -h * 1.2, w * 3, h * 1.8);
+      targetCtx.rotate(-Math.PI / 6); // Tilt forwards
+      targetCtx.drawImage(loadedIcons[iconId], -w*1.5, -h * 1.3, w * 3, h * 1.5);
     }
   }
 

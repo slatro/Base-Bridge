@@ -219,7 +219,7 @@ canvas { width: 100%; height: 100%; display: block; }
 .sf-left h3 { font-size: 1.2rem; line-height: 1.2; margin-bottom: 5px; }
 .sf-sub { font-size: 0.85rem; color: var(--text-dim); }
 
-.sf-center { display: flex; gap: 15px; overflow-x: auto; flex: 1; margin: 0 160px 0 30px; padding: 10px 5px; }
+.sf-center { display: flex; gap: 15px; overflow-x: auto; flex: 1; margin: 0 160px 0 30px; padding: 35px 5px 10px 5px; }
 .sf-center::-webkit-scrollbar { height: 8px; }
 .sf-center::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
 .skin-item { 
@@ -264,7 +264,7 @@ canvas { width: 100%; height: 100%; display: block; }
 .skin-price { color: #00e5ff; font-size: 0.75rem; display: flex; align-items: center; gap:4px; justify-content: center;}
 
 /* Vector Equipment Grid */
-.equip-grid { display: flex; flex-wrap: wrap; gap: 15px; overflow-y: auto; max-height: 400px; padding: 5px;}
+.equip-grid { display: flex; flex-wrap: wrap; gap: 15px; overflow-y: auto; max-height: 400px; padding: 35px 5px 5px 5px;}
 .equip-item { 
   width: calc(33.333% - 12px); 
   background: rgba(255,255,255,0.03); 

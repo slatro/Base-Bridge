@@ -814,9 +814,12 @@ function drawLimbPath(targetCtx, x, y, w, h, angle, color, isBack, wpnId) {
   targetCtx.beginPath(); targetCtx.roundRect(-w/2, 0, w, h, w/2); 
   targetCtx.fill();
   
-  if (!isBack && wpnId && loadedIcons['wpn_sword']) {
-    targetCtx.translate(0, h);
-    targetCtx.drawImage(loadedIcons['wpn_sword'], -w, -h*1.2, w*3, h*1.8);
+  if (!isBack && wpnId) {
+    const iconId = wpnId === 'lightsaber' ? 'wpn_saber' : 'wpn_sword';
+    if (loadedIcons[iconId]) {
+      targetCtx.translate(0, h);
+      targetCtx.drawImage(loadedIcons[iconId], -w, -h*1.2, w*3, h*1.8);
+    }
   }
 
   targetCtx.restore();

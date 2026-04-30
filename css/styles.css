@@ -16,6 +16,7 @@
   --blue-btn-2: #0088cc;
   --green-btn-1: #00ff88;
   --green-btn-2: #00b359;
+  --base-blue: #0052FF;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; font-family: 'Nunito', sans-serif; }
@@ -37,6 +38,21 @@ h1, h2, h3, h4 { font-family: 'Fredoka One', cursive; font-weight: normal; }
   background: var(--panel-bg); backdrop-filter: blur(20px);
   border: 1px solid var(--panel-border); box-shadow: 0 15px 35px rgba(0,0,0,0.5);
   border-radius: 16px;
+}
+
+.text-3d-blue {
+  color: var(--base-blue);
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.4rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-shadow: 
+    0 1px 0 #003db3,
+    0 2px 0 #003db3,
+    0 3px 0 #003db3,
+    0 4px 0 #003db3,
+    0 5px 10px rgba(0,0,0,0.5);
+  display: block;
 }
 
 /* Redesigned 3D Squircle BB Token */

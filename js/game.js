@@ -927,10 +927,10 @@ function generatePlatform() {
   // SYSTEM 8: DIFFICULTY PROGRESSION
   let difficulty = Math.min(1.0, score / 60); 
   
-  const minW = 40 - (difficulty * 15); 
-  const maxW = 120 - (difficulty * 50); 
-  const minGap = 60 + (difficulty * 40); 
-  const maxGap = Math.min(W * 0.5, 180 + (difficulty * 150)); 
+  const minW = 60 - (difficulty * 35); 
+  const maxW = 160 - (difficulty * 80); 
+  const minGap = 50 + (difficulty * 60); 
+  const maxGap = Math.min(W * 0.5, 150 + (difficulty * 180)); 
   
   const lastP = platforms[platforms.length - 1];
   const w = Math.floor(Math.random() * (maxW - minW + 1)) + minW;
@@ -939,7 +939,10 @@ function generatePlatform() {
   
   platforms.push({ x, w, npcIndex: -1 });
   currentGapWidth = gap;
-  if (platforms.length > 5) platforms.shift();
+  if (platforms.length > 5) {
+    platforms.shift();
+    if (currentPlatformIndex > 0) currentPlatformIndex--;
+  }
 }
 
 function resetBridge() {

@@ -368,7 +368,7 @@ const SHOP_DB = [
   // SKINS
   { id: 'classic', type: 'skin', name: 'Classic', rarity: 'Common', cost: 10, icon: 'classic', desc: 'The original legendary stick hero.', colors: { body: '#334155', head: '#fed7aa' } },
   { id: 'ninja', type: 'skin', name: 'Ninja', rarity: 'Uncommon', cost: 10, icon: 'ninja', desc: 'A swift warrior of the night.', colors: { body: '#111111', head: '#111111', straps: '#1f2937' } },
-  { id: 'cyber', type: 'skin', name: 'Cyber', rarity: 'Rare', cost: 10, icon: 'cyber', desc: 'Friendly AI robot from the future.', colors: { body: '#f8fafc', head: '#f8fafc', glow: '#00e5ff' } },
+  { id: 'cyber', type: 'skin', name: 'Based', rarity: 'Rare', cost: 10, icon: 'cyber', desc: 'Friendly AI robot from the future.', colors: { body: '#f8fafc', head: '#0052ff', glow: '#111111' } },
   { id: 'dino', type: 'skin', name: 'Dino', rarity: 'Epic', cost: 10, icon: 'dino', desc: 'A prehistoric powerhouse.', colors: { body: '#65a30d', head: '#65a30d' } },
   { id: 'wizard', type: 'skin', name: 'Wizard', rarity: 'Epic', cost: 10, icon: 'wizard', desc: 'A wise sorcerer with a star-patterned robe.', colors: { body: '#1d4ed8', head: '#ffffff', hat: '#1d4ed8', stars: '#facc15' } },
   { id: 'troop', type: 'skin', name: 'Troop', rarity: 'Legendary', cost: 10, icon: 'troop', desc: 'Shadowed face hidden beneath a red hood.', colors: { body: '#e11d48', head: '#be123c', faceShadow: '#111111' } },
@@ -1265,8 +1265,8 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     }
     targetCtx.fill();
 
-    // Black Visor
-    targetCtx.fillStyle = '#000000';
+    // Blue Visor (Based)
+    targetCtx.fillStyle = '#0052ff';
     targetCtx.beginPath();
     if (targetCtx.roundRect) {
       targetCtx.roundRect(-s * 0.2, s * 0.05, s * 0.4, s * 0.3, s * 0.1);
@@ -1276,8 +1276,8 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     targetCtx.fill();
 
     // Big Side Profile Glowing Astro Eye
-    targetCtx.fillStyle = '#00e5ff';
-    targetCtx.shadowColor = '#00e5ff'; targetCtx.shadowBlur = 15;
+    targetCtx.fillStyle = '#111111';
+    targetCtx.shadowColor = '#111111'; targetCtx.shadowBlur = 10;
     targetCtx.beginPath();
     if (targetCtx.ellipse) {
         targetCtx.ellipse(s * 0.1, s * 0.18, s * 0.08, s * 0.05, Math.PI / 8, 0, Math.PI * 2);
@@ -1523,7 +1523,7 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
   }
 
   // Draw Equipment
-  if (hatId === 'cap' && loadedIcons['hat_cap']) targetCtx.drawImage(loadedIcons['hat_cap'], -s * 0.3, -s * 0.38, s * 0.8, s * 0.45);
+  if (hatId === 'cap' && loadedIcons['hat_cap']) targetCtx.drawImage(loadedIcons['hat_cap'], -s * 0.32, -s * 0.30, s * 0.8, s * 0.45);
   if (hatId === 'halo' && loadedIcons['hat_halo']) targetCtx.drawImage(loadedIcons['hat_halo'], -s * 0.5, -s * 0.4, s * 1.0, s * 0.4);
 
   if (faceId === 'glasses' && loadedIcons['face_glasses']) targetCtx.drawImage(loadedIcons['face_glasses'], -s * 0.15, s * 0.1, s * 0.6, s * 0.25);

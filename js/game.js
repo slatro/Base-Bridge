@@ -356,9 +356,12 @@ let equippedHat = localStorage.getItem('bb_v1_hat') || null;
 let equippedWeapon = localStorage.getItem('bb_v1_weapon') || null;
 let equippedFace = localStorage.getItem('bb_v1_face') || null;
 
+let equippedCape = localStorage.getItem('bb_v1_cape') || null;
+
 function saveEquipmentsToStorage() {
   localStorage.setItem('bb_v1_skin', currentSkin);
   if (equippedHat) localStorage.setItem('bb_v1_hat', equippedHat); else localStorage.removeItem('bb_v1_hat');
+  if (equippedCape) localStorage.setItem('bb_v1_cape', equippedCape); else localStorage.removeItem('bb_v1_cape');
   if (equippedWeapon) localStorage.setItem('bb_v1_weapon', equippedWeapon); else localStorage.removeItem('bb_v1_weapon');
   if (equippedFace) localStorage.setItem('bb_v1_face', equippedFace); else localStorage.removeItem('bb_v1_face');
   if (typeof window.syncDataToCloud === 'function') window.syncDataToCloud();
@@ -517,7 +520,7 @@ function renderEquipmentShop(typeFilter) {
   SHOP_DB.filter(s => s.type === typeFilter).forEach(s => {
     const isOwned = ownedItems.includes(s.id);
     const lockedClass = isOwned ? '' : 'locked';
-    let isActive = (s.id === equippedHat || s.id === equippedWeapon || s.id === equippedFace);
+    let isActive = (s.id === equippedHat || s.id === equippedCape || s.id === equippedWeapon || s.id === equippedFace);
     const activeClass = isActive ? 'active' : '';
     const priceTxt = isOwned ? 'Owned' : `<div class="bb-token-small" style="width:14px;height:14px;"></div> ${s.cost}`;
 
@@ -808,15 +811,25 @@ function openShopPreview(id) {
 
     let isEq = false;
     if (item.type === 'skin' && item.id === currentSkin) isEq = true;
-    if (item.type === 'hat' && item.id === equippedHat) isEq = true;
+    if (item.type === 'hat') {
+      if (item.id === 'cape') {
+        if (equippedCape === 'cape') isEq = true;
+      } else {
+        if (item.id === equippedHat) isEq = true;
+      }
+    }
     if (item.type === 'weapon' && item.id === equippedWeapon) isEq = true;
     if (item.type === 'face' && item.id === equippedFace) isEq = true;
 
     if (isEq && item.type !== 'skin') { // Cannot unequip skin completely
       btn.innerText = "UNEQUIP";
       btn.classList.replace('btn-green', 'btn-gray');
+      btn.disabled = false; // Fix unequip bug
       btn.onclick = () => {
-        if (item.type === 'hat') equippedHat = null;
+        if (item.type === 'hat') {
+          if (item.id === 'cape') equippedCape = null;
+          else equippedHat = null;
+        }
         if (item.type === 'weapon') equippedWeapon = null;
         if (item.type === 'face') equippedFace = null;
         saveEquipmentsToStorage();
@@ -833,7 +846,10 @@ function openShopPreview(id) {
       btn.disabled = false;
       btn.onclick = () => {
         if (item.type === 'skin') currentSkin = id;
-        if (item.type === 'hat') equippedHat = id;
+        if (item.type === 'hat') {
+          if (item.id === 'cape') equippedCape = 'cape';
+          else equippedHat = id;
+        }
         if (item.type === 'weapon') equippedWeapon = id;
         if (item.type === 'face') equippedFace = id;
         saveEquipmentsToStorage();
@@ -855,8 +871,10 @@ function openShopPreview(id) {
         if (success) {
           coins -= item.cost; localStorage.setItem('bb_v1_coins', coins); uiCoinsEl.innerText = coins;
           ownedItems.push(id); localStorage.setItem('bb_v1_owned', JSON.stringify(ownedItems));
-          if (item.type === 'skin') currentSkin = id;
-          if (item.type === 'hat') equippedHat = id;
+          if (item.type === 'hat') {
+            if (item.id === 'cape') equippedCape = 'cape';
+            else equippedHat = id;
+          }
           if (item.type === 'weapon') equippedWeapon = id;
           if (item.type === 'face') equippedFace = id;
           saveEquipmentsToStorage();
@@ -889,7 +907,7 @@ function openShopPreview(id) {
 }
 
 // Side-Profile AAA+ Path2D Vector Character Rendering
-function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time) {
+function renderSkeleton(targetCtx, skinId, hatId, capeId, wpnId, faceId, s, state, time) {
   const skinData = SHOP_DB.find(x => x.id === skinId) || SHOP_DB[0];
   targetCtx.save();
 
@@ -939,12 +957,14 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
   }
 
   // Cape Rendering (Behind body)
-  if (hatId === 'cape' && loadedIcons['hat_cape']) {
-    targetCtx.save();
-    targetCtx.translate(-s * 0.1, s * 0.3);
-    targetCtx.rotate(state === 'WALK' ? Math.sin(time * 15) * 0.2 : Math.sin(time * 3) * 0.05);
-    targetCtx.drawImage(loadedIcons['hat_cape'], -s * 0.2, 0, s * 0.5, s * 0.6);
-    targetCtx.restore();
+  if (capeId === 'cape' && loadedIcons['hat_cape']) {
+    if (id === 'classic' || id === 'ninja') {
+      targetCtx.save();
+      targetCtx.translate(-s * 0.1, s * 0.3);
+      targetCtx.rotate(state === 'WALK' ? Math.sin(time * 15) * 0.2 : Math.sin(time * 3) * 0.05);
+      targetCtx.drawImage(loadedIcons['hat_cape'], -s * 0.2, 0, s * 0.5, s * 0.6);
+      targetCtx.restore();
+    }
   }
 
   // 2. Legs (Both drawn behind body for Pika/Mini/Wizard/Demon)
@@ -1596,10 +1616,14 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
   }
 
   // Draw Equipment
-  if (hatId === 'cap' && loadedIcons['hat_cap']) targetCtx.drawImage(loadedIcons['hat_cap'], -s * 0.32, -s * 0.30, s * 0.8, s * 0.45);
-  if (hatId === 'halo' && loadedIcons['hat_halo']) targetCtx.drawImage(loadedIcons['hat_halo'], -s * 0.5, -s * 0.4, s * 1.0, s * 0.4);
+  if (id === 'classic' || id === 'ninja') {
+    if (hatId === 'cap' && loadedIcons['hat_cap']) targetCtx.drawImage(loadedIcons['hat_cap'], -s * 0.32, -s * 0.30, s * 0.8, s * 0.45);
+    if (hatId === 'halo' && loadedIcons['hat_halo']) targetCtx.drawImage(loadedIcons['hat_halo'], -s * 0.5, -s * 0.4, s * 1.0, s * 0.4);
 
-  if (faceId === 'glasses' && loadedIcons['face_glasses']) targetCtx.drawImage(loadedIcons['face_glasses'], -s * 0.15, s * 0.1, s * 0.6, s * 0.25);
+    if (faceId === 'glasses' && loadedIcons['face_glasses']) targetCtx.drawImage(loadedIcons['face_glasses'], -s * 0.15, s * 0.1, s * 0.6, s * 0.25);
+    if (faceId === 'bandana' && loadedIcons['face_bandana']) targetCtx.drawImage(loadedIcons['face_bandana'], -s * 0.2, s * 0.2, s * 0.6, s * 0.4);
+    if (faceId === 'mask' && loadedIcons['face_mask']) targetCtx.drawImage(loadedIcons['face_mask'], -s * 0.15, s * 0.3, s * 0.5, s * 0.35);
+  }
 
   // Animated Electricity Aura (Drawn IN FRONT of the body)
   if (id === 'pika') {
@@ -1655,6 +1679,35 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
   if (id === 'troop') armX = s * 0.1;
   if (id !== 'dino') {
     drawLimbPath(targetCtx, armX, s * 0.3, s * 0.12, s * 0.35, armAngle1, colors.body || '#111', false, wpnId, id);
+  }
+
+  // Troop Lightsaber
+  if (id === 'troop') {
+    targetCtx.save();
+    targetCtx.translate(armX, s * 0.3);
+    targetCtx.rotate(armAngle1);
+    
+    // Lightsaber Handle
+    targetCtx.fillStyle = '#cbd5e1';
+    targetCtx.fillRect(-s*0.03, s*0.25, s*0.06, s*0.15);
+    targetCtx.fillStyle = '#111';
+    targetCtx.fillRect(-s*0.04, s*0.28, s*0.08, s*0.04);
+    
+    // Glowing Blue Blade
+    targetCtx.shadowColor = '#00e5ff';
+    targetCtx.shadowBlur = 20;
+    targetCtx.fillStyle = '#ffffff';
+    targetCtx.beginPath();
+    targetCtx.roundRect(-s*0.02, -s*0.25, s*0.04, s*0.5, s*0.02);
+    targetCtx.fill();
+    targetCtx.shadowBlur = 10;
+    targetCtx.fillStyle = '#00e5ff';
+    targetCtx.globalAlpha = 0.5;
+    targetCtx.beginPath();
+    targetCtx.roundRect(-s*0.03, -s*0.25, s*0.06, s*0.5, s*0.03);
+    targetCtx.fill();
+    targetCtx.globalAlpha = 1.0;
+    targetCtx.restore();
   }
 
   // Infinity Gauntlet for Galaxy Skin
@@ -1761,7 +1814,7 @@ function drawLimbPath(targetCtx, x, y, w, h, angle, color, isBack, wpnId, skinId
     targetCtx.lineWidth = 1;
     targetCtx.stroke();
 
-  if (!isBack && wpnId) {
+  if (!isBack && wpnId && (skinId === 'classic' || skinId === 'ninja')) {
     let iconId = 'wpn_sword';
     if (wpnId === 'plasma_saber') iconId = 'wpn_saber';
     else if (wpnId === 'battle_axe') iconId = 'wpn_axe';
@@ -2519,7 +2572,7 @@ function draw() {
   if (gameState === STATES.FALLING_DOWN || gameState === STATES.BRIDGE_GROWING) state = 'IDLE';
   if (gameState === STATES.BRIDGE_FALLING) state = 'JUMP'; // Preview jump pose
 
-  renderSkeleton(ctx, currentSkin, equippedHat, equippedWeapon, equippedFace, character.size, state, animTime);
+  renderSkeleton(ctx, currentSkin, equippedHat, equippedCape, equippedWeapon, equippedFace, character.size, state, animTime);
   ctx.restore();
 
   for (let i = particles.length - 1; i >= 0; i--) {
@@ -2537,9 +2590,12 @@ function drawPreviewCanvas() {
   if (!previewActiveItem) return;
   prevCtx.clearRect(0, 0, prevCanvas.width, prevCanvas.height);
 
-  let prevSkin = 'classic'; let prevHat = equippedHat; let prevWpn = equippedWeapon; let prevFace = equippedFace;
+  let prevSkin = 'classic'; let prevHat = equippedHat; let prevCape = equippedCape; let prevWpn = equippedWeapon; let prevFace = equippedFace;
   if (previewActiveItem.type === 'skin') prevSkin = previewActiveItem.id;
-  if (previewActiveItem.type === 'hat') prevHat = previewActiveItem.id;
+  if (previewActiveItem.type === 'hat') {
+    if (previewActiveItem.id === 'cape') prevCape = 'cape';
+    else prevHat = previewActiveItem.id;
+  }
   if (previewActiveItem.type === 'weapon') prevWpn = previewActiveItem.id;
   if (previewActiveItem.type === 'face') prevFace = previewActiveItem.id;
 
@@ -2569,7 +2625,7 @@ function drawPreviewCanvas() {
   prevCtx.fillStyle = 'rgba(0,0,0,0.5)';
   prevCtx.beginPath(); prevCtx.ellipse(0, 0, 70, 20, 0, 0, Math.PI * 2); prevCtx.fill();
 
-  renderSkeleton(prevCtx, prevSkin, prevHat, prevWpn, prevFace, 120, 'IDLE', animTime);
+  renderSkeleton(prevCtx, prevSkin, prevHat, prevCape, prevWpn, prevFace, 120, 'IDLE', animTime);
   prevCtx.restore();
 }
 

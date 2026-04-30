@@ -555,5 +555,41 @@ async function purchaseItemOnChain(item) {
   }
 }
 
+async function mintAchievementOnChain(id) {
+  if (!userAddress) {
+    if (typeof window.showInfoModal === 'function') window.showInfoModal("Wallet Required", "Please connect your wallet to mint achievements.");
+    return false;
+  }
+
+  try {
+    const provider = new ethers.BrowserProvider(window.ethereum);
+    const network = await provider.getNetwork();
+    if (Number(network.chainId) !== TARGET_CHAIN) {
+      if (typeof window.showInfoModal === 'function') window.showInfoModal("Wrong Network", "Please switch to the Base Mainnet.");
+      return false;
+    }
+
+    const signer = await provider.getSigner();
+    const mintFee = ethers.parseEther("0.000004"); // Approx $0.01
+
+    if (typeof window.showInfoModal === 'function') window.showInfoModal("Minting Achievement", "Please confirm the transaction in your wallet.");
+
+    const tx = await signer.sendTransaction({
+      to: TREASURY_ADDRESS,
+      value: mintFee
+    });
+
+    if (typeof window.showInfoModal === 'function') window.showInfoModal("Minting Started", "Processing on-chain... Your achievement is being minted.");
+    await tx.wait();
+    
+    return true;
+  } catch (e) {
+    console.error("Minting failed", e);
+    if (typeof window.showInfoModal === 'function') window.showInfoModal("Minting Canceled", "Transaction was rejected or failed.");
+    return false;
+  }
+}
+
 // Export to window
+window.mintAchievementOnChain = mintAchievementOnChain;
 window.purchaseItemOnChain = purchaseItemOnChain;

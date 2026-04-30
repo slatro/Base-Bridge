@@ -313,7 +313,7 @@ async function checkNetwork() {
     btnSwitch.classList.remove("hidden");
   } else {
     lblNetwork.innerText = "Base Mainnet";
-    lblNetwork.style.color = "#00ff88";
+    lblNetwork.style.color = "#0052FF";
     btnSwitch.classList.add("hidden");
   }
 }

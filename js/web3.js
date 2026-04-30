@@ -535,7 +535,7 @@ async function purchaseItemOnChain(item) {
     }
 
     const signer = await provider.getSigner();
-    const purchaseAmount = ethers.parseEther("0.000004"); // Approx $0.01
+    const purchaseAmount = ethers.parseEther("0.00004"); // Approx $0.10
 
     if (typeof window.showInfoModal === 'function') window.showInfoModal("Wallet Action Required", "Please confirm the transaction in your wallet.");
 
@@ -570,7 +570,7 @@ async function mintAchievementOnChain(id) {
     }
 
     const signer = await provider.getSigner();
-    const mintFee = ethers.parseEther("0.000004"); // Approx $0.01
+    const mintFee = ethers.parseEther("0.00004"); // Approx $0.10
 
     if (typeof window.showInfoModal === 'function') window.showInfoModal("Minting Achievement", "Please confirm the transaction in your wallet.");
 

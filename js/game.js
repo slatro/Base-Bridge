@@ -86,7 +86,7 @@ function renderDailyCheckinPanel() {
       card.style.boxShadow = `0 0 20px ${color}, inset 0 0 15px ${color}`;
       card.style.filter = `drop-shadow(0 0 5px ${color})`;
     }
-    card.innerHTML = `<div class="neon-card-icon" style="filter: drop-shadow(0 0 8px ${neonColors[i-1]});">${ninjaSVG}</div>`;
+    card.innerHTML = `<div class="neon-card-icon" style="filter: drop-shadow(0 0 12px ${neonColors[i-1]});">${ninjaSVG}</div>`;
     cardsContainer.appendChild(card);
 
     // --- Modal Timeline Node ---

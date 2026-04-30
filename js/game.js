@@ -738,12 +738,34 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
   targetCtx.quadraticCurveTo(s*0.25, s*0.5, s*0.2, s*0.3);
   targetCtx.fill();
   
+  // Character Outline for Hoodie
+  if (id === 'hoodie') {
+    targetCtx.strokeStyle = '#000';
+    targetCtx.lineWidth = 0.5;
+    targetCtx.stroke();
+  }
+
   // Subtle body details
   if (id === 'classic' || id === 'ninja') {
     let highlight = targetCtx.createLinearGradient(-s*0.2, s*0.3, s*0.2, s*0.7);
     highlight.addColorStop(0, 'rgba(255,255,255,0.15)'); highlight.addColorStop(1, 'transparent');
     targetCtx.fillStyle = highlight;
     targetCtx.fill();
+  }
+
+  if (id === 'cyber') {
+    // Robotic Panel Lines
+    targetCtx.strokeStyle = 'rgba(255,255,255,0.1)';
+    targetCtx.lineWidth = 1;
+    targetCtx.beginPath();
+    targetCtx.moveTo(-s*0.2, s*0.5); targetCtx.lineTo(s*0.2, s*0.5);
+    targetCtx.moveTo(0, s*0.3); targetCtx.lineTo(0, s*0.7);
+    targetCtx.stroke();
+    // Glowing Core
+    targetCtx.fillStyle = colors.glow;
+    targetCtx.shadowColor = colors.glow; targetCtx.shadowBlur = 10;
+    targetCtx.beginPath(); targetCtx.arc(0, s*0.45, s*0.05, 0, Math.PI*2); targetCtx.fill();
+    targetCtx.shadowBlur = 0;
   }
 
   targetCtx.shadowBlur = 0;
@@ -760,13 +782,16 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
   }
 
   if (id === 'cyber') {
-    targetCtx.shadowColor = colors.glow; targetCtx.shadowBlur = 10;
     targetCtx.strokeStyle = colors.glow; targetCtx.lineWidth = 2;
     targetCtx.beginPath(); targetCtx.moveTo(-s*0.1, s*0.4); targetCtx.lineTo(0, s*0.5); targetCtx.lineTo(-s*0.05, s*0.6); targetCtx.stroke();
-    // Glowing Cyber Eye (One)
+    // Glowing Cyber Eye (Modern Android)
     targetCtx.fillStyle = colors.glow;
+    targetCtx.shadowColor = colors.glow; targetCtx.shadowBlur = 10;
     targetCtx.beginPath(); targetCtx.arc(s*0.15, s*0.2, s*0.06, 0, Math.PI*2); targetCtx.fill();
     targetCtx.shadowBlur = 0;
+    // Android Head Detail
+    targetCtx.strokeStyle = 'rgba(255,255,255,0.2)';
+    targetCtx.beginPath(); targetCtx.arc(0, s*0.2, s*0.3, -Math.PI/2, Math.PI/2); targetCtx.stroke();
   }
   
   if (id === 'hoodie') {
@@ -788,37 +813,54 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     targetCtx.beginPath(); targetCtx.arc(0, s*0.2, s*0.3, 0, Math.PI*2); targetCtx.fill();
   }
 
-  // Eyes
-  if (id === 'gold' || id === 'galaxy' || id === 'classic' || id === 'hoodie') {
-    if (id === 'gold' || id === 'galaxy' || id === 'classic') {
-      targetCtx.fillStyle = (id === 'gold') ? '#111' : '#fff';
-      targetCtx.beginPath(); targetCtx.arc(s*0.15, s*0.15, s*0.05, 0, Math.PI*2); targetCtx.fill();
-    }
-    // Hoodie has no eyes (face shadow only)
-    // NINJA EYES (Side Profile - One Eye)
+  // Eyes & Details
+  if (id === 'ninja') {
+    // Ninja Mask
     targetCtx.fillStyle = '#111';
-    targetCtx.beginPath(); 
-    targetCtx.arc(s*0.15, s*0.2, s*0.04, 0, Math.PI*2); 
+    targetCtx.beginPath();
+    targetCtx.moveTo(-s*0.3, s*0.2);
+    targetCtx.lineTo(s*0.3, s*0.2);
+    targetCtx.lineTo(s*0.2, s*0.5);
+    targetCtx.lineTo(-s*0.2, s*0.5);
+    targetCtx.closePath();
     targetCtx.fill();
     
-    // Tied Bandana Tails
-    targetCtx.fillStyle = colors.band;
+    // Bandana
+    targetCtx.fillStyle = colors.band || '#e11d48';
+    targetCtx.fillRect(-s*0.3, s*0.05, s*0.65, s*0.12);
+    
+    // Bandana Tails (Back)
     targetCtx.beginPath();
-    targetCtx.moveTo(-s*0.3, s*0.05);
-    targetCtx.lineTo(-s*0.5, -s*0.05);
-    targetCtx.lineTo(-s*0.45, s*0.15);
+    targetCtx.moveTo(-s*0.3, s*0.1);
+    targetCtx.lineTo(-s*0.5, 0);
+    targetCtx.lineTo(-s*0.45, s*0.2);
     targetCtx.closePath();
     targetCtx.fill();
     targetCtx.beginPath();
-    targetCtx.moveTo(-s*0.3, s*0.08);
-    targetCtx.lineTo(-s*0.45, 0);
-    targetCtx.lineTo(-s*0.55, s*0.25);
+    targetCtx.moveTo(-s*0.3, s*0.13);
+    targetCtx.lineTo(-s*0.5, s*0.05);
+    targetCtx.lineTo(-s*0.55, s*0.3);
     targetCtx.closePath();
     targetCtx.fill();
-  } else {
+
+    // Eye
+    targetCtx.fillStyle = '#fff';
+    targetCtx.beginPath(); targetCtx.arc(s*0.15, s*0.2, s*0.04, 0, Math.PI*2); targetCtx.fill();
+  } 
+  else if (id === 'hoodie') {
+    // No eyes for hoodie, just shadow
+  }
+  else {
     targetCtx.fillStyle = colors.face || '#fff';
-    // Single Eye for Side Profile
+    if (id === 'gold') targetCtx.fillStyle = '#111';
     targetCtx.beginPath(); targetCtx.arc(s*0.18, s*0.2, s*0.06, 0, Math.PI*2); targetCtx.fill();
+  }
+
+  // Final Outline for Hoodie (Head)
+  if (id === 'hoodie') {
+    targetCtx.strokeStyle = '#000';
+    targetCtx.lineWidth = 0.5;
+    targetCtx.stroke();
   }
 
   // Draw Equipment

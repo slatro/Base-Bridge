@@ -131,6 +131,11 @@ async function initWeb3() {
     provider.on('accountsChanged', async (accounts) => {
       if (accounts && accounts.length > 0) {
         localStorage.removeItem('bb_v1_disconnected');
+        if (window.userAddress && window.userAddress.toLowerCase() !== accounts[0].toLowerCase()) {
+            if (typeof window.wipeLocalGameState === 'function') window.wipeLocalGameState();
+            window.location.reload();
+            return;
+        }
         await handleConnect(accounts[0]);
       } else {
         handleDisconnect();
@@ -268,6 +273,11 @@ async function handleConnect(account) {
   if (typeof window.loadDataFromCloud === 'function') {
       await window.loadDataFromCloud(userAddress);
       if (typeof window.reloadGameData === 'function') window.reloadGameData();
+      if (typeof updateProfileUI === 'function') {
+          currentUsername = localStorage.getItem('bb_v1_username') || "Player";
+          selectedAvatar = localStorage.getItem('bb_v1_avatar') || "classic";
+          updateProfileUI();
+      }
   }
 
   lblBest.innerText = localStorage.getItem('bb_v1_best') || "0";
@@ -284,6 +294,17 @@ async function handleConnect(account) {
   }
 }
 
+window.wipeLocalGameState = function() {
+    const keysToRemove = [];
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('bb_v') && key !== 'bb_v1_uuid' && key !== 'bb_v1_disconnected') {
+            keysToRemove.push(key);
+        }
+    }
+    keysToRemove.forEach(k => localStorage.removeItem(k));
+};
+
 async function handleDisconnect() {
   userAddress = null;
   window.userAddress = null; // GLOBAL EXPORT
@@ -299,6 +320,7 @@ async function handleDisconnect() {
     }
   }
   
+  if (typeof window.wipeLocalGameState === 'function') window.wipeLocalGameState();
   localStorage.setItem('bb_v1_disconnected', 'true');
   
   if (viewConnect) viewConnect.classList.remove("hidden");

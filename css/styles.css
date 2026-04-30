@@ -371,7 +371,7 @@ canvas { width: 100%; height: 100%; display: block; }
 .mini-avatar { background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="45" fill="%23facc15"/><rect x="5" y="45" width="90" height="10" fill="%23111"/><circle cx="32" cy="50" r="18" fill="%2394a3b8"/><circle cx="68" cy="50" r="18" fill="%2394a3b8"/><circle cx="32" cy="50" r="14" fill="%23fff"/><circle cx="68" cy="50" r="14" fill="%23fff"/><circle cx="32" cy="50" r="6" fill="%2378350f"/><circle cx="68" cy="50" r="6" fill="%2378350f"/><circle cx="32" cy="50" r="3" fill="%23111"/><circle cx="68" cy="50" r="3" fill="%23111"/><circle cx="50" cy="80" r="5" fill="%23111"/></svg>') no-repeat center/contain; }
 
 /* Fixed Built on Base Badge per instructions */
-.sf-right { position: absolute; right: 30px; bottom: 30px; display: flex; align-items: flex-end;}
+.sf-right { position: absolute; right: 12px; bottom: 12px; display: flex; align-items: flex-end; transform: scale(0.75); transform-origin: bottom right; }
 .built-on-base-pill { background: #000; padding: 10px 20px; border-radius: 16px; display: flex; align-items: center; gap: 12px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
 .built-on-base-pill .bob-logo-square { width: 24px; height: 24px; background: #0052FF; border-radius: 6px; box-shadow: inset 0 2px 4px rgba(255,255,255,0.3), 0 0 8px rgba(0,82,255,0.6); }
 .built-on-base-pill .bob-text { color: white; font-size: 0.95rem; }

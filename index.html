@@ -119,8 +119,8 @@
       <div class="feature-card glass-panel" id="fc-daily">
         <div class="fc-icon"><div class="svg-feat-daily"></div></div>
         <div class="fc-text">
-          <h4>DAILY REWARDS</h4>
-          <p>Play daily and earn BB Tokens.</p>
+          <h4>DAILY CHECK-IN</h4>
+          <p>Check-in on-chain to earn BB.</p>
         </div>
       </div>
       <div class="feature-card glass-panel" id="fc-compete">
@@ -312,5 +312,27 @@
       document.querySelectorAll('.modal-card, .modal-backdrop').forEach(el => el.classList.add('hidden'));
     };
   </script>
-</body>
+    <!-- Daily Check-in Modal -->
+    <div id="modal-daily-calendar" class="modal-backdrop hidden">
+      <div class="modal-content glass-modal" style="max-width: 450px;">
+        <div class="modal-header">
+          <h2 id="calendar-month-title">DAILY CHECK-IN</h2>
+          <button class="modal-close" id="btn-calendar-close" onclick="document.getElementById('modal-daily-calendar').classList.add('hidden')">&times;</button>
+        </div>
+        <div class="calendar-container">
+          <div class="calendar-header-info" style="display:flex; justify-content:space-between; margin-bottom:15px; font-weight:800; color:#fff;">
+            <span id="calendar-streak">STREAK: 0 DAYS</span>
+            <span id="calendar-total">TOTAL: 0</span>
+          </div>
+          <div class="calendar-grid" id="calendar-grid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin-bottom: 20px;">
+            <!-- Days injected here -->
+          </div>
+          <div class="calendar-footer" style="text-align: center; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+            <p style="font-size: 0.75rem; color: #a1a1aa; margin-bottom: 12px;">Each check-in requires a 0.10$ transaction.</p>
+            <button class="btn btn-aaa btn-blue" id="btn-do-checkin">CHECK-IN TODAY</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
 </html>

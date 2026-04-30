@@ -100,6 +100,10 @@ function incMetric(key, amt=1) {
     let dGames = parseInt(localStorage.getItem('bb_v1_daily_games') || '0');
     localStorage.setItem('bb_v1_daily_games', dGames + amt);
   }
+  if (key === 'bb_v1_total_perfects') {
+    let dPerf = parseInt(localStorage.getItem('bb_v1_daily_perfects') || '0');
+    localStorage.setItem('bb_v1_daily_perfects', dPerf + amt);
+  }
 }
 
 function notifyMission(text) {
@@ -126,10 +130,6 @@ function trackMission(type, val) {
   if (type === 'combo' && val > missionProgress.combo) {
     missionProgress.combo = val;
     if (val === 3) notifyMission("Mission Complete: Get 3x Combo! +30 BB");
-  }
-}  if (key === 'bb_v1_total_perfects') {
-    let dPerf = parseInt(localStorage.getItem('bb_v1_daily_perfects') || '0');
-    localStorage.setItem('bb_v1_daily_perfects', dPerf + amt);
   }
 }
 

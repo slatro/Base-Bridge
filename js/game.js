@@ -2000,7 +2000,7 @@ function drawLimbPath(targetCtx, x, y, w, h, angle, color, isBack, wpnId, skinId
         targetCtx.drawImage(loadedIcons[iconId], -w*1.5, -h * 1.3, w * 3, h * 1.5);
       } else if (iconId === 'wpn_gun') {
         targetCtx.rotate(0); // Laser gun points straight
-        targetCtx.drawImage(loadedIcons[iconId], -w*1.0, -h * 1.3, w * 4, h * 2);
+        targetCtx.drawImage(loadedIcons[iconId], -w*1.2, -h * 1.3, w * 4, h * 2);
       } else {
         targetCtx.rotate(Math.PI / 6); // Swords tilt forward
         targetCtx.drawImage(loadedIcons[iconId], -w*1.5, -h * 1.3, w * 3, h * 1.5);

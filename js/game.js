@@ -876,6 +876,7 @@ const BIOMES = [
 ];
 
 function updateLevelUI() {
+  level = Math.floor(score / 10) + 1;
   const bIdx = Math.min(level - 1, BIOMES.length - 1);
   const biome = BIOMES[bIdx];
   levelNameEl.innerText = biome.name;
@@ -1271,17 +1272,14 @@ function update(dt) {
   else if (gameState === STATES.CHARACTER_WALKING) {
     character.x += (W * 0.45) * (effectiveDt / 1000);
     let targetX;
-    if (success) {
-      const nextP = platforms[currentPlatformIndex + 1];
-      targetX = nextP.x + nextP.w - character.size*1.5;
-      if (character.x >= targetX) {
-        character.x = targetX; gameState = STATES.SUCCESS_TRANSITION; currentPlatformIndex++;
-        targetCameraX = platforms[currentPlatformIndex].x - W * 0.1; generatePlatform();
-        
-        // SYSTEM 8: Difficulty Scaling (Speed increase)
-        if (score > 10) level = Math.floor(score / 10) + 1;
-      }
-    } else {
+        if (success) {
+          const nextP = platforms[currentPlatformIndex + 1];
+          targetX = nextP.x + nextP.w - character.size*1.5;
+          if (character.x >= targetX) {
+            character.x = targetX; gameState = STATES.SUCCESS_TRANSITION; currentPlatformIndex++;
+            targetCameraX = platforms[currentPlatformIndex].x - W * 0.1; generatePlatform();
+          }
+        } else {
       targetX = bridge.x + bridge.length;
       if (character.x >= targetX) { character.x = targetX; gameState = STATES.FALLING_DOWN; }
     }

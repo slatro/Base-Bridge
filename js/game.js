@@ -1060,15 +1060,18 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     }
     targetCtx.fill();
 
-    // Side Profile Glowing Astro Eye
+    // Big Side Profile Glowing Astro Eye
     targetCtx.fillStyle = '#00e5ff';
     targetCtx.shadowColor = '#00e5ff'; targetCtx.shadowBlur = 15;
     targetCtx.beginPath();
-    targetCtx.moveTo(s * 0.02, s * 0.25);
-    targetCtx.quadraticCurveTo(s * 0.1, s * 0.12, s * 0.18, s * 0.25);
+    if (targetCtx.ellipse) {
+        targetCtx.ellipse(s * 0.1, s * 0.18, s * 0.08, s * 0.05, Math.PI / 8, 0, Math.PI * 2);
+    } else {
+        targetCtx.arc(s * 0.1, s * 0.18, s * 0.06, 0, Math.PI * 2);
+    }
     targetCtx.fill();
     targetCtx.fillStyle = '#ffffff'; targetCtx.shadowBlur = 0;
-    targetCtx.beginPath(); targetCtx.arc(s * 0.1, s * 0.22, s * 0.02, 0, Math.PI * 2); targetCtx.fill();
+    targetCtx.beginPath(); targetCtx.arc(s * 0.12, s * 0.16, s * 0.02, 0, Math.PI * 2); targetCtx.fill();
 
     targetCtx.shadowBlur = 0;
   }

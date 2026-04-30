@@ -925,11 +925,38 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
     targetCtx.closePath();
     targetCtx.fill();
   } else if (id === 'classic') {
-    // Original Simple Stickman
+    // Exact Stick Figure from Reference
     targetCtx.fillStyle = '#111111';
+    targetCtx.strokeStyle = '#111111';
+    targetCtx.lineWidth = s * 0.08;
+    targetCtx.lineCap = 'round';
+    targetCtx.lineJoin = 'round';
+
+    // Head
     targetCtx.beginPath();
-    targetCtx.arc(s * 0.25, s * 0.22, s * 0.22, 0, Math.PI * 2);
+    targetCtx.arc(s * 0.35, s * 0.22, s * 0.15, 0, Math.PI * 2);
     targetCtx.fill();
+
+    // Body (Torso)
+    targetCtx.beginPath();
+    targetCtx.moveTo(s * 0.35, s * 0.35);
+    targetCtx.lineTo(s * 0.25, s * 0.65);
+    targetCtx.stroke();
+
+    // Arms
+    targetCtx.beginPath();
+    targetCtx.moveTo(s * 0.32, s * 0.42);
+    targetCtx.lineTo(s * 0.55, s * 0.45);
+    targetCtx.lineTo(s * 0.65, s * 0.6);
+    targetCtx.stroke();
+
+    // Legs
+    targetCtx.beginPath();
+    targetCtx.moveTo(s * 0.25, s * 0.65);
+    targetCtx.lineTo(s * 0.1, s * 0.9); // Back leg
+    targetCtx.moveTo(s * 0.25, s * 0.65);
+    targetCtx.lineTo(s * 0.4, s * 0.9); // Front leg
+    targetCtx.stroke();
   }
 
   // Character Outline for Troop

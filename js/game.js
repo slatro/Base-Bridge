@@ -648,29 +648,27 @@ function openShopPreview(id) {
       };
     }
   } else {
-    document.getElementById('preview-cost').innerText = item.cost;
-    btn.innerText = "BUY & EQUIP";
+    document.getElementById('preview-cost').innerText = "0.01$";
+    btn.innerText = "BUY ON-CHAIN";
     btn.classList.replace('btn-gray', 'btn-green');
-    if (coins >= item.cost) {
-      btn.disabled = false;
-      btn.onclick = () => {
-        coins -= item.cost; localStorage.setItem('bb_v1_coins', coins); uiCoinsEl.innerText = coins;
+    btn.disabled = false;
+    btn.onclick = async () => {
+      btn.innerText = "PROCESSING...";
+      btn.disabled = true;
+      const success = await window.purchaseItemOnChain(item);
+      if (success) {
         ownedItems.push(id); localStorage.setItem('bb_v1_owned', JSON.stringify(ownedItems));
-
         if (item.type === 'skin') currentSkin = id;
         if (item.type === 'hat') equippedHat = id;
         if (item.type === 'weapon') equippedWeapon = id;
         if (item.type === 'face') equippedFace = id;
-
         renderSkinsShop();
         if (item.type === 'skin') closeModals(); else backToShop();
-      };
-    } else {
-      btn.innerText = "INSUFFICIENT BB";
-      btn.classList.replace('btn-green', 'btn-gray');
-      btn.disabled = true;
-      btn.onclick = null;
-    }
+      } else {
+        btn.innerText = "BUY ON-CHAIN";
+        btn.disabled = false;
+      }
+    };
   }
 
   const btnClose = document.getElementById('btn-preview-close');

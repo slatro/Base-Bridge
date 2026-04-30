@@ -34,13 +34,27 @@ const levelFillEl = document.getElementById('ui-level-fill');
 const btnRevive = document.getElementById('btn-revive');
 
 // --- DAILY CHECK-IN SYSTEM (7-DAY PROGRESSION) ---
+document.getElementById('fc-daily')?.addEventListener('click', () => {
+  const section = document.getElementById('daily-checkin-section');
+  if (section) section.scrollIntoView({ behavior: 'smooth' });
+});
+
 function renderDailyCheckinPanel() {
   const row = document.getElementById('daily-checkin-row');
   if (!row) return;
 
-  const totalCheckins = parseInt(localStorage.getItem('bb_v1_total_checkins') || '0');
-  const streak = parseInt(localStorage.getItem('bb_v1_checkin_streak') || '0');
-  const currentWeeklyDay = (streak % 7) || 7; // 1-7
+  let streak = parseInt(localStorage.getItem('bb_v1_checkin_streak') || '0');
+  
+  // If streak was 0, or we reached end of week, it's day 1 of a new cycle
+  let currentDayInWeek = (streak % 7) + 1;
+
+  const lastCheckinDate = localStorage.getItem('bb_v1_last_checkin_date');
+  const today = new Date().toLocaleDateString();
+  
+  // If we already claimed today, currentDayInWeek is actually the one we just finished
+  if (lastCheckinDate === today) {
+    currentDayInWeek = ((streak - 1) % 7) + 1;
+  }
 
   row.innerHTML = '';
   
@@ -48,18 +62,17 @@ function renderDailyCheckinPanel() {
     const dayCard = document.createElement('div');
     dayCard.className = 'checkin-day-card';
     
-    // Rewards: 50, 75, 100, 125, 150, 175, 200
     const reward = 50 + ((i - 1) * 25);
-    
-    dayCard.innerHTML = `
-      <span class="day-title">Day ${i}</span>
-      <span class="reward-amt">${reward}</span>
-    `;
+    dayCard.innerHTML = `<span class="day-title">Day ${i}</span><span class="reward-amt">${reward}</span>`;
 
-    if (i < currentWeeklyDay) {
+    if (i < currentDayInWeek) {
       dayCard.classList.add('claimed');
-    } else if (i === currentWeeklyDay) {
-      dayCard.classList.add('current');
+    } else if (i === currentDayInWeek) {
+      if (lastCheckinDate === today) {
+        dayCard.classList.add('claimed');
+      } else {
+        dayCard.classList.add('current');
+      }
     }
 
     row.appendChild(dayCard);
@@ -67,9 +80,6 @@ function renderDailyCheckinPanel() {
 
   const claimBtn = document.getElementById('btn-claim-daily');
   if (claimBtn) {
-    const lastCheckinDate = localStorage.getItem('bb_v1_last_checkin_date');
-    const today = new Date().toLocaleDateString();
-    
     if (lastCheckinDate === today) {
       claimBtn.innerText = "CLAIMED";
       claimBtn.disabled = true;

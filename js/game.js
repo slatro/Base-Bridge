@@ -169,7 +169,7 @@ let equippedFace = null;
 const SHOP_DB = [
   // SKINS
   { id: 'classic', type: 'skin', name: 'Classic', rarity: 'Common', cost: 0, icon: 'classic', desc: 'A simple but polished stick hero.', colors: { body: '#111111', head: '#111111' } },
-  { id: 'ninja', type: 'skin', name: 'Ninja', rarity: 'Uncommon', cost: 250, icon: 'ninja', desc: 'Stealthy assassin with a red headband.', colors: { body: '#1a1a1a', head: '#1a1a1a', face: '#eebb99', band: '#ef4444' } },
+  { id: 'ninja', type: 'skin', name: 'Ninja', rarity: 'Uncommon', cost: 250, icon: 'ninja', desc: 'A skilled ninja blending into the shadows.', colors: { body: '#374151', head: '#374151', skin: '#fcd34d', straps: '#1f2937' } },
   { id: 'cyber', type: 'skin', name: 'Cyber', rarity: 'Rare', cost: 350, icon: 'cyber', desc: 'Friendly AI robot from the future.', colors: { body: '#f8fafc', head: '#f8fafc', glow: '#00e5ff' } },
   { id: 'wizard', type: 'skin', name: 'Wizard', rarity: 'Epic', cost: 450, icon: 'wizard', desc: 'A wise sorcerer with a star-patterned robe.', colors: { body: '#1d4ed8', head: '#ffffff', hat: '#1d4ed8', stars: '#facc15' } },
   { id: 'troop', type: 'skin', name: 'Troop', rarity: 'Legendary', cost: 550, icon: 'troop', desc: 'Shadowed face hidden beneath a red hood.', colors: { body: '#e11d48', head: '#be123c', faceShadow: '#111111' } },
@@ -708,12 +708,12 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
   }
 
   // Back Arm & Leg
-  drawLimbPath(targetCtx, -s * 0.1, s * 0.6, s * 0.15, s * 0.4, legAngle2, colors.body || '#222', true);
-  drawLimbPath(targetCtx, 0, s * 0.3, s * 0.12, s * 0.35, armAngle2, colors.body || '#222', true, null);
+  drawLimbPath(targetCtx, -s * 0.1, s * 0.6, s * 0.15, s * 0.4, legAngle2, colors.body || '#222', true, null, id);
+  drawLimbPath(targetCtx, 0, s * 0.3, s * 0.12, s * 0.35, armAngle2, colors.body || '#222', true, null, id);
 
   // Wizard Front Leg (Drawn behind robe)
   if (id === 'wizard') {
-    drawLimbPath(targetCtx, s * 0.1, s * 0.6, s * 0.15, s * 0.4, legAngle1, colors.body || '#111', false);
+    drawLimbPath(targetCtx, s * 0.1, s * 0.6, s * 0.15, s * 0.4, legAngle1, colors.body || '#111', false, null, id);
   }
 
   // Body Path Details
@@ -722,6 +722,23 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
   targetCtx.quadraticCurveTo(-s * 0.25, s * 0.5, -s * 0.15, s * 0.7);
   targetCtx.lineTo(s * 0.15, s * 0.7);
   targetCtx.quadraticCurveTo(s * 0.25, s * 0.5, s * 0.2, s * 0.3);
+
+  if (id === 'ninja') {
+    // Cross straps
+    targetCtx.strokeStyle = colors.straps || '#1f2937'; 
+    targetCtx.lineWidth = Math.max(3, s * 0.05);
+    targetCtx.beginPath(); targetCtx.moveTo(-s*0.1, s*0.35); targetCtx.lineTo(s*0.1, s*0.55); targetCtx.stroke();
+    targetCtx.beginPath(); targetCtx.moveTo(s*0.1, s*0.35); targetCtx.lineTo(-s*0.1, s*0.55); targetCtx.stroke();
+    
+    // Pouch
+    targetCtx.fillStyle = '#1f2937';
+    targetCtx.strokeStyle = '#111'; targetCtx.lineWidth = 1;
+    targetCtx.beginPath(); targetCtx.roundRect(0, s*0.48, s*0.15, s*0.15, 3); targetCtx.fill(); targetCtx.stroke();
+    // Pouch flap
+    targetCtx.beginPath(); targetCtx.moveTo(0, s*0.48); targetCtx.lineTo(s*0.075, s*0.56); targetCtx.lineTo(s*0.15, s*0.48); targetCtx.stroke();
+    // Button
+    targetCtx.fillStyle = '#111'; targetCtx.beginPath(); targetCtx.arc(s*0.075, s*0.56, Math.max(1, s*0.02), 0, Math.PI*2); targetCtx.fill();
+  }
 
   if (id === 'wizard') {
     // Long Mystic Robe/Coat
@@ -1009,13 +1026,13 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
 
   // Front Arm & Leg
   if (id !== 'wizard') {
-    drawLimbPath(targetCtx, s * 0.1, s * 0.6, s * 0.15, s * 0.4, legAngle1, colors.body || '#111', false);
+    drawLimbPath(targetCtx, s * 0.1, s * 0.6, s * 0.15, s * 0.4, legAngle1, colors.body || '#111', false, null, id);
   }
   
   // Troop Arm alignment fix
   let armX = 0;
   if (id === 'troop') armX = s * 0.1;
-  drawLimbPath(targetCtx, armX, s * 0.3, s * 0.12, s * 0.35, armAngle1, colors.body || '#111', false, wpnId);
+  drawLimbPath(targetCtx, armX, s * 0.3, s * 0.12, s * 0.35, armAngle1, colors.body || '#111', false, wpnId, id);
 
   // Infinity Gauntlet for Galaxy Skin
   if (id === 'galaxy') {
@@ -1062,13 +1079,13 @@ function renderSkeleton(targetCtx, skinId, hatId, wpnId, faceId, s, state, time)
   targetCtx.restore();
 }
 
-function drawLimbPath(targetCtx, x, y, w, h, angle, color, isBack, wpnId) {
+function drawLimbPath(targetCtx, x, y, w, h, angle, color, isBack, wpnId, skinId) {
   targetCtx.save();
   targetCtx.translate(x, y); targetCtx.rotate(angle);
   
-  // Thin black outline for Troop arms
+  // Thin black outline for Troop and Ninja arms/legs
   let drawStroke = false;
-  if (color === '#e11d48') drawStroke = true;
+  if (color === '#e11d48' || skinId === 'ninja') drawStroke = true;
 
   const baseColor = isBack ? shadeColor(color, -20) : color;
   targetCtx.fillStyle = baseColor;
@@ -1076,28 +1093,46 @@ function drawLimbPath(targetCtx, x, y, w, h, angle, color, isBack, wpnId) {
   targetCtx.fill();
   if (drawStroke) {
     targetCtx.strokeStyle = '#000';
-    targetCtx.lineWidth = 0.5;
+    targetCtx.lineWidth = skinId === 'ninja' ? 1.5 : 0.5;
+    targetCtx.stroke();
+  }
+
+  // Ninja Wraps on Limbs
+  if (skinId === 'ninja') {
+    targetCtx.strokeStyle = '#1f2937';
+    targetCtx.lineWidth = 2;
+    targetCtx.beginPath();
+    targetCtx.moveTo(-w/2, h*0.3); targetCtx.lineTo(w/2, h*0.5);
+    targetCtx.moveTo(-w/2, h*0.5); targetCtx.lineTo(w/2, h*0.7);
+    targetCtx.moveTo(-w/2, h*0.7); targetCtx.lineTo(w/2, h*0.9);
     targetCtx.stroke();
   }
 
   // Universal Feet (for legs) - Contrasting Color
   if (h > w * 1.5 && !wpnId) {
     let footColor = (color === '#111' || color === '#222') ? '#334155' : shadeColor(color, -30);
-    if (color === '#111' && !isBack) footColor = '#ef4444'; // Ninja boots
+    if (color === '#111' && !isBack) footColor = '#ef4444'; // default red boots if needed
+    if (skinId === 'ninja') footColor = '#1f2937'; // Ninja boots/wraps
     
     targetCtx.fillStyle = footColor;
     targetCtx.beginPath(); targetCtx.arc(0, h, w*0.6, 0, Math.PI*2); targetCtx.fill();
     // Subtle outline for foot
-    targetCtx.strokeStyle = 'rgba(0,0,0,0.2)';
-    targetCtx.lineWidth = 1;
+    targetCtx.strokeStyle = skinId === 'ninja' ? '#000' : 'rgba(0,0,0,0.2)';
+    targetCtx.lineWidth = skinId === 'ninja' ? 1.5 : 1;
     targetCtx.stroke();
   }
   
   // Universal Hands (for arms) - Contrasting Color
   if (h < w * 2 || wpnId) {
     let handColor = (color === '#111' || color === '#222') ? '#475569' : shadeColor(color, -40);
+    if (skinId === 'ninja') handColor = '#fcd34d'; // Peach skin hands
+    
     targetCtx.fillStyle = handColor;
     targetCtx.beginPath(); targetCtx.arc(0, h, w*0.5, 0, Math.PI*2); targetCtx.fill();
+    targetCtx.strokeStyle = skinId === 'ninja' ? '#000' : 'rgba(0,0,0,0.2)';
+    targetCtx.lineWidth = skinId === 'ninja' ? 1.5 : 1;
+    targetCtx.stroke();
+  }
     // Subtle outline for hand
     targetCtx.strokeStyle = 'rgba(0,0,0,0.2)';
     targetCtx.lineWidth = 1;

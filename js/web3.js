@@ -109,7 +109,10 @@ function initProfileModal() {
 // DOM Labels
 // Will be initialized in initWeb3
 
+let web3Initialized = false;
 async function initWeb3() {
+  if (web3Initialized) return;
+  web3Initialized = true;
   console.log("Initializing Web3...");
   
   // Initialize DOM references
@@ -609,8 +612,13 @@ window.showInfoModal = function(title, desc) {
   document.getElementById('modal-equip-shop').classList.add('hidden');
 };
 
-document.addEventListener('DOMContentLoaded', initWeb3);
-window.addEventListener('load', initWeb3); // Fallback
+document.addEventListener('DOMContentLoaded', () => {
+    initWeb3().catch(err => console.error("Web3 critical init failure:", err));
+});
+// Backwards compatibility/safety
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    initWeb3().catch(err => console.error("Web3 immediate init failure:", err));
+}
 
 async function purchaseItemOnChain(item) {
   if (!userAddress) {

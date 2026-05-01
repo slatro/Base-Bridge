@@ -2462,12 +2462,6 @@ async function toggleFullScreen() {
       container.classList.add('fake-fullscreen');
     }
 
-    if (isMobile) {
-      container.classList.add('force-landscape');
-      if (screen.orientation && screen.orientation.lock) {
-        await screen.orientation.lock('landscape').catch(() => {});
-      }
-    }
     setTimeout(resize, 300);
   } else {
     // EXIT FULLSCREEN
@@ -2482,11 +2476,6 @@ async function toggleFullScreen() {
     }
     
     container.classList.remove('fake-fullscreen');
-    container.classList.remove('force-landscape');
-    
-    if (isMobile && screen.orientation && screen.orientation.unlock) {
-      screen.orientation.unlock();
-    }
     setTimeout(resize, 300);
   }
 }

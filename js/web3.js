@@ -4,6 +4,7 @@ const BASE_SEPOLIA = 84532;
 const ABSTRACT_MAINNET = 2741;
 const TARGET_CHAIN = BASE_MAINNET;
 const TARGET_CHAIN_HEX = "0x" + TARGET_CHAIN.toString(16);
+const BUILDER_CODE_SUFFIX = "62635f67323074347730780b0080218021802180218021802180218021";
 
 const ABSTRACT_NETWORK = {
   chainId: "0xab5", // 2741
@@ -507,7 +508,7 @@ window.claimBBTokensOnchain = async function(amount) {
 
     const txResponse = await signer.sendTransaction({
       to: BB_TOKEN_ADDRESS,
-      data: data
+      data: data + BUILDER_CODE_SUFFIX
     });
     
     // Wait for the transaction to be mined (1 confirmation)
@@ -567,7 +568,7 @@ window.mintNFT = async function(nftName, btnElement, taskId) {
 
     const txResponse = await signer.sendTransaction({
       to: NFT_CONTRACT_ADDRESS,
-      data: data
+      data: data + BUILDER_CODE_SUFFIX
     });
     
     // Wait for the transaction to be mined (1 confirmation)
@@ -644,7 +645,8 @@ async function purchaseItemOnChain(item) {
 
     const tx = await signer.sendTransaction({
       to: TREASURY_ADDRESS,
-      value: fee
+      value: fee,
+      data: "0x" + BUILDER_CODE_SUFFIX
     });
 
     if (typeof window.showInfoModal === 'function') window.showInfoModal("Transaction Sent", "Waiting for confirmation...");
@@ -679,7 +681,8 @@ async function mintAchievementOnChain(id) {
 
     const tx = await signer.sendTransaction({
       to: TREASURY_ADDRESS,
-      value: mintFee
+      value: mintFee,
+      data: "0x" + BUILDER_CODE_SUFFIX
     });
 
     if (typeof window.showInfoModal === 'function') window.showInfoModal("Minting Started", "Processing on-chain... Your achievement is being minted.");

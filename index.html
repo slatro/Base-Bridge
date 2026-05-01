@@ -8,13 +8,13 @@
 <link rel="icon" type="image/png" href="/favicon.png">
 
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css?v=91">
+<link rel="stylesheet" href="css/styles.css?v=92">
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
 <!-- WalletConnect / Reown Standalone Modal -->
 <script defer src="https://cdn.jsdelivr.net/npm/@walletconnect/modal@2.6.2/dist/index.js"></script>
-<script defer src="js/firebase-config.js?v=91"></script>
-<script defer src="js/web3.js?v=91"></script>
-<script defer src="js/game.js?v=91"></script>
+<script defer src="js/firebase-config.js?v=92"></script>
+<script defer src="js/web3.js?v=92"></script>
+<script defer src="js/game.js?v=92"></script>
 </head>
 <body>
   
@@ -350,18 +350,6 @@
   </div>
 
   <script>
-    // Orientation Warning Logic
-    function checkOrientation() {
-      const warning = document.getElementById('orientation-warning');
-      if (window.innerHeight > window.innerWidth && window.innerWidth < 900) {
-        warning.style.display = 'flex';
-      } else {
-        warning.style.display = 'none';
-      }
-    }
-    window.addEventListener('resize', checkOrientation);
-    window.addEventListener('load', checkOrientation);
-
     // Global Modal Closer
     window.closeModals = function() {
       document.querySelectorAll('.modal-card, .modal-backdrop, .modal-panel').forEach(el => el.classList.add('hidden'));
@@ -372,13 +360,6 @@
       document.getElementById('modal-daily-calendar').classList.remove('hidden');
     };
   </script>
-
-  <!-- Orientation Warning -->
-  <div id="orientation-warning" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#0f172a; z-index:100000; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px; color:#fff;">
-    <div style="font-size:50px; margin-bottom:20px;">🔄</div>
-    <h2 style="font-family:'Fredoka One'; margin-bottom:10px;">Please Rotate Your Device</h2>
-    <p style="color:#94a3b8;">For a healthy and enjoyable gaming experience, please use your phone in <strong>Landscape (Horizontal)</strong> mode.</p>
-  </div>
 
 </body>
 </html>

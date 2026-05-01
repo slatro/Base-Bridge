@@ -2435,29 +2435,48 @@ attachPlayListener('btn-start-overlay', startGame);
 attachPlayListener('btn-revive', reviveGame);
 
 // Fullscreen Logic
-function toggleFullScreen() {
+async function toggleFullScreen() {
   const container = document.querySelector('.game-card');
   if (!container) return;
   
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
   if (!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
-    if (container.requestFullscreen) container.requestFullscreen();
-    else if (container.mozRequestFullScreen) container.mozRequestFullScreen();
-    else if (container.webkitRequestFullScreen) container.webkitRequestFullScreen();
-    else if (container.msRequestFullscreen) container.msRequestFullscreen();
+    try {
+      if (container.requestFullscreen) await container.requestFullscreen();
+      else if (container.mozRequestFullScreen) await container.mozRequestFullScreen();
+      else if (container.webkitRequestFullScreen) await container.webkitRequestFullScreen();
+      else if (container.msRequestFullscreen) await container.msRequestFullscreen();
+      
+      if (isMobile) {
+        container.classList.add('force-landscape');
+        // Attempt to lock orientation if API is available
+        if (screen.orientation && screen.orientation.lock) {
+          await screen.orientation.lock('landscape').catch(() => {});
+        }
+      }
+    } catch (err) {
+      console.error("Fullscreen error:", err);
+    }
   } else {
+    container.classList.remove('force-landscape');
     if (document.exitFullscreen) document.exitFullscreen();
     else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
     else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
     else if (document.msExitFullscreen) document.msExitFullscreen();
+    
+    if (isMobile && screen.orientation && screen.orientation.unlock) {
+      screen.orientation.unlock();
+    }
   }
 }
 
 // Handle fullscreen change to resize canvas
 document.addEventListener('fullscreenchange', () => {
-  setTimeout(resize, 100); // Small delay to allow layout to settle
+  setTimeout(resize, 300); // Increased delay for mobile orientation settling
 });
 document.addEventListener('webkitfullscreenchange', () => {
-  setTimeout(resize, 100);
+  setTimeout(resize, 300);
 });
 
 document.getElementById('btn-fullscreen')?.addEventListener('pointerdown', (e) => {

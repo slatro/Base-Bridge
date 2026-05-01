@@ -74,6 +74,7 @@ console.log("%c BASE BRIDGE v17 LOADED %c", "background: #0052ff; color: #fff; f
 
 const levelFillEl = document.getElementById('ui-level-fill');
 const btnRevive = document.getElementById('btn-revive');
+let lastGameStartTime = 0;
 
 function renderDailyCheckinPanel() {
   const cardsContainer = document.getElementById('neon-cards-container');
@@ -2095,6 +2096,7 @@ function startGame() {
   btnRevive.classList.add('hidden');
   if (!localStorage.getItem('bb_v1_tut_done')) tutEl.classList.remove('hidden');
   incMetric('bb_v1_total_games', 1);
+  lastGameStartTime = Date.now();
 }
 
 function reviveGame() {
@@ -2387,6 +2389,8 @@ function triggerGameWon() {
 
 function handlePointerDown(e) {
   if (e.target.tagName === 'BUTTON' || gameState !== STATES.PLAYING) return;
+  // Bug fix: prevent immediate bridge start if user just clicked Play
+  if (Date.now() - lastGameStartTime < 300) return;
   if (!window.userAddress) {
     showInfoModal('Wallet Required', 'You must connect your wallet to play the game!');
     return;
@@ -2444,10 +2448,12 @@ async function toggleFullScreen() {
   const isCurrentlyFull = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement || container.classList.contains('fake-fullscreen'));
 
   if (!isCurrentlyFull) {
-    // ENTER FULLSCREEN
+    // Aggressively hide everything
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
     document.body.classList.add('body-fullscreen');
-    document.body.classList.add('overflow-hidden');
     
+    // Attempt real fullscreen first (Android)
     if (isNativeSupported) {
       try {
         if (container.requestFullscreen) await container.requestFullscreen();

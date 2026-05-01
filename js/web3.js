@@ -177,23 +177,33 @@ async function initWeb3() {
           if (type === 'okx') installed = !!window.okxwallet;
           if (type === 'zerion') installed = !!window.zerionWallet;
           if (type === 'rabby') installed = !!(window.ethereum && window.ethereum.isRabby);
+          if (type === 'phantom') installed = !!(window.phantom?.ethereum || (window.ethereum && window.ethereum.isPhantom));
           
           if (installed) badge.classList.remove('hidden');
           else badge.classList.add('hidden');
       });
   }
 
+  // WalletConnect Project ID (Generic or placeholder - typically requires a real ID from reown.com)
+  const WC_PROJECT_ID = '93019183492083492083492083492083'; // Placeholder
+  let wcModal = null;
+
   window.connectWallet = async function(type) {
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 900;
     const dappUrl = window.location.href.split('://')[1]; // strip https://
     
     if (type === 'walletconnect') {
-        // Fallback to MetaMask deep link for mobile or show info for desktop
-        if (isMobile) {
-            window.open(`https://metamask.app.link/dapp/${dappUrl}`, "_blank");
-        } else {
-            alert("WalletConnect integration coming soon! Please use a browser extension for now.");
+        if (typeof WalletConnectModal === 'undefined') {
+            alert("WalletConnect library loading... Please wait.");
+            return;
         }
+        if (!wcModal) {
+            wcModal = new WalletConnectModal.WalletConnectModal({
+                projectId: '4c84a8360d8e90632d431c38e9c1550a', // Real demo ID or use your own
+                chains: [TARGET_CHAIN]
+            });
+        }
+        wcModal.openModal();
         return;
     }
 
@@ -207,9 +217,14 @@ async function initWeb3() {
     if (type === 'phantom') p = window.phantom?.ethereum || (window.ethereum && window.ethereum.isPhantom ? window.ethereum : null);
     if (type === 'zerion') p = window.zerionWallet || (window.ethereum && window.ethereum.isZerion ? window.ethereum : null);
     if (type === 'okx') p = window.okxwallet || (window.ethereum && window.ethereum.isOKXWallet ? window.ethereum : null);
-    if (type === 'abstract') p = window.abstract || window.ethereum; // Simplified
+    if (type === 'abstract') p = window.abstract || (window.ethereum && window.ethereum.isAbstract ? window.ethereum : null) || window.ethereum;
     
-    if (!p) {
+    if (type === 'abstract' && !window.abstract && !window.ethereum?.isAbstract) {
+        // If not detected, try to switch network or show how to get it
+        console.log("Abstract provider not explicitly detected, attempting generic connection...");
+    }
+
+    if (!p && type !== 'abstract') {
         const urls = {
             metamask: "https://metamask.io/download/",
             rabby: "https://rabby.io/",

@@ -239,25 +239,16 @@ async function initWeb3() {
     if (type === 'phantom') p = window.phantom?.ethereum || (window.ethereum && window.ethereum.isPhantom ? window.ethereum : null);
     if (type === 'zerion') p = window.zerionWallet || (window.ethereum && window.ethereum.isZerion ? window.ethereum : null);
     if (type === 'okx') p = window.okxwallet || (window.ethereum && window.ethereum.isOKXWallet ? window.ethereum : null);
-    if (type === 'abstract') {
-        if (typeof window.loginWithAbstract === 'function') {
-            window.loginWithAbstract();
-            window.closeModals();
-        } else {
-            console.error("Abstract integration not loaded yet.");
-        }
-        return;
-    }
 
-    if (!p && type !== 'abstract') {
+
+    if (!p) {
         const urls = {
             metamask: "https://metamask.io/download/",
             rabby: "https://rabby.io/",
             phantom: "https://phantom.app/",
             coinbase: "https://www.coinbase.com/wallet",
             zerion: "https://zerion.io/",
-            okx: "https://www.okx.com/web3",
-            abstract: "https://abs.xyz/"
+            okx: "https://www.okx.com/web3"
         };
         if (urls[type]) window.open(urls[type], "_blank");
         return;

@@ -44,16 +44,30 @@ if (!localStorage.getItem('bb_v1_uuid')) {
     localStorage.setItem('bb_v1_uuid', 'u-' + Math.random().toString(36).substr(2, 9));
 }
 
+async function fetchWithTimeout(resource, options = {}) {
+  const { timeout = 5000 } = options;
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeout);
+  try {
+    const response = await fetch(resource, { ...options, signal: controller.signal });
+    clearTimeout(id);
+    return response;
+  } catch (e) {
+    clearTimeout(id);
+    throw e;
+  }
+}
+
 let currentUsername = localStorage.getItem('bb_v1_username');
 window.assignNewUsername = async function() {
     if (localStorage.getItem('bb_v1_username')) return;
     try {
         const countUrl = 'https://kvdb.io/3Bz5so9xQFGY6vAGb68Mfx/player_count';
-        let res = await fetch(`${countUrl}?t=${new Date().getTime()}`, { cache: 'no-store' });
+        let res = await fetchWithTimeout(`${countUrl}?t=${new Date().getTime()}`, { cache: 'no-store' });
         let count = 0;
         if (res.ok) count = parseInt(await res.text()) || 0;
         count++;
-        await fetch(countUrl, { method: 'POST', body: count.toString() });
+        await fetchWithTimeout(countUrl, { method: 'POST', body: count.toString() });
         
         if (!localStorage.getItem('bb_v1_username')) {
             currentUsername = "Player " + count;
@@ -289,8 +303,7 @@ async function initWeb3() {
           const bucket = "3Bz5so9xQFGY6vAGb68Mfx";
           const userKey = `u_${name.toLowerCase().replace(/\s+/g, '')}`;
           const myUUID = localStorage.getItem('bb_v1_uuid');
-
-          const res = await fetch(`https://kvdb.io/${bucket}/${userKey}`);
+          const res = await fetchWithTimeout(`https://kvdb.io/${bucket}/${userKey}`);
           if (res.ok) {
               const ownerUUID = await res.text();
               if (ownerUUID && ownerUUID.trim() !== "" && ownerUUID !== myUUID) {
@@ -301,9 +314,8 @@ async function initWeb3() {
                   return;
               }
           }
-
           // Mark as taken
-          await fetch(`https://kvdb.io/${bucket}/${userKey}`, { method: 'POST', body: myUUID });
+          await fetchWithTimeout(`https://kvdb.io/${bucket}/${userKey}`, { method: 'POST', body: myUUID });
           
           currentUsername = name;
           localStorage.setItem('bb_v1_username', currentUsername);
@@ -321,7 +333,7 @@ async function initWeb3() {
                       }
                   });
                   if (modified) {
-                      await fetch(`https://kvdb.io/${bucket}/leaderboard`, {
+                      await fetchWithTimeout(`https://kvdb.io/${bucket}/leaderboard`, {
                           method: 'POST',
                           body: JSON.stringify(board)
                       });

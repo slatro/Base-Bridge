@@ -774,7 +774,7 @@ canvas {
     flex-wrap: nowrap !important; 
     overflow-x: auto !important; 
     justify-content: flex-start !important; 
-    padding: 15px 40px !important; /* Increased padding to prevent left clipping */
+    padding: 15px 60px !important; /* Significantly increased padding to move characters right */
     gap: 12px;
     -webkit-overflow-scrolling: touch;
     width: 100% !important;

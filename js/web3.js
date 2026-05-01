@@ -215,17 +215,14 @@ async function initWeb3() {
     const dappUrl = window.location.href.split('://')[1]; // strip https://
     
     if (type === 'walletconnect') {
-        if (typeof WalletConnectModal === 'undefined') {
-            console.error("WalletConnect library not loaded yet.");
-            return;
+        if (typeof window.showInfoModal === 'function') {
+            window.showInfoModal(
+                "Coming Soon!", 
+                "WalletConnect is currently under maintenance and will be available soon. Please use another wallet extension for now. Thank you for your patience!"
+            );
+        } else {
+            alert("WalletConnect is coming soon!");
         }
-        if (!wcModal) {
-            wcModal = new WalletConnectModal.WalletConnectModal({
-                projectId: '4c84a8360d8e90632d431c38e9c1550a', 
-                chains: [TARGET_CHAIN]
-            });
-        }
-        wcModal.openModal();
         return;
     }
 

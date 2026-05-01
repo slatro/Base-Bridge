@@ -755,23 +755,50 @@ canvas {
   .skins-footer { 
     flex-direction: column; 
     height: auto !important; 
-    padding: 20px; 
-    gap: 20px; 
+    padding: 15px 0 !important; 
+    gap: 10px; 
     text-align: center;
+    overflow: hidden; /* Prevent horizontal bleed */
+    width: 100%;
   }
   .sf-left, .sf-center, .sf-right { width: 100% !important; text-align: center; justify-content: center; }
-  .sf-left h3 { font-size: 1.5rem; text-align: center; }
+  .sf-left h3 { font-size: 1.3rem; text-align: center; margin-bottom: 0; }
+  .sf-sub { font-size: 0.7rem; }
+  
   .sf-center { 
     flex-wrap: nowrap !important; 
     overflow-x: auto !important; 
     justify-content: flex-start !important; 
-    padding: 15px 5px;
+    padding: 15px 20px !important; /* Added side padding to prevent clipping at edges */
     gap: 12px;
     -webkit-overflow-scrolling: touch;
-    width: 100%;
+    width: auto !important;
+    display: flex;
   }
-  .sf-center::-webkit-scrollbar { display: none; } /* Hide scrollbar for cleaner look */
-  .skin-item { flex-shrink: 0; width: 60px; height: 60px; }
+  .sf-center::-webkit-scrollbar { display: none; }
+  
+  .skin-item { 
+    flex-shrink: 0; 
+    width: 75px !important; 
+    height: 110px !important; 
+    margin: 0 !important;
+    padding: 8px 5px !important;
+    border-radius: 14px !important;
+  }
+  .skin-avatar { 
+    width: 55px !important; 
+    height: 55px !important; 
+    font-size: 40px !important; 
+  }
+  .skin-item span { 
+    font-size: 0.55rem !important; 
+    margin-top: 6px !important; 
+    letter-spacing: 0.2px !important;
+  }
+  .skin-price { 
+    font-size: 0.5rem !important; 
+    gap: 2px !important; 
+  }
   .sf-right { position: relative; margin-top: 5px; width: 100%; display: flex; justify-content: center; }
   
   /* Modal Scaling */

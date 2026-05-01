@@ -858,9 +858,13 @@ canvas {
   
   .modal-shop-layout { flex-direction: column; width: 95% !important; height: auto !important; max-height: 95vh; }
   .shop-left { width: 100%; height: 320px; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.1); }
-  .shop-right { padding: 20px; text-align: center; }
-  .shop-right h2 { text-align: center; font-size: 1.8rem; }
-  .preview-desc { text-align: center; font-size: 0.9rem; }
+  .shop-right { padding: 10px 15px !important; text-align: center; }
+  .shop-right h2 { text-align: center; font-size: 1.3rem !important; margin-bottom: 5px !important; }
+  .preview-rarity { font-size: 0.7rem !important; margin: 0 !important; }
+  .preview-price { font-size: 1rem !important; margin-top: 5px !important; }
+  .preview-desc { text-align: center; font-size: 0.8rem !important; margin-top: 5px !important; line-height: 1.2 !important; }
+  .preview-actions { margin-top: 10px !important; gap: 8px !important; }
+  .preview-actions .btn { padding: 10px !important; font-size: 0.85rem !important; }
 }
 
 /* --- NEON DAILY CHECK-IN MODAL --- */

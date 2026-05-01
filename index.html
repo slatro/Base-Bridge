@@ -8,19 +8,19 @@
 <link rel="icon" type="image/png" href="/favicon.png">
 
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css?v=93">
+<link rel="stylesheet" href="css/styles.css?v=94">
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
 <!-- WalletConnect / Reown Standalone Modal -->
 <script defer src="https://cdn.jsdelivr.net/npm/@walletconnect/modal@2.6.2/dist/index.js"></script>
-<script defer src="js/firebase-config.js?v=93"></script>
-<script defer src="js/web3.js?v=93"></script>
-<script defer src="js/game.js?v=93"></script>
+<script defer src="js/firebase-config.js?v=94"></script>
+<script defer src="js/web3.js?v=94"></script>
+<script defer src="js/game.js?v=94"></script>
 </head>
 <body>
   
-  <div id="modal-daily-calendar" class="modal-backdrop hidden" style="z-index: 99999 !important;">
+  <div id="modal-daily-calendar" class="modal-backdrop hidden" style="z-index: 99999 !important;" onclick="this.classList.add('hidden')">
     <div style="position: absolute; top: 10px; left: 10px; color: rgba(255,255,255,0.2); font-size: 10px; pointer-events: none;">v17</div>
-    <div class="neon-modal">
+    <div class="neon-modal" onclick="event.stopPropagation()">
       <div class="neon-modal-header">
         <div class="neon-title-box">DAILY CHECK-IN</div>
         <button class="neon-close" onclick="document.getElementById('modal-daily-calendar').classList.add('hidden')">&times;</button>
@@ -128,7 +128,7 @@
           <p>Time your builds. Rescue characters.</p>
         </div>
       </div>
-      <div class="feature-card glass-panel" id="fc-daily" onclick="document.getElementById('modal-daily-calendar').classList.remove('hidden')">
+      <div class="feature-card glass-panel" id="fc-daily" onclick="window.openDailyModal()">
         <div class="fc-icon"><div class="svg-feat-daily"></div></div>
         <div class="fc-text">
           <h4>DAILY CHECK-IN</h4>
@@ -195,7 +195,7 @@
         <p class="panel-subtitle">Come back every day to get better rewards!</p>
         <div class="dashboard-daily-grid" id="dashboard-daily-grid" style="display: flex; gap: 8px; margin: 15px 0; justify-content: space-between; padding: 5px;"></div>
         <div class="dr-btn-wrapper" style="margin-top: 25px;">
-          <button class="btn btn-aaa btn-green" id="btn-open-daily-modal" onclick="document.getElementById('modal-daily-calendar').classList.remove('hidden')">CHECK IN</button>
+          <button class="btn btn-aaa btn-green" id="btn-open-daily-modal" onclick="window.openDailyModal()">CHECK IN</button>
         </div>
       </div>
 
@@ -227,126 +227,128 @@
     </section>
   </div>
 
-  <!-- MODALS -->
-  <div id="modal-backdrop" class="modal-backdrop hidden" onclick="window.closeModals()"></div>
-
-  <!-- Info Modal -->
-  <div id="modal-info" class="modal-card hidden">
-    <div class="modal-close" onclick="window.closeModals()"></div>
-    <h2 id="modal-info-title">Title</h2>
-    <p id="modal-info-desc">Description</p>
-    <button class="btn btn-aaa btn-blue" onclick="window.closeModals()">OK</button>
-  </div>
-
-  <!-- Wallet Picker Modal -->
-  <div id="modal-wallet-picker" class="modal-panel hidden">
-    <div class="modal-header">
-      <h2>SELECT WALLET</h2>
-      <button class="modal-close" onclick="window.closeModals()">&times;</button>
-    </div>
-    <p style="text-align:center; margin-bottom:20px; color:#94a3b8; font-size:0.9rem;">Connect your wallet to start playing.</p>
+  <!-- MODALS BACKDROP CONTAINER -->
+  <div id="modal-backdrop" class="modal-backdrop hidden" onclick="window.closeModals()">
     
-    <div class="wallet-grid">
-      <div class="wallet-option" onclick="window.connectWallet('walletconnect')">
-        <div class="wallet-icon-wrapper"><img src="https://icon.horse/icon/walletconnect.com" alt="WalletConnect"></div>
-        <span>WalletConnect</span>
-        <div class="wallet-badge badge-blue">QR CODE</div>
-        <div class="wallet-arrow"></div>
-      </div>
-      <div class="wallet-option" onclick="window.connectWallet('metamask')">
-        <div class="wallet-icon-wrapper"><img src="https://icon.horse/icon/metamask.io" alt="MetaMask"></div>
-        <span>MetaMask</span>
-        <div class="wallet-badge badge-installed hidden" data-wallet="metamask">INSTALLED</div>
-        <div class="wallet-arrow"></div>
-      </div>
-      <div class="wallet-option" onclick="window.connectWallet('rabby')">
-        <div class="wallet-icon-wrapper"><img src="https://icon.horse/icon/rabby.io" alt="Rabby"></div>
-        <span>Rabby Wallet</span>
-        <div class="wallet-badge badge-installed hidden" data-wallet="rabby">INSTALLED</div>
-        <div class="wallet-arrow"></div>
-      </div>
-      <div class="wallet-option" onclick="window.connectWallet('okx')">
-        <div class="wallet-icon-wrapper"><img src="https://icon.horse/icon/okx.com" alt="OKX"></div>
-        <span>OKX Wallet</span>
-        <div class="wallet-badge badge-installed hidden" data-wallet="okx">INSTALLED</div>
-        <div class="wallet-arrow"></div>
-      </div>
-      <div class="wallet-option" onclick="window.connectWallet('zerion')">
-        <div class="wallet-icon-wrapper"><img src="https://icon.horse/icon/zerion.io" alt="Zerion"></div>
-        <span>Zerion</span>
-        <div class="wallet-badge badge-installed hidden" data-wallet="zerion">INSTALLED</div>
-        <div class="wallet-arrow"></div>
-      </div>
-      <div class="wallet-option" onclick="window.connectWallet('phantom')">
-        <div class="wallet-icon-wrapper"><img src="https://icon.horse/icon/phantom.app" alt="Phantom"></div>
-        <span>Phantom Wallet</span>
-        <div class="wallet-badge badge-installed hidden" data-wallet="phantom">INSTALLED</div>
-        <div class="wallet-arrow"></div>
-      </div>
-      <div class="wallet-option" onclick="window.connectWallet('abstract')">
-        <div class="wallet-icon-wrapper"><img src="https://icon.horse/icon/abs.xyz" alt="Abstract"></div>
-        <span>Abstract Wallet</span>
-        <div class="wallet-arrow"></div>
-      </div>
+    <!-- Info Modal -->
+    <div id="modal-info" class="modal-card hidden" onclick="event.stopPropagation()">
+      <div class="modal-close" onclick="window.closeModals()"></div>
+      <h2 id="modal-info-title">Title</h2>
+      <p id="modal-info-desc">Description</p>
+      <button class="btn btn-aaa btn-blue" onclick="window.closeModals()">OK</button>
     </div>
-  </div>
 
-  <!-- Profile Settings Modal -->
-  <div id="modal-profile" class="modal-card hidden">
-    <div class="modal-close" onclick="window.closeModals()"></div>
-    <h2>PROFILE SETTINGS</h2>
-    <div class="profile-input-group" style="margin-bottom: 20px;">
-      <label for="username-input" style="color:var(--text-dim); display:block; margin-bottom:5px; text-align:left; font-weight:bold;">Username</label>
-      <input type="text" id="username-input" maxlength="15" placeholder="Enter username..." style="width:100%; padding:12px; border-radius:8px; border:1px solid rgba(255,255,255,0.2); background:rgba(0,0,0,0.5); color:#fff; font-family:'Fredoka One'; font-size:1.1rem; outline:none; text-align:center;">
-    </div>
-    <div class="profile-avatars-group">
-      <label style="color:var(--text-dim); display:block; margin-bottom:10px; text-align:left; font-weight:bold;">Choose Avatar</label>
-      <div class="avatar-grid" id="avatar-grid" style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center; max-height:220px; overflow-y:auto; padding:5px;"></div>
-    </div>
-    <div style="display:flex; gap:15px; margin-top:20px;">
-      <button class="btn btn-aaa btn-green" id="btn-save-profile" style="flex:1;">SAVE</button>
-      <button class="btn btn-aaa btn-gray" onclick="window.closeModals()" style="flex:1;">CANCEL</button>
-    </div>
-  </div>
-
-  <!-- Achievements Modal -->
-  <div id="modal-achievements" class="modal-card modal-large hidden">
-    <div class="modal-close" onclick="window.closeModals()"></div>
-    <h2>ACHIEVEMENTS</h2>
-    <div class="ach-tabs">
-      <button class="ach-tab active" data-tab="general">NFT BADGES</button>
-      <button class="ach-tab" data-tab="daily">DAILY</button>
-      <button class="ach-tab" data-tab="weekly">WEEKLY</button>
-    </div>
-    <div class="achievements-list" id="achievements-list"></div>
-  </div>
-
-  <!-- Shop Modal -->
-  <div id="modal-equip-shop" class="modal-card modal-large hidden">
-    <div class="modal-close" onclick="window.closeModals()"></div>
-    <h2>SHOP</h2>
-    <div class="ach-tabs">
-      <button class="equip-tab active" data-tab="hat">WEAR</button>
-      <button class="equip-tab" data-tab="weapon">WEAPONS</button>
-    </div>
-    <div class="equip-grid" id="equip-list"></div>
-  </div>
-
-  <!-- Preview Modal -->
-  <div id="modal-shop" class="modal-card modal-shop-layout hidden">
-    <div class="shop-left">
-      <canvas id="previewCanvas" width="300" height="400"></canvas>
-    </div>
-    <div class="shop-right">
-      <h2 id="preview-name">Item</h2>
-      <div class="preview-rarity" id="preview-rarity">Rarity</div>
-      <div class="preview-price"><div class="bb-token-small"></div> <span id="preview-cost">0</span></div>
-      <p class="preview-desc" id="preview-desc">Description</p>
-      <div class="preview-actions" style="display:flex; gap: 15px; margin-top: 20px;">
-        <button class="btn btn-aaa btn-green" id="btn-buy-equip" style="flex:1;">BUY & EQUIP</button>
-        <button class="btn btn-aaa btn-gray" id="btn-preview-close" style="flex:1;">BACK</button>
+    <!-- Wallet Picker Modal -->
+    <div id="modal-wallet-picker" class="modal-panel hidden" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h2>SELECT WALLET</h2>
+        <button class="modal-close" onclick="window.closeModals()">&times;</button>
+      </div>
+      <p style="text-align:center; margin-bottom:20px; color:#94a3b8; font-size:0.9rem;">Connect your wallet to start playing.</p>
+      
+      <div class="wallet-grid">
+        <div class="wallet-option" onclick="window.connectWallet('walletconnect')">
+          <div class="wallet-icon-wrapper"><img src="https://icon.horse/icon/walletconnect.com" alt="WalletConnect"></div>
+          <span>WalletConnect</span>
+          <div class="wallet-badge badge-blue">QR CODE</div>
+          <div class="wallet-arrow"></div>
+        </div>
+        <div class="wallet-option" onclick="window.connectWallet('metamask')">
+          <div class="wallet-icon-wrapper"><img src="https://icon.horse/icon/metamask.io" alt="MetaMask"></div>
+          <span>MetaMask</span>
+          <div class="wallet-badge badge-installed hidden" data-wallet="metamask">INSTALLED</div>
+          <div class="wallet-arrow"></div>
+        </div>
+        <div class="wallet-option" onclick="window.connectWallet('rabby')">
+          <div class="wallet-icon-wrapper"><img src="https://icon.horse/icon/rabby.io" alt="Rabby"></div>
+          <span>Rabby Wallet</span>
+          <div class="wallet-badge badge-installed hidden" data-wallet="rabby">INSTALLED</div>
+          <div class="wallet-arrow"></div>
+        </div>
+        <div class="wallet-option" onclick="window.connectWallet('okx')">
+          <div class="wallet-icon-wrapper"><img src="https://icon.horse/icon/okx.com" alt="OKX"></div>
+          <span>OKX Wallet</span>
+          <div class="wallet-badge badge-installed hidden" data-wallet="okx">INSTALLED</div>
+          <div class="wallet-arrow"></div>
+        </div>
+        <div class="wallet-option" onclick="window.connectWallet('zerion')">
+          <div class="wallet-icon-wrapper"><img src="https://icon.horse/icon/zerion.io" alt="Zerion"></div>
+          <span>Zerion</span>
+          <div class="wallet-badge badge-installed hidden" data-wallet="zerion">INSTALLED</div>
+          <div class="wallet-arrow"></div>
+        </div>
+        <div class="wallet-option" onclick="window.connectWallet('phantom')">
+          <div class="wallet-icon-wrapper"><img src="https://icon.horse/icon/phantom.app" alt="Phantom"></div>
+          <span>Phantom Wallet</span>
+          <div class="wallet-badge badge-installed hidden" data-wallet="phantom">INSTALLED</div>
+          <div class="wallet-arrow"></div>
+        </div>
+        <div class="wallet-option" onclick="window.connectWallet('abstract')">
+          <div class="wallet-icon-wrapper"><img src="https://icon.horse/icon/abs.xyz" alt="Abstract"></div>
+          <span>Abstract Wallet</span>
+          <div class="wallet-arrow"></div>
+        </div>
       </div>
     </div>
+
+    <!-- Profile Settings Modal -->
+    <div id="modal-profile" class="modal-card hidden" onclick="event.stopPropagation()">
+      <div class="modal-close" onclick="window.closeModals()"></div>
+      <h2>PROFILE SETTINGS</h2>
+      <div class="profile-input-group" style="margin-bottom: 20px;">
+        <label for="username-input" style="color:var(--text-dim); display:block; margin-bottom:5px; text-align:left; font-weight:bold;">Username</label>
+        <input type="text" id="username-input" maxlength="15" placeholder="Enter username..." style="width:100%; padding:12px; border-radius:8px; border:1px solid rgba(255,255,255,0.2); background:rgba(0,0,0,0.5); color:#fff; font-family:'Fredoka One'; font-size:1.1rem; outline:none; text-align:center;">
+      </div>
+      <div class="profile-avatars-group">
+        <label style="color:var(--text-dim); display:block; margin-bottom:10px; text-align:left; font-weight:bold;">Choose Avatar</label>
+        <div class="avatar-grid" id="avatar-grid" style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center; max-height:220px; overflow-y:auto; padding:5px;"></div>
+      </div>
+      <div style="display:flex; gap:15px; margin-top:20px;">
+        <button class="btn btn-aaa btn-green" id="btn-save-profile" style="flex:1;">SAVE</button>
+        <button class="btn btn-aaa btn-gray" onclick="window.closeModals()" style="flex:1;">CANCEL</button>
+      </div>
+    </div>
+
+    <!-- Achievements Modal -->
+    <div id="modal-achievements" class="modal-card modal-large hidden" onclick="event.stopPropagation()">
+      <div class="modal-close" onclick="window.closeModals()"></div>
+      <h2>ACHIEVEMENTS</h2>
+      <div class="ach-tabs">
+        <button class="ach-tab active" data-tab="general">NFT BADGES</button>
+        <button class="ach-tab" data-tab="daily">DAILY</button>
+        <button class="ach-tab" data-tab="weekly">WEEKLY</button>
+      </div>
+      <div class="achievements-list" id="achievements-list"></div>
+    </div>
+
+    <!-- Shop Modal -->
+    <div id="modal-equip-shop" class="modal-card modal-large hidden" onclick="event.stopPropagation()">
+      <div class="modal-close" onclick="window.closeModals()"></div>
+      <h2>SHOP</h2>
+      <div class="ach-tabs">
+        <button class="equip-tab active" data-tab="hat">WEAR</button>
+        <button class="equip-tab" data-tab="weapon">WEAPONS</button>
+      </div>
+      <div class="equip-grid" id="equip-list"></div>
+    </div>
+
+    <!-- Preview Modal -->
+    <div id="modal-shop" class="modal-card modal-shop-layout hidden" onclick="event.stopPropagation()">
+      <div class="shop-left">
+        <canvas id="previewCanvas" width="300" height="400"></canvas>
+      </div>
+      <div class="shop-right">
+        <h2 id="preview-name">Item</h2>
+        <div class="preview-rarity" id="preview-rarity">Rarity</div>
+        <div class="preview-price"><div class="bb-token-small"></div> <span id="preview-cost">0</span></div>
+        <p class="preview-desc" id="preview-desc">Description</p>
+        <div class="preview-actions" style="display:flex; gap: 15px; margin-top: 20px;">
+          <button class="btn btn-aaa btn-green" id="btn-buy-equip" style="flex:1;">BUY & EQUIP</button>
+          <button class="btn btn-aaa btn-gray" id="btn-preview-close" style="flex:1;">BACK</button>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <script>
@@ -358,6 +360,14 @@
     // Daily Modal Opener Helper
     window.openDailyModal = function() {
       document.getElementById('modal-daily-calendar').classList.remove('hidden');
+    };
+
+    // Generic Info Modal Opener
+    window.showInfoModal = function(title, desc) {
+      document.getElementById('modal-info-title').innerText = title;
+      document.getElementById('modal-info-desc').innerText = desc;
+      document.getElementById('modal-info').classList.remove('hidden');
+      document.getElementById('modal-backdrop').classList.remove('hidden');
     };
   </script>
 

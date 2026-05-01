@@ -580,6 +580,7 @@ canvas {
   position: relative;
   overflow: visible;
   animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+  grid-area: 1 / 1;
 }
 #modal-info { z-index: 1000; }
 #modal-daily-calendar { z-index: 500; }
@@ -640,6 +641,7 @@ canvas {
   flex-direction: column;
   position: relative;
   animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  grid-area: 1 / 1;
 }
 
 .modal-header {

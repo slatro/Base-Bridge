@@ -857,7 +857,7 @@ canvas {
   #btn-claim-daily { min-width: 100% !important; padding: 12px !important; font-size: 1rem !important; }
   
   .modal-shop-layout { flex-direction: column; width: 95% !important; height: auto !important; max-height: 95vh; }
-  .shop-left { width: 100%; height: 200px; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  .shop-left { width: 100%; height: 320px; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.1); }
   .shop-right { padding: 20px; text-align: center; }
   .shop-right h2 { text-align: center; font-size: 1.8rem; }
   .preview-desc { text-align: center; font-size: 0.9rem; }

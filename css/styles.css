@@ -593,8 +593,9 @@ canvas {
   justify-content: center;
   align-items: center;
   transition: all 0.2s ease;
-  z-index: 100;
+  z-index: 1000;
   border: 1px solid rgba(255, 255, 255, 0.2);
+  pointer-events: auto;
 }
 .modal-close:hover {
   background: rgba(255, 255, 255, 0.2);
@@ -895,9 +896,10 @@ canvas {
 
 .neon-timeline-container {
   position: relative;
-  width: 85%;
-  margin: 40px 0 20px 0;
+  width: 90%;
+  margin: 40px auto 25px auto;
   height: 30px;
+  padding: 0 25px;
 }
 
 .neon-timeline-line {

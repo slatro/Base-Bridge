@@ -216,10 +216,20 @@ async function initWeb3() {
     const dappUrl = window.location.href.split('://')[1]; // strip https://
     
     if (type === 'walletconnect') {
+        // Explicitly hide the picker first to prevent side-by-side overlap
+        document.getElementById('modal-wallet-picker')?.classList.add('hidden');
+        
         if (typeof window.showInfoModal === 'function') {
             window.showInfoModal(
                 "Coming Soon!", 
-                "WalletConnect is currently under maintenance and will be available soon. Please use another wallet extension for now. Thank you for your patience!"
+                "WalletConnect is currently under maintenance and will be available soon. Please use another wallet extension for now. Thank you for your patience!",
+                "OK",
+                () => {
+                    // This is the return action: close everything then restore the picker
+                    window.closeModals();
+                    document.getElementById('modal-wallet-picker')?.classList.remove('hidden');
+                    document.getElementById('modal-backdrop')?.classList.remove('hidden');
+                }
             );
         } else {
             alert("WalletConnect is coming soon!");
@@ -594,17 +604,8 @@ window.mintNFT = async function(nftName, btnElement, taskId) {
 
 window.renderAchievements = null; // Will be set by game.js
 
-// Ensure closeModals is truly global
-window.closeModals = function() {
-  document.getElementById('modal-backdrop').classList.add('hidden');
-  document.getElementById('modal-info').classList.add('hidden');
-  document.getElementById('modal-achievements').classList.add('hidden');
-  document.getElementById('modal-shop').classList.add('hidden');
-  document.getElementById('modal-equip-shop').classList.add('hidden');
-  document.getElementById('modal-wallet-picker').classList.add('hidden');
-  const profileModal = document.getElementById('modal-profile');
-  if (profileModal) profileModal.classList.add('hidden');
-};
+// Ensure closeModals is truly global and handled in index.html for UI consistency
+// Removed redundant definition from web3.js to prevent conflicts.
 
 
 

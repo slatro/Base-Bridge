@@ -2436,24 +2436,29 @@ attachPlayListener('btn-revive', reviveGame);
 
 // Fullscreen Logic
 function toggleFullScreen() {
-  const container = document.documentElement; // Go fullscreen on the whole page for best mobile experience
+  const container = document.querySelector('.game-card');
+  if (!container) return;
   
   if (!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
     if (container.requestFullscreen) container.requestFullscreen();
     else if (container.mozRequestFullScreen) container.mozRequestFullScreen();
     else if (container.webkitRequestFullScreen) container.webkitRequestFullScreen();
     else if (container.msRequestFullscreen) container.msRequestFullscreen();
-    
-    document.getElementById('btn-fullscreen').innerText = '⛶'; // Could change icon if desired
   } else {
     if (document.exitFullscreen) document.exitFullscreen();
     else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
     else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
     else if (document.msExitFullscreen) document.msExitFullscreen();
-    
-    document.getElementById('btn-fullscreen').innerText = '⛶';
   }
 }
+
+// Handle fullscreen change to resize canvas
+document.addEventListener('fullscreenchange', () => {
+  setTimeout(resize, 100); // Small delay to allow layout to settle
+});
+document.addEventListener('webkitfullscreenchange', () => {
+  setTimeout(resize, 100);
+});
 
 document.getElementById('btn-fullscreen')?.addEventListener('pointerdown', (e) => {
   e.preventDefault();

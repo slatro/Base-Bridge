@@ -827,10 +827,34 @@ canvas {
   .go-btn-wrapper { margin-top: 0 !important; transform: scale(0.85); gap: 5px !important; width: 100% !important; max-width: 240px !important; }
   .go-btn-wrapper .btn { padding: 10px !important; font-size: 0.9rem !important; }
   
+  .modal-card { width: 95% !important; padding: 15px !important; max-height: 85vh !important; overflow-y: auto !important; }
+  .modal-large { width: 95% !important; min-height: 0 !important; }
+  .modal-card h2 { font-size: 1.4rem !important; margin-bottom: 15px !important; }
+  
+  /* Shop / Equip Grid Mobile */
+  .equip-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; padding: 5px !important; }
+  .equip-card { padding: 10px !important; min-height: 140px !important; }
+  .equip-card-img { height: 60px !important; }
+  .equip-card h3 { font-size: 0.8rem !important; }
+  
+  /* Achievements Mobile */
+  .ach-tabs { gap: 5px !important; margin-bottom: 10px !important; }
+  .ach-tab { padding: 8px 10px !important; font-size: 0.7rem !important; }
+  .ach-card { padding: 10px !important; gap: 10px !important; }
+  .ach-icon { width: 40px !important; height: 40px !important; font-size: 1.2rem !important; }
+  .ach-info h4 { font-size: 0.8rem !important; }
+  .ach-info p { font-size: 0.7rem !important; }
+  
   /* Daily Modal Fixes */
-  .neon-cards-container { flex-wrap: wrap; gap: 5px; }
-  .neon-card { flex: 1 1 calc(25% - 5px); min-width: 60px; }
-  .neon-timeline-container { display: none; } /* Hide timeline on mobile to save space */
+  .neon-cards-container { flex-wrap: wrap; gap: 8px !important; justify-content: center; }
+  .neon-card { flex: 0 0 calc(33% - 10px) !important; min-width: 80px !important; height: 100px !important; padding: 10px !important; }
+  .neon-card-day { font-size: 0.6rem !important; }
+  .neon-card-icon { font-size: 1.2rem !important; }
+  .neon-card-reward { font-size: 0.7rem !important; }
+  .neon-timeline-container { display: none !important; }
+  #daily-timer-container { font-size: 0.8rem !important; padding: 8px !important; margin-bottom: 15px !important; }
+  #daily-countdown { font-size: 1rem !important; }
+  #btn-claim-daily { min-width: 100% !important; padding: 12px !important; font-size: 1rem !important; }
   
   .modal-shop-layout { flex-direction: column; width: 95% !important; height: auto !important; max-height: 95vh; }
   .shop-left { width: 100%; height: 200px; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.1); }

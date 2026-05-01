@@ -155,7 +155,9 @@ h1, h2, h3, h4 { font-family: 'Fredoka One', cursive; font-weight: normal; }
 .mb-2 { margin-bottom: 10px;}
 
 /* --- TOP ROW --- */
-.top-row { display: flex; gap: 15px; height: 500px; }
+.top-row { display: flex; gap: 15px; height: 500px; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+.top-row.wide-mode .menu-card { display: none !important; }
+.top-row.wide-mode .game-card { flex: 1 !important; width: 100% !important; max-width: 100% !important; }
 
 .game-card { flex: 1; border-radius: 20px; overflow: hidden; position: relative; box-shadow: 0 20px 40px rgba(0,0,0,0.6), inset 0 0 0 2px rgba(255,255,255,0.1); display: flex; flex-direction: column; }
 .canvas-wrapper { position: absolute; inset: 0; z-index: 1; background: #000; cursor: pointer;}
@@ -250,14 +252,15 @@ canvas {
 
 /* --- PANELS ROW --- */
 .panels-row { display: flex; gap: 15px; height: 280px; }
+
 .panel-card { padding: 25px; display: flex; flex-direction: column; overflow: hidden; }
 .panel-title { font-size: 1.2rem; color: #fff; margin-bottom: 15px; text-align: center; text-shadow: 0 2px 4px rgba(0,0,0,0.5); flex-shrink: 0;}
 
 /* Onchain Integrations */
 .onchain-panel { flex: 1.2; display: flex; flex-direction: column; }
-.oc-connect-view { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 0; }
-.oc-text-wrapper { flex: 1; display: flex; align-items: center; justify-content: center; width: 100%; }
-.oc-connect-view p { font-size: 0.9rem; color: var(--text-dim); line-height: 1.5; margin: 0; }
+.oc-connect-view { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 0; position: relative; }
+.oc-text-wrapper { flex: 1; display: flex; align-items: center; justify-content: center; width: 100%; padding-bottom: 20px; }
+.oc-connect-view p { font-size: 1.05rem; color: var(--text-dim); line-height: 1.5; margin: 0; max-width: 280px; }
 .oc-bottom-btn { margin-top: auto !important; margin-bottom: 0; }
 
 .oc-list { display: flex; flex-direction: column; gap: 12px; font-size: 0.95rem; flex: 1; overflow-y: auto;}

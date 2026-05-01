@@ -2493,9 +2493,21 @@ attachPlayListener('btn-revive', reviveGame);
 // Fullscreen Logic
 async function toggleFullScreen() {
   const container = document.querySelector('.game-card');
+  const topRow = document.querySelector('.top-row');
   if (!container) return;
   
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 900;
+
+  if (!isMobile) {
+    // Desktop Wide Mode Toggle
+    if (topRow) {
+      topRow.classList.toggle('wide-mode');
+      setTimeout(resize, 100);
+      setTimeout(resize, 450); // After transition
+    }
+    return;
+  }
+
   const isNativeSupported = !!(container.requestFullscreen || container.webkitRequestFullscreen || container.mozRequestFullScreen || container.msRequestFullscreen);
   const isCurrentlyFull = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement || container.classList.contains('fake-fullscreen'));
 

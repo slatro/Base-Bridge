@@ -774,15 +774,16 @@ canvas {
     flex-wrap: nowrap !important; 
     overflow-x: auto !important; 
     justify-content: flex-start !important; 
-    padding: 15px 25px !important; /* Fixed left clipping */
-    gap: 15px;
+    padding: 15px 40px !important; /* Increased padding to prevent left clipping */
+    gap: 12px;
     -webkit-overflow-scrolling: touch;
     width: 100% !important;
+    box-sizing: border-box !important;
     display: flex;
     z-index: 5;
     pointer-events: auto !important;
     touch-action: pan-x;
-    border-bottom: 1px solid rgba(0, 229, 255, 0.2); /* Neon scroll indicator line */
+    border-bottom: 1px solid rgba(0, 229, 255, 0.2); 
     box-shadow: 0 10px 15px -10px rgba(0, 229, 255, 0.2);
     margin-bottom: 5px;
   }

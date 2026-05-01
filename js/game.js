@@ -496,11 +496,23 @@ function startGrowSound() {
 }
 function stopGrowSound() { if (gainNode) { gainNode.gain.linearRampToValueAtTime(0, actx.currentTime + 0.05); setTimeout(() => { if (osc) { osc.stop(); osc.disconnect(); osc = null; } }, 50); } }
 
+let gameScale = 1.0;
 function resize() {
   const rect = canvas.parentElement.getBoundingClientRect(); W = rect.width; H = rect.height;
   canvas.width = W * dpr; canvas.height = H * dpr; ctx.scale(dpr, dpr);
-  platformHeight = Math.min(H * 0.4, 300);
-  if (gameState === STATES.PLAYING || gameState === STATES.MENU) { bridge.y = H - platformHeight; character.y = H - platformHeight; }
+  
+  // SYSTEM 10: ADAPTIVE SCALING
+  // Reference height is 600px. We scale dimensions based on actual H.
+  gameScale = Math.max(0.6, Math.min(1.2, H / 600));
+  
+  platformHeight = H * 0.35;
+  character.size = 55 * gameScale;
+  bridge.thickness = 12 * gameScale;
+  
+  if (gameState === STATES.PLAYING || gameState === STATES.MENU) { 
+    bridge.y = H - platformHeight; 
+    character.y = H - platformHeight; 
+  }
 }
 window.addEventListener('resize', resize);
 
@@ -2123,10 +2135,10 @@ function generatePlatform() {
   // SYSTEM 8: DIFFICULTY PROGRESSION
   let difficulty = Math.min(1.0, score / 60);
 
-  const minW = 60 - (difficulty * 35);
-  const maxW = 160 - (difficulty * 80);
-  const minGap = 50 + (difficulty * 60);
-  const maxGap = Math.min(W * 0.5, 150 + (difficulty * 180));
+  const minW = (60 - (difficulty * 35)) * gameScale;
+  const maxW = (160 - (difficulty * 80)) * gameScale;
+  const minGap = (50 + (difficulty * 60)) * gameScale;
+  const maxGap = Math.min(W * 0.7, (150 + (difficulty * 180)) * gameScale);
 
   const lastP = platforms[platforms.length - 1];
   const w = Math.floor(Math.random() * (maxW - minW + 1)) + minW;

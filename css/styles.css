@@ -811,7 +811,7 @@ canvas {
     font-size: 0.5rem !important; 
     gap: 2px !important; 
   }
-  .sf-right { position: relative; margin-top: 5px; width: 100%; display: flex; justify-content: center; padding-right: 40px; box-sizing: border-box; }
+  .sf-right { position: relative; margin-top: 5px; width: 100%; display: flex; justify-content: center; padding-right: 60px; box-sizing: border-box; }
   
   /* Game Over Mobile Scaling */
   .game-overlay { 

@@ -529,25 +529,58 @@ canvas { width: 100%; height: 100%; display: block; }
 }
 
 /* GLOBAL MODALS */
-.modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(12px); display: flex; justify-content: center; align-items: center; z-index: 1000; animation: fadeIn 0.2s ease-out;}
+.modal-backdrop { 
+  position: fixed; inset: 0; 
+  background: rgba(0,0,0,0.85); 
+  backdrop-filter: blur(15px); 
+  display: flex; justify-content: center; align-items: center; 
+  z-index: 99999999; 
+  animation: fadeIn 0.2s ease-out;
+}
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
 .modal-card { 
-  background: var(--panel-bg); backdrop-filter: blur(25px); 
-  border: 1px solid var(--panel-border); border-radius: 24px; 
-  padding: 35px; width: 450px; max-width: 90%; 
-  box-shadow: 0 25px 60px rgba(0,0,0,0.8); text-align: center; 
+  background: rgba(15, 23, 42, 0.7); 
+  backdrop-filter: blur(40px) saturate(180%); 
+  border: 1px solid rgba(255, 255, 255, 0.15); 
+  border-radius: 28px; 
+  padding: 40px; width: 450px; max-width: 90%; 
+  box-shadow: 0 30px 60px rgba(0,0,0,0.9), inset 0 0 0 1px rgba(255,255,255,0.1); 
+  text-align: center; 
   display: flex; flex-direction: column; gap: 20px; 
-  animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
   position: relative;
+  overflow: visible;
+  animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
 }
 .modal-close {
-  position: absolute; top: -15px; right: -15px; width: 40px; height: 40px; background: #ff2a7a; border-radius: 50%;
-  display: flex; justify-content: center; align-items: center; cursor: pointer; color: white; font-weight: bold; font-size: 1.5rem;
-  box-shadow: 0 4px 10px rgba(255,42,122,0.4); border: 2px solid white; z-index: 10; transition: 0.2s;
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 32px;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.2s ease;
+  z-index: 100;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
-.modal-close:hover { transform: scale(1.1); filter: brightness(1.1); }
-.modal-close::after { content: '×'; }
+.modal-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: rotate(90deg) scale(1.1);
+}
+.modal-close::before, .modal-close::after {
+  content: '';
+  position: absolute;
+  width: 14px;
+  height: 2px;
+  background: #fff;
+}
+.modal-close::before { transform: rotate(45deg); }
+.modal-close::after { transform: rotate(-45deg); }
 
 @keyframes slideUp { from { transform: translateY(50px) scale(0.9); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
 
@@ -881,41 +914,49 @@ canvas { width: 100%; height: 100%; display: block; }
 .wallet-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 12px;
+  gap: 15px;
+  margin-top: 10px;
 }
 .wallet-option {
   display: flex;
   align-items: center;
-  gap: 15px;
-  padding: 15px 20px;
-  background: rgba(255,255,255,0.03);
+  gap: 18px;
+  padding: 16px 24px;
+  background: rgba(255,255,255,0.05);
   border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 16px;
+  border-radius: 20px;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  text-align: left;
 }
 .wallet-option:hover {
-  background: rgba(0,229,255,0.1);
+  background: rgba(255,255,255,0.08);
   border-color: rgba(0,229,255,0.5);
-  transform: translateX(5px);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.4);
 }
-.wallet-option img {
-  width: 32px;
-  height: 32px;
-  object-fit: contain;
-}
-.wallet-option span {
-  font-weight: 700;
-  font-size: 1.1rem;
-  color: #f8fafc;
-}
-.wallet-icon-fallback {
-  width: 32px;
-  height: 32px;
+.wallet-icon-wrapper {
+  width: 40px;
+  height: 40px;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 1.5rem;
-  background: rgba(255,255,255,0.1);
-  border-radius: 8px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 12px;
+  padding: 8px;
+  flex-shrink: 0;
+}
+.wallet-option img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.wallet-option span {
+  font-weight: 800;
+  font-size: 1.2rem;
+  color: #fff;
+  letter-spacing: 0.5px;
+}
+.wallet-icon-fallback {
+  font-size: 1.8rem;
 }

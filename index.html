@@ -10,11 +10,11 @@
 <link rel="icon" type="image/png" href="/favicon.png">
 
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css?v=76">
+<link rel="stylesheet" href="css/styles.css?v=79">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
-<script defer src="js/firebase-config.js?v=76"></script>
-<script defer src="js/web3.js?v=76"></script>
-<script defer src="js/game.js?v=76"></script>
+<script defer src="js/firebase-config.js?v=79"></script>
+<script defer src="js/web3.js?v=79"></script>
+<script defer src="js/game.js?v=79"></script>
 </head>
 <body>
   
@@ -244,10 +244,40 @@
     
     <!-- Info Modal -->
     <div id="modal-info" class="modal-card hidden">
-      <div class="modal-close" onclick="closeModals()"></div>
+      <div class="modal-close" onclick="window.closeModals()"></div>
       <h2 id="modal-info-title">Title</h2>
       <p id="modal-info-desc">Description</p>
-      <button class="btn btn-aaa btn-blue" onclick="closeModals()">OK</button>
+      <button class="btn btn-aaa btn-blue" onclick="window.closeModals()">OK</button>
+    </div>
+
+    <!-- Wallet Picker Modal -->
+    <div id="modal-wallet-picker" class="modal-card hidden" style="width: 420px;">
+      <div class="modal-close" onclick="window.closeModals()"></div>
+      <h2 style="font-size: 1.8rem; background: linear-gradient(to right, #fff, #00e5ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; border: none; padding: 0 0 15px; margin: 0; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1);">SELECT WALLET</h2>
+      <p style="color: #94a3b8; font-size: 0.9rem; margin: 10px 0 15px; text-align: left;">Connect your wallet to start playing.</p>
+      
+      <div class="wallet-grid">
+        <div class="wallet-option" onclick="window.connectWallet('metamask')">
+          <div class="wallet-icon-wrapper"><img src="https://raw.githubusercontent.com/MetaMask/brand-resources/master/SVG/metamask-fox.svg" alt="MetaMask"></div>
+          <span>MetaMask</span>
+        </div>
+        <div class="wallet-option" onclick="window.connectWallet('rabby')">
+          <div class="wallet-icon-wrapper"><img src="https://rabby.io/assets/images/logo.png" alt="Rabby" onerror="this.src='https://rabby.io/favicon.ico'"></div>
+          <span>Rabby</span>
+        </div>
+        <div class="wallet-option" onclick="window.connectWallet('phantom')">
+          <div class="wallet-icon-wrapper"><img src="https://phantom.app/favicon.ico" alt="Phantom"></div>
+          <span>Phantom</span>
+        </div>
+        <div class="wallet-option" onclick="window.connectWallet('coinbase')">
+          <div class="wallet-icon-wrapper"><img src="https://www.coinbase.com/favicon.ico" alt="Coinbase"></div>
+          <span>Coinbase</span>
+        </div>
+        <div class="wallet-option" onclick="window.connectWallet('browser')">
+          <div class="wallet-icon-wrapper"><div class="wallet-icon-fallback">🌐</div></div>
+          <span>Browser Wallet</span>
+        </div>
+      </div>
     </div>
 
     <!-- Profile Settings Modal -->
@@ -364,36 +394,6 @@
       <p>For a healthy and enjoyable gaming experience, please use your phone in <strong>Landscape (Horizontal)</strong> mode.</p>
     </div>
 
-    <!-- Wallet Picker Modal -->
-    <div id="modal-wallet-picker" class="modal-content hidden" style="width: 400px; padding: 30px;">
-      <div class="modal-header">
-        <h2 style="font-size: 1.8rem; background: linear-gradient(to bottom, #fff, #00e5ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; border: none; padding: 0; margin: 0;">SELECT WALLET</h2>
-        <button class="close-btn" onclick="window.closeModals()">×</button>
-      </div>
-      <p style="color: #94a3b8; font-size: 0.9rem; margin: 15px 0 25px;">Connect your favorite wallet to start playing and earning.</p>
-      
-      <div class="wallet-grid">
-        <div class="wallet-option" onclick="window.connectWallet('metamask')">
-          <img src="https://raw.githubusercontent.com/MetaMask/brand-resources/master/SVG/metamask-fox.svg" alt="MetaMask">
-          <span>MetaMask</span>
-        </div>
-        <div class="wallet-option" onclick="window.connectWallet('rabby')">
-          <img src="https://rabby.io/assets/images/logo.png" alt="Rabby">
-          <span>Rabby</span>
-        </div>
-        <div class="wallet-option" onclick="window.connectWallet('phantom')">
-          <img src="https://phantom.app/favicon.ico" alt="Phantom">
-          <span>Phantom</span>
-        </div>
-        <div class="wallet-option" onclick="window.connectWallet('coinbase')">
-          <img src="https://www.coinbase.com/favicon.ico" alt="Coinbase">
-          <span>Coinbase</span>
-        </div>
-        <div class="wallet-option" onclick="window.connectWallet('browser')">
-          <div class="wallet-icon-fallback">🌐</div>
-          <span>Browser Wallet</span>
-        </div>
-      </div>
     </div>
   </body>
 </html>

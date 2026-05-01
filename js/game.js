@@ -20,18 +20,20 @@ if (!CanvasRenderingContext2D.prototype.roundRect) {
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
-// --- DAILY TIMER LOGIC ---
+// --- DAILY TIMER LOGIC (UTC 00:00 Reset) ---
 function updateDailyCountdown() {
     const now = new Date();
-    // Calculate UTC now
-    const utcNow = now.getTime() + (now.getTimezoneOffset() * 60000);
-    const dateNow = new Date(utcNow);
     
-    // Target is next 00:00:00 UTC
-    const target = new Date(utcNow);
-    target.setUTCHours(24, 0, 0, 0);
+    // Calculate the next UTC Midnight
+    const nextMidnightUTC = Date.UTC(
+        now.getUTCFullYear(), 
+        now.getUTCMonth(), 
+        now.getUTCDate() + 1, 
+        0, 0, 0
+    );
     
-    const diff = target.getTime() - dateNow.getTime();
+    const diff = nextMidnightUTC - now.getTime();
+    
     if (diff <= 0) {
         const cd = document.getElementById('daily-countdown');
         if (cd) cd.innerText = "00:00:00";

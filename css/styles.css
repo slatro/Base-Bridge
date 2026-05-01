@@ -863,8 +863,8 @@ canvas {
   .preview-rarity { font-size: 0.7rem !important; margin: 0 !important; }
   .preview-price { font-size: 1rem !important; margin-top: 5px !important; }
   .preview-desc { text-align: center; font-size: 0.8rem !important; margin-top: 5px !important; line-height: 1.2 !important; }
-  .preview-actions { margin-top: 10px !important; gap: 8px !important; }
-  .preview-actions .btn { padding: 10px !important; font-size: 0.85rem !important; }
+  .preview-actions { margin-top: 5px !important; gap: 8px !important; }
+  .preview-actions .btn { padding: 8px !important; font-size: 0.8rem !important; }
 }
 
 /* --- NEON DAILY CHECK-IN MODAL --- */

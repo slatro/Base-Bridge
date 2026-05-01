@@ -136,14 +136,16 @@ async function initWeb3() {
   if (btnConnect) btnConnect.innerText = "CONNECT WALLET";
 
   const provider = window.ethereum;
-    
+  const isDisconnected = localStorage.getItem('bb_v1_disconnected') === 'true';
+
+  if (provider) {
     if (!isDisconnected) {
       try {
         const accounts = await provider.request({ method: "eth_accounts" });
         if (accounts && accounts.length > 0) {
           await handleConnect(accounts[0]);
         }
-      } catch (e) { }
+      } catch (e) { console.error("Auto-connect failed", e); }
     }
 
     provider.on('accountsChanged', async (accounts) => {
@@ -161,7 +163,7 @@ async function initWeb3() {
     });
     provider.on('chainChanged', () => window.location.reload());
   } else {
-    btnConnect.innerText = "CONNECT WALLET";
+    if (btnConnect) btnConnect.innerText = "CONNECT WALLET";
   }
 
   // Open multi-wallet picker instead of direct connect

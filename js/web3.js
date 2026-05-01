@@ -23,20 +23,10 @@ const NFT_CONTRACT_ADDRESS = "0x0000000000000000000000000000000000000002";
 const LEADERBOARD_CONTRACT_ADDRESS = "0x0000000000000000000000000000000000000003";
 const TREASURY_ADDRESS = "0x7Da10DeE012a89d3bb454047Fe29Fd130952058E";
 
-// DOM
-const btnConnect = document.getElementById("btn-connect-wallet");
-const btnSwitch = document.getElementById("btn-switch-network");
-const viewConnect = document.getElementById("onchain-connect-view");
-const viewDetails = document.getElementById("onchain-details-view");
-
-const userProfileArea = document.getElementById("user-profile-area");
-const currentUserName = document.getElementById("current-user-name");
-const currentUserAvatar = document.getElementById("current-user-avatar");
-const btnProfileSettings = document.getElementById("btn-profile-settings");
-const btnDisconnect = document.getElementById("btn-disconnect-wallet");
-const inputUsername = document.getElementById("username-input");
-const btnSaveProfile = document.getElementById("btn-save-profile");
-const avatarGrid = document.getElementById("avatar-grid");
+// DOM placeholders
+let btnConnect, btnSwitch, viewConnect, viewDetails;
+let userProfileArea, currentUserName, currentUserAvatar, btnProfileSettings, btnDisconnect, inputUsername, btnSaveProfile, avatarGrid;
+let lblNetwork, lblAddress, lblBest, lblRefs, refInput, btnCopyRef, refText;
 
 const AVATAR_LIST = [
   { id: 'classic', svg: `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M 20 60 C 15 20 85 20 80 60 L 75 85 Q 50 100 25 85 Z" fill="%23ffd1b3"/><path d="M 15 45 Q 50 15 85 45 L 80 55 Q 50 35 20 55 Z" fill="%234db8b8"/><path d="M 18 35 C 20 -5 80 -5 82 35 Z" fill="%23111"/><path d="M 20 55 Q 50 45 80 55 L 75 70 Q 50 78 25 70 Z" fill="%23111"/><path d="M 32 58 Q 38 52 45 58 Z" fill="%23fff"/><path d="M 55 58 Q 62 52 68 58 Z" fill="%23fff"/></svg>` },
@@ -116,23 +106,36 @@ function initProfileModal() {
   inputUsername.value = currentUsername;
 }
 
-const lblNetwork = document.getElementById("network-status");
-const lblAddress = document.getElementById("wallet-address");
-const lblBest = document.getElementById("onchain-best");
-const lblRefs = document.getElementById("onchain-refs");
-
-const refInput = document.getElementById("ref-link-input");
-const btnCopyRef = document.getElementById("btn-copy-ref");
-const refText = document.getElementById("referred-by-text");
+// DOM Labels
+// Will be initialized in initWeb3
 
 async function initWeb3() {
-  await new Promise(r => setTimeout(r, 200));
+  console.log("Initializing Web3...");
+  
+  // Initialize DOM references
+  btnConnect = document.getElementById("btn-connect-wallet");
+  btnSwitch = document.getElementById("btn-switch-network");
+  viewConnect = document.getElementById("onchain-connect-view");
+  viewDetails = document.getElementById("onchain-details-view");
+  userProfileArea = document.getElementById("user-profile-area");
+  currentUserName = document.getElementById("current-user-name");
+  currentUserAvatar = document.getElementById("current-user-avatar");
+  btnProfileSettings = document.getElementById("btn-profile-settings");
+  btnDisconnect = document.getElementById("btn-disconnect-wallet");
+  inputUsername = document.getElementById("username-input");
+  btnSaveProfile = document.getElementById("btn-save-profile");
+  avatarGrid = document.getElementById("avatar-grid");
+  lblNetwork = document.getElementById("network-status");
+  lblAddress = document.getElementById("wallet-address");
+  lblBest = document.getElementById("onchain-best");
+  lblRefs = document.getElementById("onchain-refs");
+  refInput = document.getElementById("ref-link-input");
+  btnCopyRef = document.getElementById("btn-copy-ref");
+  refText = document.getElementById("referred-by-text");
+
+  if (btnConnect) btnConnect.innerText = "CONNECT WALLET";
 
   const provider = window.ethereum;
-  const isDisconnected = localStorage.getItem('bb_v1_disconnected') === 'true';
-
-  if (provider) {
-    btnConnect.innerText = "CONNECT WALLET";
     
     if (!isDisconnected) {
       try {
@@ -604,7 +607,8 @@ window.showInfoModal = function(title, desc) {
   document.getElementById('modal-equip-shop').classList.add('hidden');
 };
 
-window.addEventListener('load', initWeb3);
+document.addEventListener('DOMContentLoaded', initWeb3);
+window.addEventListener('load', initWeb3); // Fallback
 
 async function purchaseItemOnChain(item) {
   if (!userAddress) {

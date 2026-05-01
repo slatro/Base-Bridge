@@ -149,24 +149,58 @@ async function initWeb3() {
     });
     provider.on('chainChanged', () => window.location.reload());
   } else {
-    btnConnect.innerText = "INSTALL WALLET";
+    btnConnect.innerText = "CONNECT WALLET";
   }
 
-  btnConnect.addEventListener("click", async () => {
-    if (!provider) {
-      window.open("https://metamask.io/download/", "_blank");
-      return;
+  // Open multi-wallet picker instead of direct connect
+  btnConnect.addEventListener("click", () => {
+    document.getElementById('modal-backdrop').classList.remove('hidden');
+    document.getElementById('modal-wallet-picker').classList.remove('hidden');
+  });
+
+  window.connectWallet = async function(type) {
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const dappUrl = window.location.href.split('://')[1]; // strip https://
+    
+    if (type === 'metamask' && isMobile && !window.ethereum) {
+        window.open(`https://metamask.app.link/dapp/${dappUrl}`, "_blank");
+        return;
     }
+
+    let p = window.ethereum;
+    if (type === 'coinbase') p = window.coinbaseWalletExtension || (window.ethereum && window.ethereum.isCoinbaseWallet ? window.ethereum : null);
+    if (type === 'phantom') p = window.phantom?.ethereum || (window.ethereum && window.ethereum.isPhantom ? window.ethereum : null);
+    
+    if (!p && type !== 'browser') {
+        const urls = {
+            metamask: "https://metamask.io/download/",
+            rabby: "https://rabby.io/",
+            phantom: "https://phantom.app/",
+            coinbase: "https://www.coinbase.com/wallet"
+        };
+        window.open(urls[type], "_blank");
+        return;
+    }
+
+    if (!p) p = window.ethereum; // final fallback
+
+    if (!p) {
+        alert("No wallet detected. Please install a wallet extension.");
+        return;
+    }
+
     try {
-      const accounts = await provider.request({ method: "eth_requestAccounts" });
+      const accounts = await p.request({ method: "eth_requestAccounts" });
       if (accounts && accounts.length > 0) {
         localStorage.removeItem('bb_v1_disconnected');
+        window.closeModals();
         await handleConnect(accounts[0]);
       }
     } catch (error) {
       console.error(error);
+      alert("Connection failed: " + (error.message || error));
     }
-  });
+  };
 
   if(btnSwitch) btnSwitch.addEventListener("click", switchNetwork);
   if(btnCopyRef) btnCopyRef.addEventListener("click", copyRef);
@@ -499,6 +533,7 @@ window.closeModals = function() {
   document.getElementById('modal-achievements').classList.add('hidden');
   document.getElementById('modal-shop').classList.add('hidden');
   document.getElementById('modal-equip-shop').classList.add('hidden');
+  document.getElementById('modal-wallet-picker').classList.add('hidden');
   const profileModal = document.getElementById('modal-profile');
   if (profileModal) profileModal.classList.add('hidden');
 };

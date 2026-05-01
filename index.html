@@ -10,11 +10,11 @@
 <link rel="icon" type="image/png" href="/favicon.png">
 
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css?v=75">
+<link rel="stylesheet" href="css/styles.css?v=76">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
-<script defer src="js/firebase-config.js?v=75"></script>
-<script defer src="js/web3.js?v=75"></script>
-<script defer src="js/game.js?v=75"></script>
+<script defer src="js/firebase-config.js?v=76"></script>
+<script defer src="js/web3.js?v=76"></script>
+<script defer src="js/game.js?v=76"></script>
 </head>
 <body>
   
@@ -350,5 +350,50 @@
       console.log('Daily modal listeners attached:', !!fcDaily, !!btnOpen, !!panel);
     });
   </script>
+    <!-- Orientation Warning (Mobile Only) -->
+    <div id="orientation-warning">
+      <div class="rotate-icon">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <path d="M70 20 L30 20 Q20 20 20 30 L20 70 Q20 80 30 80 L70 80 Q80 80 80 70 L80 30 Q80 20 70 20" fill="none" stroke="white" stroke-width="4"/>
+          <path d="M45 40 A 10 10 0 1 1 55 40" fill="none" stroke="#00e5ff" stroke-width="4" stroke-linecap="round">
+            <animateTransform attributeName="transform" type="rotate" from="0 50 50" to="360 50 50" dur="2s" repeatCount="indefinite"/>
+          </path>
+        </svg>
+      </div>
+      <h2>Please Rotate Your Device</h2>
+      <p>For a healthy and enjoyable gaming experience, please use your phone in <strong>Landscape (Horizontal)</strong> mode.</p>
+    </div>
+
+    <!-- Wallet Picker Modal -->
+    <div id="modal-wallet-picker" class="modal-content hidden" style="width: 400px; padding: 30px;">
+      <div class="modal-header">
+        <h2 style="font-size: 1.8rem; background: linear-gradient(to bottom, #fff, #00e5ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; border: none; padding: 0; margin: 0;">SELECT WALLET</h2>
+        <button class="close-btn" onclick="window.closeModals()">×</button>
+      </div>
+      <p style="color: #94a3b8; font-size: 0.9rem; margin: 15px 0 25px;">Connect your favorite wallet to start playing and earning.</p>
+      
+      <div class="wallet-grid">
+        <div class="wallet-option" onclick="window.connectWallet('metamask')">
+          <img src="https://raw.githubusercontent.com/MetaMask/brand-resources/master/SVG/metamask-fox.svg" alt="MetaMask">
+          <span>MetaMask</span>
+        </div>
+        <div class="wallet-option" onclick="window.connectWallet('rabby')">
+          <img src="https://rabby.io/assets/images/logo.png" alt="Rabby">
+          <span>Rabby</span>
+        </div>
+        <div class="wallet-option" onclick="window.connectWallet('phantom')">
+          <img src="https://phantom.app/favicon.ico" alt="Phantom">
+          <span>Phantom</span>
+        </div>
+        <div class="wallet-option" onclick="window.connectWallet('coinbase')">
+          <img src="https://www.coinbase.com/favicon.ico" alt="Coinbase">
+          <span>Coinbase</span>
+        </div>
+        <div class="wallet-option" onclick="window.connectWallet('browser')">
+          <div class="wallet-icon-fallback">🌐</div>
+          <span>Browser Wallet</span>
+        </div>
+      </div>
+    </div>
   </body>
 </html>

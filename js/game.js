@@ -2183,6 +2183,11 @@ function reviveGame() {
   if (coins >= 25 && !reviveUsed) {
     addCoins(-25);
     reviveUsed = true;
+    const uiHeader = document.getElementById('game-header-ui');
+    if (uiHeader) {
+      uiHeader.style.opacity = '1';
+      uiHeader.style.pointerEvents = 'auto';
+    }
     gameOverOverlay.classList.add('hidden');
     gameState = STATES.PLAYING;
 
@@ -2415,6 +2420,12 @@ function triggerGameOver() {
   // Trigger cloud sync to save coins and new best score
   if (typeof window.syncDataToCloud === 'function') window.syncDataToCloud();
 
+  const uiHeader = document.getElementById('game-header-ui');
+  if (uiHeader) {
+    uiHeader.style.opacity = '0';
+    uiHeader.style.pointerEvents = 'none';
+  }
+
   document.querySelector('.gh-center').style.opacity = '0';
   setTimeout(() => gameOverOverlay.classList.remove('hidden'), 800);
 }
@@ -2481,6 +2492,12 @@ function triggerGameWon() {
         await window.submitScoreToFirebase(score);
       }
     }, 100);
+  }
+
+  const uiHeader = document.getElementById('game-header-ui');
+  if (uiHeader) {
+    uiHeader.style.opacity = '0';
+    uiHeader.style.pointerEvents = 'none';
   }
 
   setTimeout(() => gameOverOverlay.classList.remove('hidden'), 1000);

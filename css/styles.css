@@ -255,8 +255,9 @@ canvas {
 
 /* Onchain Integrations */
 .onchain-panel { flex: 1.2; display: flex; flex-direction: column; }
-.oc-connect-view { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0 20px; }
-.oc-connect-view p { font-size: 0.95rem; color: var(--text-dim); margin-bottom: 25px; line-height: 1.5;}
+.oc-connect-view { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; text-align: center; padding: 0 10px; }
+.oc-connect-view p { font-size: 0.9rem; color: var(--text-dim); margin-bottom: 20px; line-height: 1.5;}
+.oc-bottom-btn { margin-top: auto !important; }
 
 .oc-list { display: flex; flex-direction: column; gap: 12px; font-size: 0.95rem; flex: 1; overflow-y: auto;}
 .oc-item { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); padding: 10px 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);}

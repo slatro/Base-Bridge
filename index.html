@@ -252,7 +252,7 @@
       <div class="modal-close" onclick="window.closeModals()"></div>
       <h2 id="modal-info-title">Title</h2>
       <p id="modal-info-desc">Description</p>
-      <button class="btn btn-aaa btn-blue" onclick="window.closeModals()">OK</button>
+      <button class="btn btn-aaa btn-blue" id="modal-info-ok" style="margin-top:20px; width:100%;">OK</button>
     </div>
 
     <!-- Wallet Picker Modal -->
@@ -375,9 +375,21 @@
     };
 
     // Generic Info Modal Opener
-    window.showInfoModal = function(title, desc) {
+    window.showInfoModal = function(title, desc, btnText = "OK", btnAction = null) {
       document.getElementById('modal-info-title').innerText = title;
       document.getElementById('modal-info-desc').innerText = desc;
+      const okBtn = document.getElementById('modal-info-ok');
+      if (okBtn) {
+        okBtn.innerText = btnText;
+        okBtn.onclick = (e) => {
+          e.stopPropagation();
+          if (typeof btnAction === 'function') {
+            btnAction();
+          } else {
+            window.closeModals();
+          }
+        };
+      }
       document.getElementById('modal-info').classList.remove('hidden');
       document.getElementById('modal-backdrop').classList.remove('hidden');
     };

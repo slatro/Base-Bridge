@@ -606,15 +606,7 @@ window.closeModals = function() {
   if (profileModal) profileModal.classList.add('hidden');
 };
 
-window.showInfoModal = function(title, desc) {
-  document.getElementById('modal-info-title').innerText = title;
-  document.getElementById('modal-info-desc').innerText = desc;
-  document.getElementById('modal-backdrop').classList.remove('hidden');
-  document.getElementById('modal-info').classList.remove('hidden');
-  document.getElementById('modal-achievements').classList.add('hidden');
-  document.getElementById('modal-shop').classList.add('hidden');
-  document.getElementById('modal-equip-shop').classList.add('hidden');
-};
+
 
 document.addEventListener('DOMContentLoaded', () => {
     initWeb3().catch(err => console.error("Web3 critical init failure:", err));

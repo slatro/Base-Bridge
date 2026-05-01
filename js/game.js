@@ -2439,12 +2439,15 @@ async function toggleFullScreen() {
   const container = document.querySelector('.game-card');
   if (!container) return;
   
-  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 900;
   const isNativeSupported = !!(container.requestFullscreen || container.webkitRequestFullscreen || container.mozRequestFullScreen || container.msRequestFullscreen);
   const isCurrentlyFull = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement || container.classList.contains('fake-fullscreen'));
 
   if (!isCurrentlyFull) {
     // ENTER FULLSCREEN
+    document.body.classList.add('body-fullscreen');
+    document.body.classList.add('overflow-hidden');
+    
     if (isNativeSupported) {
       try {
         if (container.requestFullscreen) await container.requestFullscreen();
@@ -2454,11 +2457,9 @@ async function toggleFullScreen() {
       } catch (err) {
         console.warn("Native fullscreen failed, falling back to fake:", err);
         container.classList.add('fake-fullscreen');
-        document.body.classList.add('overflow-hidden');
       }
     } else {
       container.classList.add('fake-fullscreen');
-      document.body.classList.add('overflow-hidden');
     }
 
     if (isMobile) {
@@ -2470,6 +2471,9 @@ async function toggleFullScreen() {
     setTimeout(resize, 300);
   } else {
     // EXIT FULLSCREEN
+    document.body.classList.remove('body-fullscreen');
+    document.body.classList.remove('overflow-hidden');
+    
     if (isNativeSupported && !container.classList.contains('fake-fullscreen')) {
       if (document.exitFullscreen) document.exitFullscreen();
       else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
@@ -2479,7 +2483,6 @@ async function toggleFullScreen() {
     
     container.classList.remove('fake-fullscreen');
     container.classList.remove('force-landscape');
-    document.body.classList.remove('overflow-hidden');
     
     if (isMobile && screen.orientation && screen.orientation.unlock) {
       screen.orientation.unlock();

@@ -7,17 +7,36 @@
 
 <link rel="icon" type="image/png" href="/favicon.png">
 
+<script type="importmap">
+  {
+    "imports": {
+      "viem": "https://esm.sh/viem",
+      "viem/chains": "https://esm.sh/viem/chains",
+      "@abstract-foundation/agw-client": "https://esm.sh/@abstract-foundation/agw-client"
+    }
+  }
+</script>
+
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css?v=95">
+<link rel="stylesheet" href="css/styles.css?v=96">
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
 <!-- WalletConnect / Reown Standalone Modal -->
 <script src="https://cdn.jsdelivr.net/npm/@walletconnect/modal@2.6.2/dist/index.js"></script>
-<script defer src="js/firebase-config.js?v=95"></script>
-<script defer src="js/web3.js?v=95"></script>
-<script defer src="js/game.js?v=95"></script>
+<script defer src="js/firebase-config.js?v=96"></script>
+<script defer src="js/web3.js?v=96"></script>
+<script defer src="js/game.js?v=96"></script>
+<script type="module" src="js/abstract.js?v=96"></script>
 </head>
 <body>
   
+  <div id="agw-badge-container" style="position: fixed; top: 15px; right: 15px; z-index: 9999999;">
+    <button id="btn-agw-login" class="btn btn-switch-small" style="background: linear-gradient(135deg, #0052ff, #00e5ff); border: none; font-weight: 800; box-shadow: 0 4px 15px rgba(0, 82, 255, 0.4);">Connect AGW</button>
+    <div id="agw-status-badge" class="hidden" style="background: rgba(0, 82, 255, 0.2); border: 1px solid rgba(0, 82, 255, 0.4); padding: 5px 12px; border-radius: 20px; color: #fff; font-size: 0.85rem; font-weight: 800; backdrop-filter: blur(10px); display: flex; align-items: center; gap: 8px; cursor: pointer;">
+      <div style="width: 8px; height: 8px; background: #00ff88; border-radius: 50%; box-shadow: 0 0 8px #00ff88;"></div>
+      <span id="agw-address-text">--</span>
+    </div>
+  </div>
+
   <div id="modal-daily-calendar" class="modal-backdrop hidden" style="z-index: 99999 !important;" onclick="this.classList.add('hidden')">
     <div style="position: absolute; top: 10px; left: 10px; color: rgba(255,255,255,0.2); font-size: 10px; pointer-events: none;">v17</div>
     <div class="neon-modal" onclick="event.stopPropagation()">

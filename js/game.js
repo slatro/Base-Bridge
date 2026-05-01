@@ -2406,8 +2406,27 @@ function triggerGameWon() {
 
   const btnSubmitScore = document.getElementById('btn-submit-score');
   if (btnSubmitScore) {
-    btnSubmitScore.classList.add('hidden');
+    if (window.userAddress) {
+      btnSubmitScore.classList.remove('hidden');
+      btnSubmitScore.innerText = "SUBMIT SCORE TO WEB3";
+      btnSubmitScore.disabled = false;
+    } else {
+      btnSubmitScore.classList.remove('hidden');
+      btnSubmitScore.innerText = "Connect Abstract Wallet to submit score";
+      btnSubmitScore.disabled = true;
+      btnSubmitScore.style.opacity = "0.7";
+    }
   }
+
+  // Save score metadata to localStorage as requested
+  const scoreData = {
+    address: window.userAddress || "anonymous",
+    score: score,
+    timestamp: Date.now()
+  };
+  let localScores = JSON.parse(localStorage.getItem('bb_v1_local_history') || '[]');
+  localScores.push(scoreData);
+  localStorage.setItem('bb_v1_local_history', JSON.stringify(localScores.slice(-50))); // Keep last 50
 
   if (isNewBest && score > 0) {
     setTimeout(async () => {
@@ -2425,8 +2444,8 @@ function handlePointerDown(e) {
   // Bug fix: prevent immediate bridge start if user just clicked Play
   if (Date.now() - lastGameStartTime < 300) return;
   if (!window.userAddress) {
-    showInfoModal('Wallet Required', 'You must connect your wallet to play the game!');
-    return;
+    // 6. Allow play without wallet, but notify about leaderboard
+    console.log("Playing as guest. Connect wallet to submit scores.");
   }
   initAudio();
   if (gameState === STATES.PLAYING) {

@@ -239,11 +239,14 @@ async function initWeb3() {
     if (type === 'phantom') p = window.phantom?.ethereum || (window.ethereum && window.ethereum.isPhantom ? window.ethereum : null);
     if (type === 'zerion') p = window.zerionWallet || (window.ethereum && window.ethereum.isZerion ? window.ethereum : null);
     if (type === 'okx') p = window.okxwallet || (window.ethereum && window.ethereum.isOKXWallet ? window.ethereum : null);
-    if (type === 'abstract') p = window.abstract || (window.ethereum && window.ethereum.isAbstract ? window.ethereum : null) || window.ethereum;
-    
-    if (type === 'abstract' && !window.abstract && !window.ethereum?.isAbstract) {
-        // If not detected, try to switch network or show how to get it
-        console.log("Abstract provider not explicitly detected, attempting generic connection...");
+    if (type === 'abstract') {
+        if (typeof window.loginWithAbstract === 'function') {
+            window.loginWithAbstract();
+            window.closeModals();
+        } else {
+            console.error("Abstract integration not loaded yet.");
+        }
+        return;
     }
 
     if (!p && type !== 'abstract') {

@@ -430,6 +430,38 @@ canvas { width: 100%; height: 100%; display: block; }
 .tut-text { font-family: 'Fredoka One'; font-size: 2rem; text-align: center; text-shadow: 0 4px 10px rgba(0,0,0,0.9); margin-top: 20px;}
 @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
 
+/* Fullscreen Button */
+.fullscreen-btn {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  width: 44px;
+  height: 44px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  color: white;
+  font-size: 1.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  z-index: 100;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.fullscreen-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+}
+
+.fullscreen-btn:active {
+  transform: scale(0.95);
+}
+
 /* GLOBAL MODALS */
 .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(12px); display: flex; justify-content: center; align-items: center; z-index: 1000; animation: fadeIn 0.2s ease-out;}
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }

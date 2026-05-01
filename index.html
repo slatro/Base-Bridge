@@ -67,6 +67,8 @@
         <div class="canvas-wrapper" id="canvas-wrapper">
           <canvas id="gameCanvas"></canvas>
           
+          <button id="btn-fullscreen" class="fullscreen-btn" title="Toggle Fullscreen">⛶</button>
+          
           <div id="start-overlay" class="game-overlay" style="background: rgba(0,0,0,0.3); backdrop-filter: blur(8px); display: flex; flex-direction: column; align-items: center; justify-content: center;">
             <div id="btn-start-overlay" style="width: 140px; height: 140px; background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 50%; border: 1px solid rgba(255,255,255,0.2); display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 0 15px rgba(255,255,255,0.1); transition: 0.3s; margin-bottom: 25px;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
               <div style="width: 0; height: 0; border-top: 30px solid transparent; border-bottom: 30px solid transparent; border-left: 45px solid #fff; margin-left: 15px; filter: drop-shadow(0 0 20px rgba(255,255,255,0.8));"></div>

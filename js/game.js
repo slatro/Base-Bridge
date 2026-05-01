@@ -2325,7 +2325,7 @@ function triggerGameOver() {
   if (coins >= 25 && !reviveUsed && score > 0) {
     btnRevive.classList.remove('hidden');
     btnRevive.innerText = "REVIVE (25 BB)";
-    btnRevive.onclick = reviveGame;
+    btnRevive.onpointerdown = (e) => { e.preventDefault(); reviveGame(); };
   } else {
     btnRevive.classList.add('hidden');
   }
@@ -2411,10 +2411,54 @@ canvasArea.addEventListener('mousedown', handlePointerDown);
 canvasArea.addEventListener('touchstart', (e) => { e.preventDefault(); handlePointerDown(e); }, { passive: false });
 window.addEventListener('mouseup', handlePointerUp);
 window.addEventListener('touchend', handlePointerUp);
-document.getElementById('btn-play').addEventListener('click', startGame);
-document.getElementById('btn-restart').addEventListener('click', startGame);
-document.getElementById('btn-start-overlay').addEventListener('click', startGame);
-document.getElementById('btn-revive').addEventListener('click', reviveGame);
+
+// Mobile-friendly interaction for Play buttons
+function attachPlayListener(id, fn) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  let lastTrigger = 0;
+  const handler = (e) => {
+    const now = Date.now();
+    if (now - lastTrigger < 500) return;
+    lastTrigger = now;
+    // Don't preventDefault on click if it's a real button, but for divs it's fine
+    if (e.cancelable) e.preventDefault();
+    fn();
+  };
+  el.addEventListener('pointerdown', handler);
+  el.addEventListener('click', handler);
+}
+
+attachPlayListener('btn-play', startGame);
+attachPlayListener('btn-restart', startGame);
+attachPlayListener('btn-start-overlay', startGame);
+attachPlayListener('btn-revive', reviveGame);
+
+// Fullscreen Logic
+function toggleFullScreen() {
+  const container = document.documentElement; // Go fullscreen on the whole page for best mobile experience
+  
+  if (!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
+    if (container.requestFullscreen) container.requestFullscreen();
+    else if (container.mozRequestFullScreen) container.mozRequestFullScreen();
+    else if (container.webkitRequestFullScreen) container.webkitRequestFullScreen();
+    else if (container.msRequestFullscreen) container.msRequestFullscreen();
+    
+    document.getElementById('btn-fullscreen').innerText = '⛶'; // Could change icon if desired
+  } else {
+    if (document.exitFullscreen) document.exitFullscreen();
+    else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
+    else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+    else if (document.msExitFullscreen) document.msExitFullscreen();
+    
+    document.getElementById('btn-fullscreen').innerText = '⛶';
+  }
+}
+
+document.getElementById('btn-fullscreen')?.addEventListener('pointerdown', (e) => {
+  e.preventDefault();
+  toggleFullScreen();
+});
 
 // Consolidated Feature Card Listeners
 document.getElementById('fc-skill')?.addEventListener('click', () => {

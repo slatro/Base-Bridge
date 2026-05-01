@@ -475,7 +475,7 @@ canvas {
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  z-index: 9999999;
+  z-index: 50;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 8px 32px rgba(0,0,0,0.5);
 }

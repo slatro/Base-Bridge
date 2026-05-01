@@ -28,20 +28,25 @@
 </head>
 <body>
   
-  <div id="modal-daily-calendar" class="modal-backdrop hidden" style="z-index: 99999 !important;" onclick="this.classList.add('hidden')">
-    <div style="position: absolute; top: 10px; left: 10px; color: rgba(255,255,255,0.2); font-size: 10px; pointer-events: none;">v17</div>
-    <div class="neon-modal" onclick="event.stopPropagation()">
-      <div class="neon-modal-header">
-        <div class="neon-title-box">DAILY CHECK-IN</div>
-        <button class="neon-close" onclick="document.getElementById('modal-daily-calendar').classList.add('hidden')">&times;</button>
-      </div>
+  <!-- Daily Rewards Modal (Standardized) -->
+  <div id="modal-daily-calendar" class="modal-backdrop hidden" onclick="window.closeModals()">
+    <div class="modal-card modal-large" onclick="event.stopPropagation()" style="background: rgba(13, 14, 33, 0.95); border: 1px solid rgba(0, 229, 255, 0.3); box-shadow: 0 0 30px rgba(0, 229, 255, 0.1);">
+      <div class="modal-close" onclick="window.closeModals()"></div>
+      <h2 style="margin-bottom: 25px; color: #00e5ff; text-shadow: 0 0 10px rgba(0, 229, 255, 0.5);">DAILY REWARDS</h2>
+      
       <div class="neon-cards-container" id="neon-cards-container"></div>
-      <div class="neon-timeline-container" id="neon-timeline-container">
+      
+      <div class="neon-timeline-container" id="neon-timeline-container" style="margin: 35px 0;">
         <div class="neon-timeline-line"></div>
         <div class="neon-timeline-nodes" id="neon-timeline-nodes"></div>
       </div>
-      <div class="neon-modal-footer" style="margin-top: 25px; text-align: center;">
-        <button class="btn neon-claim-btn" id="btn-claim-daily">CHECK IN TODAY</button>
+
+      <div id="daily-timer-container" style="margin-bottom: 25px; color: var(--text-dim); font-weight: 800; font-size: 1rem; text-align: center; background: rgba(0,0,0,0.3); padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+        NEXT RESET IN: <span id="daily-countdown" style="color: #00e5ff; font-family: monospace; font-size: 1.2rem; margin-left: 8px;">--:--:--</span>
+      </div>
+
+      <div class="neon-modal-footer" style="text-align: center;">
+        <button class="btn btn-aaa btn-pink" id="btn-claim-daily" style="min-width: 220px; font-weight: 900; letter-spacing: 1px;">CHECK IN TODAY</button>
       </div>
     </div>
   </div>

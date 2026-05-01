@@ -19,6 +19,37 @@ if (!CanvasRenderingContext2D.prototype.roundRect) {
 
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
+
+// --- DAILY TIMER LOGIC ---
+function updateDailyCountdown() {
+    const now = new Date();
+    // Calculate UTC now
+    const utcNow = now.getTime() + (now.getTimezoneOffset() * 60000);
+    const dateNow = new Date(utcNow);
+    
+    // Target is next 00:00:00 UTC
+    const target = new Date(utcNow);
+    target.setUTCHours(24, 0, 0, 0);
+    
+    const diff = target.getTime() - dateNow.getTime();
+    if (diff <= 0) {
+        const cd = document.getElementById('daily-countdown');
+        if (cd) cd.innerText = "00:00:00";
+        return;
+    }
+    
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    
+    const countdownEl = document.getElementById('daily-countdown');
+    if (countdownEl) {
+        countdownEl.innerText = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    }
+}
+setInterval(updateDailyCountdown, 1000);
+updateDailyCountdown(); // Initial call
+
 const prevCanvas = document.getElementById('previewCanvas');
 const prevCtx = prevCanvas.getContext('2d');
 

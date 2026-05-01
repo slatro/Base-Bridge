@@ -599,11 +599,45 @@ canvas {
 
 @keyframes slideUp { from { transform: translateY(50px) scale(0.9); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
 
-.modal-card h2 { 
+.modal-card h2, .modal-panel h2 { 
   font-size: 2.2rem; font-family: 'Fredoka One'; 
-  background: linear-gradient(to right, #ff2a7a, #b517ff);
+  background: linear-gradient(to right, #00e5ff, #b517ff);
   -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  text-shadow: none; border-bottom: 2px solid rgba(255,255,255,0.1); padding-bottom: 15px;
+  text-shadow: 0 0 15px rgba(0, 229, 255, 0.4); 
+  border-bottom: 2px solid rgba(255,255,255,0.1); 
+  padding-bottom: 15px;
+  width: 100%;
+  text-align: center;
+}
+
+.modal-panel {
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(40px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 28px;
+  padding: 30px;
+  width: 450px;
+  max-width: 90%;
+  box-shadow: 0 30px 60px rgba(0,0,0,0.9), inset 0 0 0 1px rgba(255,255,255,0.1);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.modal-header {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  margin-bottom: 10px;
+}
+.modal-header h2 { margin: 0; padding-bottom: 10px; }
+.modal-header .modal-close {
+  position: absolute;
+  right: -10px;
+  top: -10px;
 }
 
 .modal-large { width: 550px; max-height: 85vh; padding: 25px; }

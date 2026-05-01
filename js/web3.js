@@ -216,12 +216,12 @@ async function initWeb3() {
     
     if (type === 'walletconnect') {
         if (typeof WalletConnectModal === 'undefined') {
-            alert("WalletConnect library loading... Please wait.");
+            console.error("WalletConnect library not loaded yet.");
             return;
         }
         if (!wcModal) {
             wcModal = new WalletConnectModal.WalletConnectModal({
-                projectId: '4c84a8360d8e90632d431c38e9c1550a', // Real demo ID or use your own
+                projectId: '4c84a8360d8e90632d431c38e9c1550a', 
                 chains: [TARGET_CHAIN]
             });
         }

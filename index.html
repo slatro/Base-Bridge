@@ -10,11 +10,11 @@
 <link rel="icon" type="image/png" href="/favicon.png">
 
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css?v=79">
+<link rel="stylesheet" href="css/styles.css?v=80">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
-<script defer src="js/firebase-config.js?v=79"></script>
-<script defer src="js/web3.js?v=79"></script>
-<script defer src="js/game.js?v=79"></script>
+<script defer src="js/firebase-config.js?v=80"></script>
+<script defer src="js/web3.js?v=80"></script>
+<script defer src="js/game.js?v=80"></script>
 </head>
 <body>
   
@@ -262,7 +262,7 @@
           <span>MetaMask</span>
         </div>
         <div class="wallet-option" onclick="window.connectWallet('rabby')">
-          <div class="wallet-icon-wrapper"><img src="https://rabby.io/assets/images/logo.png" alt="Rabby" onerror="this.src='https://rabby.io/favicon.ico'"></div>
+          <div class="wallet-icon-wrapper"><img src="https://rabby.io/static/media/rabby-logo.0c0a9697.svg" alt="Rabby" onerror="this.src='https://rabby.io/favicon.ico'"></div>
           <span>Rabby</span>
         </div>
         <div class="wallet-option" onclick="window.connectWallet('phantom')">
@@ -271,11 +271,15 @@
         </div>
         <div class="wallet-option" onclick="window.connectWallet('coinbase')">
           <div class="wallet-icon-wrapper"><img src="https://www.coinbase.com/favicon.ico" alt="Coinbase"></div>
-          <span>Coinbase</span>
+          <span>Coinbase Wallet</span>
         </div>
-        <div class="wallet-option" onclick="window.connectWallet('browser')">
-          <div class="wallet-icon-wrapper"><div class="wallet-icon-fallback">🌐</div></div>
-          <span>Browser Wallet</span>
+        <div class="wallet-option" onclick="window.connectWallet('zerion')">
+          <div class="wallet-icon-wrapper"><img src="https://zerion.io/static/images/logo.png" alt="Zerion" onerror="this.src='https://s2.coinmarketcap.com/static/img/exchanges/64x64/zerion.png'"></div>
+          <span>Zerion</span>
+        </div>
+        <div class="wallet-option" onclick="window.connectWallet('okx')">
+          <div class="wallet-icon-wrapper"><img src="https://www.okx.com/favicon.ico" alt="OKX"></div>
+          <span>OKX Wallet</span>
         </div>
       </div>
     </div>

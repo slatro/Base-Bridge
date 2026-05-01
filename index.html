@@ -18,25 +18,17 @@
 </script>
 
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css?v=96">
+<link rel="stylesheet" href="css/styles.css?v=97">
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
 <!-- WalletConnect / Reown Standalone Modal -->
 <script src="https://cdn.jsdelivr.net/npm/@walletconnect/modal@2.6.2/dist/index.js"></script>
-<script defer src="js/firebase-config.js?v=96"></script>
-<script defer src="js/web3.js?v=96"></script>
-<script defer src="js/game.js?v=96"></script>
-<script type="module" src="js/abstract.js?v=96"></script>
+<script defer src="js/firebase-config.js?v=97"></script>
+<script defer src="js/web3.js?v=97"></script>
+<script defer src="js/game.js?v=97"></script>
+<script type="module" src="js/abstract.js?v=97"></script>
 </head>
 <body>
   
-  <div id="agw-badge-container" style="position: fixed; top: 15px; right: 15px; z-index: 9999999;">
-    <button id="btn-agw-login" class="btn btn-switch-small" style="background: linear-gradient(135deg, #0052ff, #00e5ff); border: none; font-weight: 800; box-shadow: 0 4px 15px rgba(0, 82, 255, 0.4);">Connect AGW</button>
-    <div id="agw-status-badge" class="hidden" style="background: rgba(0, 82, 255, 0.2); border: 1px solid rgba(0, 82, 255, 0.4); padding: 5px 12px; border-radius: 20px; color: #fff; font-size: 0.85rem; font-weight: 800; backdrop-filter: blur(10px); display: flex; align-items: center; gap: 8px; cursor: pointer;">
-      <div style="width: 8px; height: 8px; background: #00ff88; border-radius: 50%; box-shadow: 0 0 8px #00ff88;"></div>
-      <span id="agw-address-text">--</span>
-    </div>
-  </div>
-
   <div id="modal-daily-calendar" class="modal-backdrop hidden" style="z-index: 99999 !important;" onclick="this.classList.add('hidden')">
     <div style="position: absolute; top: 10px; left: 10px; color: rgba(255,255,255,0.2); font-size: 10px; pointer-events: none;">v17</div>
     <div class="neon-modal" onclick="event.stopPropagation()">
@@ -280,13 +272,13 @@
         </div>
         <div class="wallet-option" onclick="window.connectWallet('phantom')">
           <div class="wallet-icon-wrapper"><img src="https://icon.horse/icon/phantom.app" alt="Phantom"></div>
-          <span>Phantom Wallet</span>
+          <span>Phantom</span>
           <div class="wallet-badge badge-installed hidden" data-wallet="phantom">INSTALLED</div>
           <div class="wallet-arrow"></div>
         </div>
         <div class="wallet-option" onclick="window.connectWallet('okx')">
           <div class="wallet-icon-wrapper"><img src="https://icon.horse/icon/okx.com" alt="OKX"></div>
-          <span>OKX Wallet</span>
+          <span>OKX</span>
           <div class="wallet-badge badge-installed hidden" data-wallet="okx">INSTALLED</div>
           <div class="wallet-arrow"></div>
         </div>
@@ -298,13 +290,13 @@
         </div>
         <div class="wallet-option" onclick="window.connectWallet('rabby')">
           <div class="wallet-icon-wrapper"><img src="https://icon.horse/icon/rabby.io" alt="Rabby"></div>
-          <span>Rabby Wallet</span>
+          <span>Rabby</span>
           <div class="wallet-badge badge-installed hidden" data-wallet="rabby">INSTALLED</div>
           <div class="wallet-arrow"></div>
         </div>
         <div class="wallet-option" onclick="window.connectWallet('abstract')">
           <div class="wallet-icon-wrapper"><img src="https://icon.horse/icon/abs.xyz" alt="Abstract"></div>
-          <span>Abstract Wallet</span>
+          <span>Abstract</span>
           <div class="wallet-arrow"></div>
         </div>
       </div>

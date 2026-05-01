@@ -156,8 +156,14 @@ h1, h2, h3, h4 { font-family: 'Fredoka One', cursive; font-weight: normal; }
 
 /* --- TOP ROW --- */
 .top-row { display: flex; gap: 15px; height: 500px; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-.top-row.wide-mode .menu-card { display: none !important; }
-.top-row.wide-mode .game-card { flex: 1 !important; width: 100% !important; max-width: 100% !important; }
+.top-row.wide-mode { flex-direction: column; height: auto !important; gap: 15px; }
+.top-row.wide-mode .game-card { flex: none !important; width: 100% !important; height: 500px; }
+.top-row.wide-mode .menu-card { width: 100%; flex-direction: row !important; height: auto; min-height: 80px; padding: 15px 25px; justify-content: space-between; gap: 30px; }
+.top-row.wide-mode .menu-title-area { flex-direction: row !important; margin: 0; gap: 30px; flex: 0 1 auto; }
+.top-row.wide-mode .menu-buttons { flex-direction: row !important; margin: 0; gap: 12px; flex: 1; justify-content: center; }
+.top-row.wide-mode .user-profile-area { max-width: 220px; }
+.top-row.wide-mode .btn-aaa { padding: 8px 15px; font-size: 0.9rem; }
+.top-row.wide-mode .menu-top { display: none; }
 
 .game-card { flex: 1; border-radius: 20px; overflow: hidden; position: relative; box-shadow: 0 20px 40px rgba(0,0,0,0.6), inset 0 0 0 2px rgba(255,255,255,0.1); display: flex; flex-direction: column; }
 .canvas-wrapper { position: absolute; inset: 0; z-index: 1; background: #000; cursor: pointer;}
@@ -203,8 +209,10 @@ canvas {
 .user-badge { background: rgba(0,0,0,0.4); padding: 6px 12px; border-radius: 12px; display: flex; align-items: center; gap: 8px; font-size: 0.85rem; font-weight: bold; border: 1px solid rgba(255,255,255,0.1); }
 .user-avatar { width: 18px; height: 18px; background: #00e5ff; border-radius: 50%; box-shadow: 0 0 8px #00e5ff;}
 
-.menu-title-area { margin: 10px 0 30px 0; display: flex; align-items: center; gap: 12px; justify-content: center; width: 100%;}
+.menu-title-area { margin: 10px 0 30px 0; display: flex; flex-direction: column; gap: 15px; align-items: center; justify-content: center; width: 100%;}
 .menu-title { font-size: 2.2rem; line-height: 1.1; background: linear-gradient(to bottom, #ffffff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5)); text-align: left;}
+
+.user-profile-area { display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.4); padding: 8px 15px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); width: 100%; max-width: 250px; }
 
 .menu-buttons { display: flex; flex-direction: column; gap: 18px; width: 100%; flex: 1; justify-content: center;}
 

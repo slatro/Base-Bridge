@@ -498,12 +498,27 @@ function stopGrowSound() { if (gainNode) { gainNode.gain.linearRampToValueAtTime
 
 let gameScale = 1.0;
 function resize() {
-  const rect = canvas.parentElement.getBoundingClientRect(); W = rect.width; H = rect.height;
-  canvas.width = W * dpr; canvas.height = H * dpr; ctx.scale(dpr, dpr);
+  // Clear any existing CSS sizing to get a fresh measurement
+  const parent = canvas.parentElement;
+  if (!parent) return;
+
+  const rect = parent.getBoundingClientRect();
+  W = Math.floor(rect.width);
+  H = Math.floor(rect.height);
   
+  if (W <= 0 || H <= 0) return;
+
   // SYSTEM 10: ADAPTIVE SCALING
   // Reference height is 600px. We scale dimensions based on actual H.
   gameScale = Math.max(0.6, Math.min(1.2, H / 600));
+  
+  // Set internal resolution
+  canvas.width = W * dpr;
+  canvas.height = H * dpr;
+  
+  // Reset and set scale
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.scale(dpr, dpr);
   
   platformHeight = H * 0.35;
   character.size = 55 * gameScale;
@@ -514,7 +529,13 @@ function resize() {
     character.y = H - platformHeight; 
   }
 }
-window.addEventListener('resize', resize);
+// Robust resize triggers
+window.addEventListener('resize', () => {
+  resize();
+  setTimeout(resize, 100); // Catch layout shifts
+  setTimeout(resize, 500); // Catch late shifts (e.g. toolbars)
+});
+window.addEventListener('orientationchange', () => setTimeout(resize, 500));
 
 async function updateLeaderboardUI() {
   const container = document.getElementById('lb-rows-container');

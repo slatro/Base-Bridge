@@ -922,54 +922,87 @@ canvas { width: 100%; height: 100%; display: block; }
 
 /* Wallet Picker Modal */
 .wallet-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
   margin-top: 10px;
 }
 .wallet-option {
   display: flex;
   align-items: center;
-  gap: 18px;
-  padding: 16px 24px;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 20px;
+  gap: 15px;
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s ease;
   text-align: left;
+  position: relative;
 }
 .wallet-option:hover {
   background: rgba(255,255,255,0.08);
-  border-color: rgba(0,229,255,0.5);
-  transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+  border-color: rgba(255,255,255,0.2);
+  transform: translateX(4px);
 }
 .wallet-icon-wrapper {
-  width: 44px;
-  height: 44px;
+  width: 36px;
+  height: 36px;
   display: flex;
   justify-content: center;
   align-items: center;
   background: #fff;
-  border-radius: 50%;
-  padding: 6px;
+  border-radius: 10px;
+  padding: 4px;
   flex-shrink: 0;
   overflow: hidden;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
 }
 .wallet-option img {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  border-radius: 50%;
 }
 .wallet-option span {
-  font-weight: 800;
-  font-size: 1.2rem;
+  font-weight: 700;
+  font-size: 1rem;
   color: #fff;
+  flex-grow: 1;
+}
+.wallet-badge {
+  font-size: 0.65rem;
+  font-weight: 900;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.6);
+  text-transform: uppercase;
   letter-spacing: 0.5px;
 }
+.wallet-badge.badge-blue {
+  background: rgba(59, 130, 246, 0.2);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+.wallet-badge.badge-installed {
+  background: rgba(34, 197, 94, 0.1);
+  color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+.wallet-arrow {
+  width: 8px;
+  height: 8px;
+  border-top: 2px solid rgba(255,255,255,0.3);
+  border-right: 2px solid rgba(255,255,255,0.3);
+  transform: rotate(45deg);
+  margin-left: 10px;
+}
+.wallet-option:hover .wallet-arrow {
+  border-color: #fff;
+}
+.wallet-search {
+  background: rgba(255,255,255,0.02);
+  border-style: dashed;
+}
 .wallet-icon-fallback {
-  font-size: 1.8rem;
+  font-size: 1.2rem;
 }

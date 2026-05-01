@@ -1,8 +1,17 @@
 // js/web3.js
 const BASE_MAINNET = 8453;
 const BASE_SEPOLIA = 84532;
+const ABSTRACT_MAINNET = 2741;
 const TARGET_CHAIN = BASE_MAINNET;
 const TARGET_CHAIN_HEX = "0x" + TARGET_CHAIN.toString(16);
+
+const ABSTRACT_NETWORK = {
+  chainId: "0xab5", // 2741
+  chainName: "Abstract Mainnet",
+  nativeCurrency: { name: "ETH", symbol: "ETH", decimals: 18 },
+  rpcUrls: ["https://api.mainnet.abs.xyz"],
+  blockExplorerUrls: ["https://abscan.org/"]
+};
 
 let provider;
 let signer;
@@ -156,12 +165,38 @@ async function initWeb3() {
   btnConnect.addEventListener("click", () => {
     document.getElementById('modal-backdrop').classList.remove('hidden');
     document.getElementById('modal-wallet-picker').classList.remove('hidden');
+    checkInstalledWallets();
   });
 
+  function checkInstalledWallets() {
+      const badges = document.querySelectorAll('.badge-installed');
+      badges.forEach(badge => {
+          const type = badge.getAttribute('data-wallet');
+          let installed = false;
+          if (type === 'metamask') installed = !!(window.ethereum && window.ethereum.isMetaMask);
+          if (type === 'okx') installed = !!window.okxwallet;
+          if (type === 'zerion') installed = !!window.zerionWallet;
+          if (type === 'rabby') installed = !!(window.ethereum && window.ethereum.isRabby);
+          
+          if (installed) badge.classList.remove('hidden');
+          else badge.classList.add('hidden');
+      });
+  }
+
   window.connectWallet = async function(type) {
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 900;
     const dappUrl = window.location.href.split('://')[1]; // strip https://
     
+    if (type === 'walletconnect') {
+        // Fallback to MetaMask deep link for mobile or show info for desktop
+        if (isMobile) {
+            window.open(`https://metamask.app.link/dapp/${dappUrl}`, "_blank");
+        } else {
+            alert("WalletConnect integration coming soon! Please use a browser extension for now.");
+        }
+        return;
+    }
+
     if (type === 'metamask' && isMobile && !window.ethereum) {
         window.open(`https://metamask.app.link/dapp/${dappUrl}`, "_blank");
         return;
@@ -172,6 +207,7 @@ async function initWeb3() {
     if (type === 'phantom') p = window.phantom?.ethereum || (window.ethereum && window.ethereum.isPhantom ? window.ethereum : null);
     if (type === 'zerion') p = window.zerionWallet || (window.ethereum && window.ethereum.isZerion ? window.ethereum : null);
     if (type === 'okx') p = window.okxwallet || (window.ethereum && window.ethereum.isOKXWallet ? window.ethereum : null);
+    if (type === 'abstract') p = window.abstract || window.ethereum; // Simplified
     
     if (!p) {
         const urls = {
@@ -180,9 +216,10 @@ async function initWeb3() {
             phantom: "https://phantom.app/",
             coinbase: "https://www.coinbase.com/wallet",
             zerion: "https://zerion.io/",
-            okx: "https://www.okx.com/web3"
+            okx: "https://www.okx.com/web3",
+            abstract: "https://abs.xyz/"
         };
-        window.open(urls[type], "_blank");
+        if (urls[type]) window.open(urls[type], "_blank");
         return;
     }
 

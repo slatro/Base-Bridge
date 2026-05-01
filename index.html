@@ -10,11 +10,11 @@
 <link rel="icon" type="image/png" href="/favicon.png">
 
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css?v=80">
+<link rel="stylesheet" href="css/styles.css?v=82">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
-<script defer src="js/firebase-config.js?v=80"></script>
-<script defer src="js/web3.js?v=80"></script>
-<script defer src="js/game.js?v=80"></script>
+<script defer src="js/firebase-config.js?v=82"></script>
+<script defer src="js/web3.js?v=82"></script>
+<script defer src="js/game.js?v=82"></script>
 </head>
 <body>
   
@@ -257,29 +257,46 @@
       <p style="color: #94a3b8; font-size: 0.9rem; margin: 10px 0 15px; text-align: left;">Connect your wallet to start playing.</p>
       
       <div class="wallet-grid">
+        <div class="wallet-option" onclick="window.connectWallet('walletconnect')">
+          <div class="wallet-icon-wrapper"><img src="https://walletconnect.com/favicon.ico" alt="WalletConnect"></div>
+          <span>WalletConnect</span>
+          <div class="wallet-badge badge-blue">QR CODE</div>
+          <div class="wallet-arrow"></div>
+        </div>
+        <div class="wallet-option" onclick="window.connectWallet('abstract')">
+          <div class="wallet-icon-wrapper"><img src="https://abs.xyz/favicon.ico" alt="Abstract"></div>
+          <span>Abstract Wallet</span>
+          <div class="wallet-arrow"></div>
+        </div>
         <div class="wallet-option" onclick="window.connectWallet('metamask')">
           <div class="wallet-icon-wrapper"><img src="https://raw.githubusercontent.com/MetaMask/brand-resources/master/SVG/metamask-fox.svg" alt="MetaMask"></div>
           <span>MetaMask</span>
-        </div>
-        <div class="wallet-option" onclick="window.connectWallet('rabby')">
-          <div class="wallet-icon-wrapper"><img src="https://rabby.io/static/media/rabby-logo.0c0a9697.svg" alt="Rabby" onerror="this.src='https://rabby.io/favicon.ico'"></div>
-          <span>Rabby</span>
-        </div>
-        <div class="wallet-option" onclick="window.connectWallet('phantom')">
-          <div class="wallet-icon-wrapper"><img src="https://phantom.app/favicon.ico" alt="Phantom"></div>
-          <span>Phantom</span>
-        </div>
-        <div class="wallet-option" onclick="window.connectWallet('coinbase')">
-          <div class="wallet-icon-wrapper"><img src="https://www.coinbase.com/favicon.ico" alt="Coinbase"></div>
-          <span>Coinbase Wallet</span>
-        </div>
-        <div class="wallet-option" onclick="window.connectWallet('zerion')">
-          <div class="wallet-icon-wrapper"><img src="https://zerion.io/static/images/logo.png" alt="Zerion" onerror="this.src='https://s2.coinmarketcap.com/static/img/exchanges/64x64/zerion.png'"></div>
-          <span>Zerion</span>
+          <div class="wallet-badge badge-installed hidden" data-wallet="metamask">INSTALLED</div>
+          <div class="wallet-arrow"></div>
         </div>
         <div class="wallet-option" onclick="window.connectWallet('okx')">
           <div class="wallet-icon-wrapper"><img src="https://www.okx.com/favicon.ico" alt="OKX"></div>
           <span>OKX Wallet</span>
+          <div class="wallet-badge badge-installed hidden" data-wallet="okx">INSTALLED</div>
+          <div class="wallet-arrow"></div>
+        </div>
+        <div class="wallet-option" onclick="window.connectWallet('zerion')">
+          <div class="wallet-icon-wrapper"><img src="https://zerion.io/static/images/logo.png" alt="Zerion" onerror="this.src='https://s2.coinmarketcap.com/static/img/exchanges/64x64/zerion.png'"></div>
+          <span>Zerion</span>
+          <div class="wallet-badge badge-installed hidden" data-wallet="zerion">INSTALLED</div>
+          <div class="wallet-arrow"></div>
+        </div>
+        <div class="wallet-option" onclick="window.connectWallet('rabby')">
+          <div class="wallet-icon-wrapper"><img src="https://rabby.io/static/media/rabby-logo.0c0a9697.svg" alt="Rabby" onerror="this.src='https://rabby.io/favicon.ico'"></div>
+          <span>Rabby Wallet</span>
+          <div class="wallet-badge badge-installed hidden" data-wallet="rabby">INSTALLED</div>
+          <div class="wallet-arrow"></div>
+        </div>
+        <div class="wallet-option wallet-search">
+          <div class="wallet-icon-wrapper" style="background: rgba(255,255,255,0.1);"><div class="wallet-icon-fallback">🔍</div></div>
+          <span>Search Wallet</span>
+          <div class="wallet-badge">540+</div>
+          <div class="wallet-arrow"></div>
         </div>
       </div>
     </div>

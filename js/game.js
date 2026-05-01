@@ -2138,6 +2138,14 @@ function updateLevelUI() {
 }
 
 function startGame() {
+  if (!window.userAddress) {
+    if (typeof showInfoModal === 'function') {
+      showInfoModal('Wallet Required', 'You must connect your wallet to play Base Bridge and submit scores!');
+    }
+    document.getElementById('modal-wallet-picker')?.classList.remove('hidden');
+    document.getElementById('modal-backdrop')?.classList.remove('hidden');
+    return;
+  }
   initAudio();
   score = 0; level = 1;
   perfectStreak = 0; sessionBestCombo = 0; sessionPerfects = 0; sessionCoins = 0;

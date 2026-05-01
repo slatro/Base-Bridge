@@ -2440,46 +2440,61 @@ async function toggleFullScreen() {
   if (!container) return;
   
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  const isNativeSupported = !!(container.requestFullscreen || container.webkitRequestFullscreen || container.mozRequestFullScreen || container.msRequestFullscreen);
+  const isCurrentlyFull = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement || container.classList.contains('fake-fullscreen'));
 
-  if (!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
-    try {
-      if (container.requestFullscreen) await container.requestFullscreen();
-      else if (container.mozRequestFullScreen) await container.mozRequestFullScreen();
-      else if (container.webkitRequestFullScreen) await container.webkitRequestFullScreen();
-      else if (container.msRequestFullscreen) await container.msRequestFullscreen();
-      
-      if (isMobile) {
-        container.classList.add('force-landscape');
-        // Attempt to lock orientation if API is available
-        if (screen.orientation && screen.orientation.lock) {
-          await screen.orientation.lock('landscape').catch(() => {});
-        }
+  if (!isCurrentlyFull) {
+    // ENTER FULLSCREEN
+    if (isNativeSupported) {
+      try {
+        if (container.requestFullscreen) await container.requestFullscreen();
+        else if (container.webkitRequestFullscreen) await container.webkitRequestFullscreen();
+        else if (container.mozRequestFullScreen) await container.mozRequestFullScreen();
+        else if (container.msRequestFullscreen) await container.msRequestFullscreen();
+      } catch (err) {
+        console.warn("Native fullscreen failed, falling back to fake:", err);
+        container.classList.add('fake-fullscreen');
+        document.body.classList.add('overflow-hidden');
       }
-    } catch (err) {
-      console.error("Fullscreen error:", err);
+    } else {
+      container.classList.add('fake-fullscreen');
+      document.body.classList.add('overflow-hidden');
     }
+
+    if (isMobile) {
+      container.classList.add('force-landscape');
+      if (screen.orientation && screen.orientation.lock) {
+        await screen.orientation.lock('landscape').catch(() => {});
+      }
+    }
+    setTimeout(resize, 300);
   } else {
+    // EXIT FULLSCREEN
+    if (isNativeSupported && !container.classList.contains('fake-fullscreen')) {
+      if (document.exitFullscreen) document.exitFullscreen();
+      else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+      else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
+      else if (document.msExitFullscreen) document.msExitFullscreen();
+    }
+    
+    container.classList.remove('fake-fullscreen');
     container.classList.remove('force-landscape');
-    if (document.exitFullscreen) document.exitFullscreen();
-    else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
-    else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-    else if (document.msExitFullscreen) document.msExitFullscreen();
+    document.body.classList.remove('overflow-hidden');
     
     if (isMobile && screen.orientation && screen.orientation.unlock) {
       screen.orientation.unlock();
     }
+    setTimeout(resize, 300);
   }
 }
 
 // Handle fullscreen change to resize canvas
-document.addEventListener('fullscreenchange', () => {
-  setTimeout(resize, 300); // Increased delay for mobile orientation settling
-});
-document.addEventListener('webkitfullscreenchange', () => {
-  setTimeout(resize, 300);
+const fsEvents = ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'msfullscreenchange'];
+fsEvents.forEach(evt => {
+  document.addEventListener(evt, () => setTimeout(resize, 300));
 });
 
-document.getElementById('btn-fullscreen')?.addEventListener('pointerdown', (e) => {
+document.getElementById('btn-fullscreen')?.addEventListener('click', (e) => {
   e.preventDefault();
   toggleFullScreen();
 });

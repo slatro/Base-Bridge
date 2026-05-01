@@ -561,7 +561,8 @@ canvas {
   position: fixed; inset: 0; 
   background: rgba(0,0,0,0.85); 
   backdrop-filter: blur(15px); 
-  display: flex; justify-content: center; align-items: center; 
+  display: grid; 
+  place-items: center;
   z-index: 99999999; 
   animation: fadeIn 0.2s ease-out;
 }
@@ -580,6 +581,8 @@ canvas {
   overflow: visible;
   animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
 }
+#modal-info { z-index: 1000; }
+#modal-daily-calendar { z-index: 500; }
 .modal-close {
   position: absolute;
   top: 20px;

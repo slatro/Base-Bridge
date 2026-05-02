@@ -2420,6 +2420,12 @@ function triggerGameOver() {
   // Trigger cloud sync to save coins and new best score
   if (typeof window.syncDataToCloud === 'function') window.syncDataToCloud();
 
+  if (isNewBest && score > 0) {
+    if (typeof window.submitScoreToFirebase === 'function') {
+      window.submitScoreToFirebase(score);
+    }
+  }
+
   const uiHeader = document.getElementById('game-header-ui');
   if (uiHeader) {
     uiHeader.style.opacity = '0';

@@ -422,7 +422,7 @@ window.wipeLocalGameState = function() {
     const keysToRemove = [];
     for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
-        if (key && key.startsWith('bb_v') && key !== 'bb_v1_uuid' && key !== 'bb_v1_disconnected') {
+        if (key && key.startsWith('bb_v') && key !== 'bb_v1_disconnected') {
             keysToRemove.push(key);
         }
     }

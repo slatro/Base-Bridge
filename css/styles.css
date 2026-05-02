@@ -262,7 +262,7 @@ canvas {
 .panels-row { display: flex; gap: 15px; height: 280px; }
 
 .panel-card { padding: 20px; display: flex; flex-direction: column; overflow: hidden; }
-.panel-title { font-size: 1.1rem; color: #fff; margin-bottom: 12px; text-align: center; text-shadow: 0 0 10px rgba(0,229,255,0.3); opacity: 0.9; flex-shrink: 0;}
+.panel-title { font-size: 1.3rem; color: #fff; margin-bottom: 15px; text-align: center; text-shadow: 0 0 15px rgba(0,229,255,0.4); opacity: 1; flex-shrink: 0; text-transform: uppercase; letter-spacing: 1px; }
 
 /* Onchain Integrations */
 .onchain-panel { flex: 1.2; display: flex; flex-direction: column; }

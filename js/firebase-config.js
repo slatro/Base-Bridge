@@ -22,12 +22,21 @@ window.fetchFirebaseLeaderboard = async function() {
 window.submitScoreToFirebase = async function(score) {
     try {
         const username = localStorage.getItem('bb_v1_username') || "Player";
+        const userWallet = (window.userAddress || "").toLowerCase();
         
         // 1. Fetch current leaderboard
         let currentBoard = await window.fetchFirebaseLeaderboard();
         
         let myUUID = localStorage.getItem('bb_v1_uuid') || "unknown";
-        let existingIndex = currentBoard.findIndex(e => e.uuid === myUUID || (e.addr === username && username !== "Player"));
+        
+        // 2. Find existing entry (Prioritize wallet, then UUID)
+        let existingIndex = -1;
+        if (userWallet) {
+            existingIndex = currentBoard.findIndex(e => e.wallet === userWallet);
+        }
+        if (existingIndex === -1 && myUUID !== "unknown") {
+            existingIndex = currentBoard.findIndex(e => e.uuid === myUUID);
+        }
         
         if (existingIndex >= 0) {
             if (score > currentBoard[existingIndex].score) {
@@ -36,18 +45,20 @@ window.submitScoreToFirebase = async function(score) {
             }
             currentBoard[existingIndex].addr = username;
             currentBoard[existingIndex].uuid = myUUID;
+            if (userWallet) currentBoard[existingIndex].wallet = userWallet;
         } else {
             currentBoard.push({
                 uuid: myUUID,
                 addr: username,
+                wallet: userWallet,
                 score: score,
                 timestamp: new Date().getTime()
             });
         }
         
-        // 3. Sort descending and keep top 10
+        // 3. Sort descending and keep top 100
         currentBoard.sort((a,b) => b.score - a.score);
-        currentBoard = currentBoard.slice(0, 10);
+        currentBoard = currentBoard.slice(0, 100);
         
         // 4. Save back to KVDB
         await fetch(KVDB_URL, {

@@ -406,6 +406,12 @@ async function handleConnect(account) {
 
   lblBest.innerText = localStorage.getItem('bb_v1_best') || "0";
   
+  // Retroactive migration: Push cloud-restored score to global leaderboard
+  const restoredBest = parseInt(localStorage.getItem('bb_v1_best') || "0");
+  if (restoredBest > 0 && typeof window.submitScoreToFirebase === 'function') {
+      window.submitScoreToFirebase(restoredBest);
+  }
+
   if (typeof updateLeaderboardUI === 'function') updateLeaderboardUI();
   
   await checkNetwork();

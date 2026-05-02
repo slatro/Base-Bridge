@@ -293,20 +293,37 @@ canvas {
 .dr-btn-wrapper { width: 100%; flex-shrink: 0; padding-bottom: 0;}
 
 /* Leaderboard */
-.leaderboard-panel { flex: 1; }
-.lb-tabs { display: flex; gap: 5px; margin-bottom: 15px; background: rgba(0,0,0,0.3); padding: 5px; border-radius: 10px; }
-.lb-tab { flex: 1; background: transparent; border: none; color: var(--text-dim); font-weight: 800; padding: 8px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; }
-.lb-tab.active { background: #00e5ff; color: #000; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-.lb-rows { display: flex; flex-direction: column; gap: 8px; overflow-y: auto; flex:1;}
-.lb-row { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); padding: 12px 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);}
-.lb-rank { width: 28px; height: 28px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-family: 'Fredoka One'; font-size: 1rem; box-shadow: inset 0 0 5px rgba(0,0,0,0.5);}
-.rank-1 { background: #ffd700; color: #854d0e; }
-.rank-2 { background: #e2e8f0; color: #334155; }
-.rank-3 { background: #cd7f32; color: #fff; }
-.rank-4 { background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.2);}
-.lb-addr { font-family: monospace; color: #ccd6f6; flex: 1; margin-left: 15px; font-size: 1rem;}
-.lb-score { font-family: 'Fredoka One'; color: #00e5ff; font-size: 1.1rem;}
-.lb-empty { text-align: center; color: var(--text-dim); font-style: italic; margin-top: 30px; }
+.leaderboard-panel { flex: 1; padding: 20px; }
+.panel-title { font-size: 1.1rem; color: #fff; margin-bottom: 12px; text-align: center; text-shadow: 0 0 10px rgba(0,229,255,0.3); opacity: 0.9; }
+
+.lb-rows { display: flex; flex-direction: column; gap: 6px; overflow-y: auto; flex:1; padding-right: 4px; }
+.lb-rows::-webkit-scrollbar { width: 4px; }
+.lb-rows::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+
+.lb-row { 
+  display: flex; justify-content: space-between; align-items: center; 
+  background: rgba(255,255,255,0.03); 
+  padding: 8px 12px; 
+  border-radius: 12px; 
+  border: 1px solid rgba(255,255,255,0.05);
+  transition: 0.2s;
+}
+.lb-row:hover { background: rgba(255,255,255,0.07); transform: scale(1.02); border-color: rgba(0,229,255,0.2); }
+
+.lb-rank { 
+  width: 24px; height: 24px; border-radius: 6px; 
+  display: flex; justify-content: center; align-items: center; 
+  font-family: 'Fredoka One'; font-size: 0.85rem; 
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+.rank-1 { background: linear-gradient(135deg, #ffd700, #b8860b); color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+.rank-2 { background: linear-gradient(135deg, #e2e8f0, #94a3b8); color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+.rank-3 { background: linear-gradient(135deg, #cd7f32, #8b4513); color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+.rank-4 { background: rgba(0,0,0,0.3); color: #94a3b8; border: 1px solid rgba(255,255,255,0.1);}
+
+.lb-addr { font-family: 'Nunito'; font-weight: 700; color: #cbd5e1; flex: 1; margin-left: 12px; font-size: 0.85rem; letter-spacing: 0.2px; }
+.lb-score { font-family: 'Fredoka One'; color: #00e5ff; font-size: 1rem; text-shadow: 0 0 10px rgba(0,229,255,0.4); }
+.lb-empty { text-align: center; color: var(--text-dim); font-style: italic; margin-top: 20px; font-size: 0.85rem; opacity: 0.6; }
 
 /* --- SKINS FOOTER --- */
 .skins-footer { display: flex; justify-content: space-between; align-items: center; padding: 20px 30px; height: 160px; position: relative;}
